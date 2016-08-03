@@ -1,6 +1,6 @@
 //
-//  LinuxRunnersTests.swift
-//  LinuxRunnersTests
+//  XcodeHelpersTests.swift
+//  XcodeHelpersTests
 //
 //  Created by Joel Saltzman on 7/30/16.
 //
@@ -9,11 +9,16 @@
 import XCTest
 import TaskExtension
 import DockerTask
+#if os(OSX) || os(iOS)
+    import Darwin
+#elseif os(Linux)
+    import Glibc
+#endif
 
 @testable
-import LinuxRunner
+import XcodeHelper
 
-class LinuxRunnersTests: XCTestCase {
+class XcodeHelperTests: XCTestCase {
     
     var sourcePath : String?
     
@@ -34,7 +39,7 @@ class LinuxRunnersTests: XCTestCase {
     private func cloneToTempDirectory() -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
         let tempDir = "/tmp/\(UUID())/"
-        let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", "https://github.com/saltzmanjoelh/LinuxRunner.git", tempDir], silenceOutput: false)
+        let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", "https://github.com/saltzmanjoelh/XcodeHelper.git", tempDir], silenceOutput: false)
         XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
@@ -43,12 +48,12 @@ class LinuxRunnersTests: XCTestCase {
     
     func testUpdateSymLinks() {
         let packages = ["TaskExtension", "DockerTask"]
-        let runner = LinuxRunner()
+        let helper = XcodeHelper()
         
         do {
             print("updating sym links at: \(sourcePath)")
-            try runner.build(source: sourcePath!, usingConfiguration: .debug)
-            try runner.updateSymLinks(sourcePath: sourcePath!)
+            try helper.build(source: sourcePath!, usingConfiguration: .debug)
+            try helper.updateSymLinks(sourcePath: sourcePath!)
         }catch let e {
             XCTFail("Error: \(e)")
         }
@@ -57,17 +62,17 @@ class LinuxRunnersTests: XCTestCase {
             let path = sourcePath!.appending("Packages/\(package)")
             var isDirectory: ObjCBool = false
             XCTAssertTrue(FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), "Failed to find \(path)")
-            XCTAssertTrue(isDirectory, "\(path) was not a directory")
+            XCTAssertTrue(isDirectory.boolValue, "\(path) was not a directory")
         }
     }
     
     func testCleanLinuxBuilds() {
         //run DockTask with new repo and build in both debug and release, verify .build dir, cleanLinuxBuild
 //
-//        let helper = LinuxRunner()
+//        let helper = XcodeHelper()
 //        for subPath in helper.buildSubPaths {
 //            guard let prefix = subPath.range(of: "/")?.lowerBound, let suffix = subPath.range(of: ".yaml")?.lowerBound else {
-//                XCTFail("Failed to parse LinuxRunner.buildSubPath configurations")
+//                XCTFail("Failed to parse XcodeHelper.buildSubPath configurations")
 //                return
 //            }
 //            let range = subPath.index(after:prefix)..<subPath.index(before:suffix)

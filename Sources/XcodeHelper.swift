@@ -1,5 +1,5 @@
 //xcode -> swift package fetch
-//PreBuild -> Packages/LinuxRunners*/ 
+//PreBuild -> Packages/XcodeHelpers*/ 
 
 import Foundation
 import TaskExtension
@@ -23,13 +23,13 @@ enum BuildConfiguration {
     }
 }
 
-enum LinuxRunnerError : ErrorProtocol {
+enum XcodeHelperError : Error {
     case CleanError(message:String)
     case BuildError(message:String)
     case UpdateSymLinksError(message:String)
 }
 
-struct LinuxRunner {
+struct XcodeHelper {
     
     func bash(command:String) throws -> [String] {
         return ["/bin/bash", "-c", command]
@@ -41,7 +41,7 @@ struct LinuxRunner {
         }
         let result = DockerTask(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath], imageName: imageName, commandArgs: ["/usr/bin/swift", "build"]).launch()
         if let error = result.error, result.exitCode != 0 {
-            throw LinuxRunnerError.BuildError(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
+            throw XcodeHelperError.BuildError(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
         }
     }
     
@@ -49,7 +49,7 @@ struct LinuxRunner {
         let yamlPath = configuration.yamlPath(inSourcePath:sourcePath)
         if FileManager.default.isReadableFile(atPath: yamlPath) {
             let yamlFile = try String(contentsOfFile: yamlPath)
-            return !yamlFile.contains("\"-target\",\"x86_64-apple")//if we have a file and it contains apple target, don't clean
+            return yamlFile.contains("\"-target\",\"x86_64-apple")//if we have a file and it contains apple target, clean
         }
         
         //otherwise, clean if there is a build path but the file isn't readable
@@ -60,7 +60,7 @@ struct LinuxRunner {
         //We can use Task instead of firing up Docker because the end result is the same. A clean .build dir
         let result = Task.run(launchPath: "/usr/bin/swift", arguments: ["build", "--clean"])
         if result.exitCode != 0, let error = result.error {
-            throw LinuxRunnerError.CleanError(message: "Error cleaning: \(error)")
+            throw XcodeHelperError.CleanError(message: "Error cleaning: \(error)")
         }
     }
     
@@ -69,12 +69,12 @@ struct LinuxRunner {
         //iterate Packages dir and create symlinks without the -Ver.sion.#
         let path = sourcePath.hasSuffix("/") ? sourcePath.appending("Packages/") : sourcePath.appending("/Packages/")
         guard FileManager.default.fileExists(atPath: path) else {
-            throw LinuxRunnerError.UpdateSymLinksError(message: "Failed to find directory: \(path)")
+            throw XcodeHelperError.UpdateSymLinksError(message: "Failed to find directory: \(path)")
         }
         for directory in try FileManager.default.contentsOfDirectory(atPath: path) {
             let versionedPackageName = "\(directory)"
             if versionedPackageName.hasPrefix(".") || versionedPackageName.range(of: "-")?.lowerBound == nil {
-                continue//if it begins with . or doesn't have the - in it like LinuxRunner-1.0.0, skip it
+                continue//if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
             }
             //remove the - version number from name and create sym link
             let packageName = versionedPackageName.substring(to: versionedPackageName.range(of: "-")!.lowerBound)
