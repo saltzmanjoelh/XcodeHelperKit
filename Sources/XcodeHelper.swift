@@ -39,7 +39,13 @@ struct XcodeHelper {
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
             try clean(sourcePath: sourcePath)
         }
-        let result = DockerTask(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath], imageName: imageName, commandArgs: ["/usr/bin/swift", "build"]).launch()
+        //At the moment, building directly from a mounted volume gives errors like "error: Could not create file ... /.Package.toml"
+        //rsync the files to the root of the disk (excluding .build dir) the replace the build
+//        let buildDir = configuration.buildDirectory(inSourcePath: sourcePath)
+//        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
+        //simple build doesn't work
+        let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
+        let result = DockerTask(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch()
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.BuildError(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
         }
@@ -58,12 +64,13 @@ struct XcodeHelper {
     
     func clean(sourcePath:String) throws {
         //We can use Task instead of firing up Docker because the end result is the same. A clean .build dir
-        let result = Task.run(launchPath: "/usr/bin/swift", arguments: ["build", "--clean"])
+        let result = Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.CleanError(message: "Error cleaning: \(error)")
         }
     }
     
+    //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     func updateSymLinks(sourcePath:String) throws {
         
         //iterate Packages dir and create symlinks without the -Ver.sion.#

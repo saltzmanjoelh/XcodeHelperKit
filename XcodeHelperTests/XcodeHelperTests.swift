@@ -20,12 +20,14 @@ import XcodeHelper
 
 class XcodeHelperTests: XCTestCase {
     
+//    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
+    let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
+    let libraryRepoURL = "https://github.com/saltzmanjoelh/Hello"
     var sourcePath : String?
     
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
-        sourcePath = cloneToTempDirectory()
     }
     
     override func tearDown() {
@@ -36,10 +38,10 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     //returns the temp dir that we cloned into
-    private func cloneToTempDirectory() -> String? {
+    private func cloneToTempDirectory(repoURL:String) -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
         let tempDir = "/tmp/\(UUID())/"
-        let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", "https://github.com/saltzmanjoelh/XcodeHelper.git", tempDir], silenceOutput: false)
+        let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], silenceOutput: false)
         XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
@@ -47,14 +49,15 @@ class XcodeHelperTests: XCTestCase {
     }
     
     func testUpdateSymLinks() {
-        let packages = ["TaskExtension", "DockerTask"]
+        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        let packages = ["Hello"]
         let helper = XcodeHelper()
         
         do {
             print("updating sym links at: \(sourcePath)")
             try helper.build(source: sourcePath!, usingConfiguration: .debug)
             try helper.updateSymLinks(sourcePath: sourcePath!)
-        }catch let e {
+        } catch let e {
             XCTFail("Error: \(e)")
         }
         
@@ -65,21 +68,38 @@ class XcodeHelperTests: XCTestCase {
             XCTAssertTrue(isDirectory.boolValue, "\(path) was not a directory")
         }
     }
+    func testShouldClean(){
+        //build it in macOS so we know that it needs to be cleaned
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
+        
+        do{
+            let ans = try XcodeHelper().shouldClean(sourcePath: sourcePath!, forConfiguration: .debug)
+            
+            XCTAssertTrue(ans, "shouldClean should have returned true")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+        
+        
+    }
     
     func testCleanLinuxBuilds() {
-        //run DockTask with new repo and build in both debug and release, verify .build dir, cleanLinuxBuild
-//
-//        let helper = XcodeHelper()
-//        for subPath in helper.buildSubPaths {
-//            guard let prefix = subPath.range(of: "/")?.lowerBound, let suffix = subPath.range(of: ".yaml")?.lowerBound else {
-//                XCTFail("Failed to parse XcodeHelper.buildSubPath configurations")
-//                return
-//            }
-//            let range = subPath.index(after:prefix)..<subPath.index(before:suffix)
-//            let configuration = subPath.substring(with: range)
-//            DockerTask.init(command: "run", commandOptions: ["--rm", "-v", "\(tempDir):\(tempDir)"], imageName: "saltzmanjoelh/swiftubuntu", commandArgs: ["/bin/bash", "-c", "swift build -c \(configuration)"]).launch()
-//            XCTAssert(FileManager)
-//        }
+        //build first so that we have something to clean
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
+        let helper = XcodeHelper()
+        
+        do {
+            try helper.clean(sourcePath: sourcePath!)
+            
+            XCTAssertFalse(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory should not found after cleaning")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
     }
     
     

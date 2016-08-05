@@ -57,6 +57,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "38BCE6631D51C7C600D09F56"
+               BuildableName = "XcodeHelperTests.xctest"
+               BlueprintName = "XcodeHelperTests"
+               ReferencedContainer = "container:XcodeHelper.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

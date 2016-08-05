@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38BCE6671D51C7C600D09F56 /* XcodeHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */; };
+		38BCE6691D51C7C600D09F56 /* XcodeHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_XcodeHelper" /* XcodeHelper.framework */; };
 		_LinkFileRef_DockerTask_via_XcodeHelper /* DockerTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_DockerTask" /* DockerTask.framework */; };
 		_LinkFileRef_TaskExtension_via_DockerTask /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
 		_LinkFileRef_TaskExtension_via_XcodeHelper /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
@@ -30,9 +32,19 @@
 			remoteGlobalIDString = "______Target_DockerTask";
 			remoteInfo = DockerTask;
 		};
+		38BCE66A1D51C7C600D09F56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = __RootObject_ /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "______Target_XcodeHelper";
+			remoteInfo = XcodeHelper;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodeHelperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelperTests.swift; sourceTree = "<group>"; };
+		38BCE6681D51C7C600D09F56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		__PBXFileRef_DockerTask_Info.plist /* XcodeHelper.xcodeproj/DockerTask_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/DockerTask_Info.plist; sourceTree = SOURCE_ROOT; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		"__PBXFileRef_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerTask.swift; sourceTree = "<group>"; };
@@ -43,10 +55,18 @@
 		__PBXFileRef_XcodeHelper_Info.plist /* XcodeHelper.xcodeproj/XcodeHelper_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/XcodeHelper_Info.plist; sourceTree = SOURCE_ROOT; };
 		"_____Product_DockerTask" /* DockerTask.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DockerTask.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"_____Product_TaskExtension" /* TaskExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TaskExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"_____Product_XcodeHelper" /* RelativePath(_impl: Basic.(PathImpl in _F37600050464D58680C1E5753557C388)(string: "XcodeHelper.framework")) */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = "RelativePath(_impl: Basic.(PathImpl in _F37600050464D58680C1E5753557C388)(string: \"XcodeHelper.framework\"))"; path = XcodeHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		"_____Product_XcodeHelper" /* XcodeHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XcodeHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		38BCE6611D51C7C600D09F56 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38BCE6691D51C7C600D09F56 /* XcodeHelper.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		"___LinkPhase_DockerTask" /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
@@ -74,6 +94,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		38BCE6651D51C7C600D09F56 /* XcodeHelperTests */ = {
+			isa = PBXGroup;
+			children = (
+				38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */,
+				38BCE6681D51C7C600D09F56 /* Info.plist */,
+			);
+			path = XcodeHelperTests;
+			sourceTree = "<group>";
+		};
 		Dependencies_ /* Dependencies */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,6 +119,7 @@
 				"_____Configs_" /* Configs */,
 				"_____Sources_" /* Sources */,
 				Dependencies_ /* Dependencies */,
+				38BCE6651D51C7C600D09F56 /* XcodeHelperTests */,
 				"____Products_" /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,7 +129,8 @@
 			children = (
 				"_____Product_TaskExtension" /* TaskExtension.framework */,
 				"_____Product_DockerTask" /* DockerTask.framework */,
-				"_____Product_XcodeHelper" /* RelativePath(_impl: Basic.(PathImpl in _F37600050464D58680C1E5753557C388)(string: "XcodeHelper.framework")) */,
+				"_____Product_XcodeHelper" /* XcodeHelper.framework */,
+				38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,6 +184,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		38BCE6631D51C7C600D09F56 /* XcodeHelperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38BCE66E1D51C7C600D09F56 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */;
+			buildPhases = (
+				38BCE6601D51C7C600D09F56 /* Sources */,
+				38BCE6611D51C7C600D09F56 /* Frameworks */,
+				38BCE6621D51C7C600D09F56 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				38BCE66B1D51C7C600D09F56 /* PBXTargetDependency */,
+			);
+			name = XcodeHelperTests;
+			productName = XcodeHelperTests;
+			productReference = 38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		"______Target_DockerTask" /* DockerTask */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = "_______Confs_DockerTask" /* Build configuration list for PBXNativeTarget "DockerTask" */;
@@ -201,7 +250,7 @@
 			);
 			name = XcodeHelper;
 			productName = XcodeHelper;
-			productReference = "_____Product_XcodeHelper" /* RelativePath(_impl: Basic.(PathImpl in _F37600050464D58680C1E5753557C388)(string: "XcodeHelper.framework")) */;
+			productReference = "_____Product_XcodeHelper" /* XcodeHelper.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -210,7 +259,15 @@
 		__RootObject_ /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0800;
 				LastUpgradeCheck = 9999;
+				TargetAttributes = {
+					38BCE6631D51C7C600D09F56 = {
+						CreatedOnToolsVersion = 8.0;
+						DevelopmentTeam = A43A74F4MB;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = "___RootConfs_" /* Build configuration list for PBXProject "XcodeHelper" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -227,11 +284,30 @@
 				"______Target_TaskExtension" /* TaskExtension */,
 				"______Target_DockerTask" /* DockerTask */,
 				"______Target_XcodeHelper" /* XcodeHelper */,
+				38BCE6631D51C7C600D09F56 /* XcodeHelperTests */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		38BCE6621D51C7C600D09F56 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		38BCE6601D51C7C600D09F56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38BCE6671D51C7C600D09F56 /* XcodeHelperTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CompilePhase_DockerTask /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
@@ -259,6 +335,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		38BCE66B1D51C7C600D09F56 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "______Target_XcodeHelper" /* XcodeHelper */;
+			targetProxy = 38BCE66A1D51C7C600D09F56 /* PBXContainerItemProxy */;
+		};
 		__Dependency_DockerTask /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_DockerTask" /* DockerTask */;
@@ -272,6 +353,110 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		38BCE66C1D51C7C600D09F56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = A43A74F4MB;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = XcodeHelperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelsaltzman.XcodeHelperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		38BCE66D1D51C7C600D09F56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = A43A74F4MB;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = XcodeHelperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelsaltzman.XcodeHelperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		_ReleaseConf_DockerTask /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -388,6 +573,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		38BCE66E1D51C7C600D09F56 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38BCE66C1D51C7C600D09F56 /* Debug */,
+				38BCE66D1D51C7C600D09F56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		"___RootConfs_" /* Build configuration list for PBXProject "XcodeHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
