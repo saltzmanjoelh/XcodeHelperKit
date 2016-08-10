@@ -102,5 +102,47 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     
-    
+    func testArchiveFlatList(){
+        let helper = XcodeHelper()
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let archivePath = "\(sourcePath!)test.tar"
+        
+        do{
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: true)
+            
+            XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
+            let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
+            Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+        
+            let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
+            XCTAssertEqual(contents.count, 2, "There should be exactly 2 files")
+            XCTAssertFalse("\(contents)".contains("tmp"), "Flat list archiving shouldn't contain a directory structure")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testStructuredArchive(){
+        let helper = XcodeHelper()
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let archivePath = "\(sourcePath!)test.tar"
+        
+        do{
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: false)
+            
+            XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
+            let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
+            Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+        
+            let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
+            XCTAssertEqual(contents.count, 1, "There should be a root tmp directory")
+            //make sure the subPath contains the structure from the archive
+            XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: subPath.appending(sourcePath!)).count, 2, "There should be one Package.swift file and a Sources directory")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+
+    func testUploadArchive(){
+        
+    }
 }

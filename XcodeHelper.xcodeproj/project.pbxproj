@@ -7,32 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		38BCE6671D51C7C600D09F56 /* XcodeHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */; };
-		38BCE6691D51C7C600D09F56 /* XcodeHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_XcodeHelper" /* XcodeHelper.framework */; };
+		CC1BCCD21D5B11870031B0F1 /* XcodeHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1BCCD11D5B11870031B0F1 /* XcodeHelperTests.swift */; };
+		CC1BCCD41D5B11870031B0F1 /* XcodeHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_XcodeHelper" /* XcodeHelper.framework */; };
 		_LinkFileRef_DockerTask_via_XcodeHelper /* DockerTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_DockerTask" /* DockerTask.framework */; };
 		_LinkFileRef_TaskExtension_via_DockerTask /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
 		_LinkFileRef_TaskExtension_via_XcodeHelper /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
-		"__src_cc_ref_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift */; };
-		"__src_cc_ref_Packages/TaskExtension-1.0.4/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/TaskExtension-1.0.4/Sources/TaskExtension.swift" /* TaskExtension.swift */; };
+		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift */; };
+		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift */; };
+		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift */; };
+		"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */; };
 		__src_cc_ref_Sources/XcodeHelper.swift /* XcodeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/XcodeHelper.swift /* XcodeHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		38BCE6591D51C21B00D09F56 /* PBXContainerItemProxy */ = {
+		CC1BCCC91D5B11430031B0F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "______Target_TaskExtension";
 			remoteInfo = TaskExtension;
 		};
-		38BCE65A1D51C21B00D09F56 /* PBXContainerItemProxy */ = {
+		CC1BCCCA1D5B11430031B0F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "______Target_DockerTask";
 			remoteInfo = DockerTask;
 		};
-		38BCE66A1D51C7C600D09F56 /* PBXContainerItemProxy */ = {
+		CC1BCCD51D5B11870031B0F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
@@ -42,13 +44,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodeHelperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelperTests.swift; sourceTree = "<group>"; };
-		38BCE6681D51C7C600D09F56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC1BCCCF1D5B11860031B0F1 /* XcodeHelperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodeHelperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC1BCCD11D5B11870031B0F1 /* XcodeHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelperTests.swift; sourceTree = "<group>"; };
+		CC1BCCD31D5B11870031B0F1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		__PBXFileRef_DockerTask_Info.plist /* XcodeHelper.xcodeproj/DockerTask_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/DockerTask_Info.plist; sourceTree = SOURCE_ROOT; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		"__PBXFileRef_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerTask.swift; sourceTree = "<group>"; };
-		"__PBXFileRef_Packages/TaskExtension-1.0.4/Sources/TaskExtension.swift" /* TaskExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExtension.swift; sourceTree = "<group>"; };
+		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerForMacTask.swift; sourceTree = "<group>"; };
+		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerTask.swift; sourceTree = "<group>"; };
+		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerToolboxTask.swift; sourceTree = "<group>"; };
+		"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExtension.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/XcodeHelper.swift /* XcodeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelper.swift; sourceTree = "<group>"; };
 		__PBXFileRef_TaskExtension_Info.plist /* XcodeHelper.xcodeproj/TaskExtension_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/TaskExtension_Info.plist; sourceTree = SOURCE_ROOT; };
 		__PBXFileRef_XcodeHelper.xcodeproj/Configs/Project.xcconfig /* XcodeHelper.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XcodeHelper.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
@@ -59,11 +63,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		38BCE6611D51C7C600D09F56 /* Frameworks */ = {
+		CC1BCCCC1D5B11860031B0F1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38BCE6691D51C7C600D09F56 /* XcodeHelper.framework in Frameworks */,
+				CC1BCCD41D5B11870031B0F1 /* XcodeHelper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,11 +98,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		38BCE6651D51C7C600D09F56 /* XcodeHelperTests */ = {
+		CC1BCCD01D5B11870031B0F1 /* XcodeHelperTests */ = {
 			isa = PBXGroup;
 			children = (
-				38BCE6661D51C7C600D09F56 /* XcodeHelperTests.swift */,
-				38BCE6681D51C7C600D09F56 /* Info.plist */,
+				CC1BCCD11D5B11870031B0F1 /* XcodeHelperTests.swift */,
+				CC1BCCD31D5B11870031B0F1 /* Info.plist */,
 			);
 			path = XcodeHelperTests;
 			sourceTree = "<group>";
@@ -119,7 +123,7 @@
 				"_____Configs_" /* Configs */,
 				"_____Sources_" /* Sources */,
 				Dependencies_ /* Dependencies */,
-				38BCE6651D51C7C600D09F56 /* XcodeHelperTests */,
+				CC1BCCD01D5B11870031B0F1 /* XcodeHelperTests */,
 				"____Products_" /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,7 +134,7 @@
 				"_____Product_TaskExtension" /* TaskExtension.framework */,
 				"_____Product_DockerTask" /* DockerTask.framework */,
 				"_____Product_XcodeHelper" /* XcodeHelper.framework */,
-				38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */,
+				CC1BCCCF1D5B11860031B0F1 /* XcodeHelperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,21 +158,23 @@
 		"_______Group_DockerTask" /* DockerTask */ = {
 			isa = PBXGroup;
 			children = (
-				"__PBXFileRef_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift */,
+				"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift */,
+				"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift */,
+				"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift */,
 				__PBXFileRef_DockerTask_Info.plist /* XcodeHelper.xcodeproj/DockerTask_Info.plist */,
 			);
 			name = DockerTask;
-			path = "Packages/DockerTask-1.0.4/Sources";
+			path = "Packages/DockerTask-1.0.5/Sources";
 			sourceTree = "<group>";
 		};
 		"_______Group_TaskExtension" /* TaskExtension */ = {
 			isa = PBXGroup;
 			children = (
-				"__PBXFileRef_Packages/TaskExtension-1.0.4/Sources/TaskExtension.swift" /* TaskExtension.swift */,
+				"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */,
 				__PBXFileRef_TaskExtension_Info.plist /* XcodeHelper.xcodeproj/TaskExtension_Info.plist */,
 			);
 			name = TaskExtension;
-			path = "Packages/TaskExtension-1.0.4/Sources";
+			path = "Packages/TaskExtension-1.0.5/Sources";
 			sourceTree = "<group>";
 		};
 		"_______Group_XcodeHelper" /* XcodeHelper */ = {
@@ -184,22 +190,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		38BCE6631D51C7C600D09F56 /* XcodeHelperTests */ = {
+		CC1BCCCE1D5B11860031B0F1 /* XcodeHelperTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38BCE66E1D51C7C600D09F56 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */;
+			buildConfigurationList = CC1BCCD71D5B11870031B0F1 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */;
 			buildPhases = (
-				38BCE6601D51C7C600D09F56 /* Sources */,
-				38BCE6611D51C7C600D09F56 /* Frameworks */,
-				38BCE6621D51C7C600D09F56 /* Resources */,
+				CC1BCCCB1D5B11860031B0F1 /* Sources */,
+				CC1BCCCC1D5B11860031B0F1 /* Frameworks */,
+				CC1BCCCD1D5B11860031B0F1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				38BCE66B1D51C7C600D09F56 /* PBXTargetDependency */,
+				CC1BCCD61D5B11870031B0F1 /* PBXTargetDependency */,
 			);
 			name = XcodeHelperTests;
 			productName = XcodeHelperTests;
-			productReference = 38BCE6641D51C7C600D09F56 /* XcodeHelperTests.xctest */;
+			productReference = CC1BCCCF1D5B11860031B0F1 /* XcodeHelperTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		"______Target_DockerTask" /* DockerTask */ = {
@@ -262,9 +268,8 @@
 				LastSwiftUpdateCheck = 0800;
 				LastUpgradeCheck = 9999;
 				TargetAttributes = {
-					38BCE6631D51C7C600D09F56 = {
+					CC1BCCCE1D5B11860031B0F1 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = A43A74F4MB;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -284,13 +289,13 @@
 				"______Target_TaskExtension" /* TaskExtension */,
 				"______Target_DockerTask" /* DockerTask */,
 				"______Target_XcodeHelper" /* XcodeHelper */,
-				38BCE6631D51C7C600D09F56 /* XcodeHelperTests */,
+				CC1BCCCE1D5B11860031B0F1 /* XcodeHelperTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		38BCE6621D51C7C600D09F56 /* Resources */ = {
+		CC1BCCCD1D5B11860031B0F1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -300,11 +305,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		38BCE6601D51C7C600D09F56 /* Sources */ = {
+		CC1BCCCB1D5B11860031B0F1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38BCE6671D51C7C600D09F56 /* XcodeHelperTests.swift in Sources */,
+				CC1BCCD21D5B11870031B0F1 /* XcodeHelperTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,7 +317,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				"__src_cc_ref_Packages/DockerTask-1.0.4/Sources/DockerTask.swift" /* DockerTask.swift in Sources */,
+				"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift in Sources */,
+				"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift in Sources */,
+				"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,7 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				"__src_cc_ref_Packages/TaskExtension-1.0.4/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */,
+				"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,25 +342,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		38BCE66B1D51C7C600D09F56 /* PBXTargetDependency */ = {
+		CC1BCCD61D5B11870031B0F1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_XcodeHelper" /* XcodeHelper */;
-			targetProxy = 38BCE66A1D51C7C600D09F56 /* PBXContainerItemProxy */;
+			targetProxy = CC1BCCD51D5B11870031B0F1 /* PBXContainerItemProxy */;
 		};
 		__Dependency_DockerTask /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_DockerTask" /* DockerTask */;
-			targetProxy = 38BCE65A1D51C21B00D09F56 /* PBXContainerItemProxy */;
+			targetProxy = CC1BCCCA1D5B11430031B0F1 /* PBXContainerItemProxy */;
 		};
 		__Dependency_TaskExtension /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_TaskExtension" /* TaskExtension */;
-			targetProxy = 38BCE6591D51C21B00D09F56 /* PBXContainerItemProxy */;
+			targetProxy = CC1BCCC91D5B11430031B0F1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		38BCE66C1D51C7C600D09F56 /* Debug */ = {
+		CC1BCCD81D5B11870031B0F1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -378,7 +385,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = A43A74F4MB;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -409,7 +415,7 @@
 			};
 			name = Debug;
 		};
-		38BCE66D1D51C7C600D09F56 /* Release */ = {
+		CC1BCCD91D5B11870031B0F1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -434,7 +440,6 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = A43A74F4MB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -573,11 +578,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		38BCE66E1D51C7C600D09F56 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */ = {
+		CC1BCCD71D5B11870031B0F1 /* Build configuration list for PBXNativeTarget "XcodeHelperTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				38BCE66C1D51C7C600D09F56 /* Debug */,
-				38BCE66D1D51C7C600D09F56 /* Release */,
+				CC1BCCD81D5B11870031B0F1 /* Debug */,
+				CC1BCCD91D5B11870031B0F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
