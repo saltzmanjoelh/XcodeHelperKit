@@ -55,7 +55,11 @@ class XcodeHelperTests: XCTestCase {
         
         do {
             print("updating sym links at: \(sourcePath)")
-            try helper.build(source: sourcePath!, usingConfiguration: .debug)
+            let buildResult = try helper.build(source: sourcePath!, usingConfiguration: .debug)
+            if let buildError = buildResult.error {
+                XCTFail("Error: \(buildError)")
+            }
+            
             try helper.updateSymLinks(sourcePath: sourcePath!)
         } catch let e {
             XCTFail("Error: \(e)")
@@ -143,6 +147,30 @@ class XcodeHelperTests: XCTestCase {
     }
 
     func testUploadArchive(){
-        
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            let archiveName = "test.tar"
+            let archivePath = "\(sourcePath!)\(archiveName)"
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: true)
+            
+            
+            let destination = "s3://saltzman.test/test.tar"
+            let uploadResult = try helper.upload(archive: archivePath, to: destination)
+            
+            if let error = uploadResult.error {
+                XCTFail("Error: \(error)")
+            }
+            XCTAssertNotNil(uploadResult.output)
+            XCTAssertTrue(uploadResult.output!.hasPrefix("upload:"))
+            XCTAssertTrue(uploadResult.output!.hasSuffix(archiveName.appending("\n")), "Output should end with \(archiveName)")
+            let lsResult = Task.run(launchPath: "/usr/local/bin/aws", arguments: ["s3", "ls", destination])
+            if let lsError = lsResult.error {
+                XCTFail("Error: \(lsError)")
+            }
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
     }
 }

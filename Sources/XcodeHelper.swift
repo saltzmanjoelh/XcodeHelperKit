@@ -33,11 +33,8 @@ enum XcodeHelperError : Error {
 }
 
 struct XcodeHelper {
-    
-    func bash(command:String) throws -> [String] {
-        return ["/bin/bash", "-c", command]
-    }
-    func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws {
+    @discardableResult
+    func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> DockerTaskResult {
         //check if we need to clean first
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
             try clean(sourcePath: sourcePath)
@@ -52,6 +49,7 @@ struct XcodeHelper {
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.build(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
         }
+        return result
     }
     
     func shouldClean(sourcePath:String, forConfiguration configuration:BuildConfiguration) throws -> Bool {
@@ -64,16 +62,18 @@ struct XcodeHelper {
         //otherwise, clean if there is a build path but the file isn't readable
         return FileManager.default.fileExists(atPath: configuration.buildDirectory(inSourcePath: sourcePath))
     }
-    
-    func clean(sourcePath:String) throws {
+    @discardableResult
+    func clean(sourcePath:String) throws -> DockerTaskResult {
         //We can use Task instead of firing up Docker because the end result is the same. A clean .build dir
         let result = Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
         }
+        return result
     }
     
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
+    @discardableResult
     func updateSymLinks(sourcePath:String) throws {
         
         //iterate Packages dir and create symlinks without the -Ver.sion.#
@@ -94,34 +94,27 @@ struct XcodeHelper {
             }
         }
     }
-    
-    func create(archive archivePath:String, files filePaths:[String], flatList:Bool) throws {
+    @discardableResult
+    func create(archive archivePath:String, files filePaths:[String], flatList:Bool) throws -> DockerTaskResult {
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
         let arguments = ["-cvzf", archivePath]+args
         let result = Task.run(launchPath: "/usr/bin/tar", arguments: arguments)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
         }
+        return result
     }
     
-    //Currently requires aws cli tool
+    //Currently requires aws cli tool, use like cp {source} s3://{destination}
     //TODO: use REST API
-    func upload(archive archivePath:String, to s3Bucket:String, using awsCliPath:String) throws {
-        let archiveName = URL(fileURLWithPath:archivePath).lastPathComponent
-        let result = Task.run(launchPath: awsCliPath, arguments: ["s3", "cp", archivePath, "s3://\(s3Bucket)/\(archiveName)" ])
+    @discardableResult
+    func upload(archive archivePath:String, to s3Path:String, using awsCliPath:String = "/usr/local/bin/aws") throws -> DockerTaskResult {
+        let result = Task.run(launchPath: awsCliPath, arguments: ["s3", "cp", archivePath, s3Path])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.uploadArchive(message: "Error uploading archive: \(error)")
         }
+        return result
     }
-//    #upload archive from osx
-//    if [ "${ACTION}" == "install" ]; then
-//    cd $PROJECT_DIR
-//    if [ -f "${S3_ARCHIVE_NAME}" ]; then
-//    $AWS_CLI s3 cp "${S3_ARCHIVE_NAME}" "s3://${S3_BUCKET_ROOT}.${BRANCH_NAME}/${S3_ARCHIVE_NAME}"
-//    rm "${S3_ARCHIVE_NAME}"
-//    else echo "Archive (${S3_ARCHIVE_NAME}) not found."; ls -al
-//    fi
-//    fi
     
 //    func commit(to branch:String, tag)
 }
