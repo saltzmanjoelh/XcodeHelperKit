@@ -44,7 +44,7 @@ class XcodeHelperTests: XCTestCase {
         if !FileManager.default.fileExists(atPath: tempDir) {
             do {
                 try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
-            }catch let e{
+            }catch _{
                 
             }
         }
@@ -150,13 +150,13 @@ class XcodeHelperTests: XCTestCase {
     func testArchiveFlatList(){
         let helper = XcodeHelper()
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        let archivePath = "\(sourcePath!)test.tar"
+        let archivePath = "\(sourcePath!)/test.tar"
         
         do{
             try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
-            let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
+            let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
             Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
@@ -169,13 +169,13 @@ class XcodeHelperTests: XCTestCase {
     func testStructuredArchive(){
         let helper = XcodeHelper()
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        let archivePath = "\(sourcePath!)test.tar"
+        let archivePath = "\(sourcePath!)/test.tar"
         
         do{
             try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: false)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
-            let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
+            let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
             Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
@@ -192,7 +192,7 @@ class XcodeHelperTests: XCTestCase {
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
             let archiveName = "test.tar"
-            let archivePath = "\(sourcePath!)\(archiveName)"
+            let archivePath = "\(sourcePath!)/\(archiveName)"
             try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
             
