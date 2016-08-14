@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import TaskExtension
+import SynchronousTask
 import DockerTask
 #if os(OSX) || os(iOS)
     import Darwin
@@ -40,12 +40,53 @@ class XcodeHelperTests: XCTestCase {
     //returns the temp dir that we cloned into
     private func cloneToTempDirectory(repoURL:String) -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
-        let tempDir = "/tmp/\(UUID())/"
+        let tempDir = FileManager.default.homeDirectoryForCurrentUser.path.appending("/Documents/XcodeHelperTests/\(UUID())")
+        if !FileManager.default.fileExists(atPath: tempDir) {
+            do {
+                try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
+            }catch let e{
+                
+            }
+        }
         let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], silenceOutput: false)
         XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
         return tempDir
+    }
+    
+    func testFetchPackages() {
+        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        let helper = XcodeHelper()
+        
+        do {
+            let fetchResult = try helper.fetchPackages(at: sourcePath!, forLinux: false, inDockerImage: nil)
+            if let fetchError = fetchResult.error {
+                XCTFail("Error: \(fetchError)")
+            }
+            XCTAssertNotNil(fetchResult.output)
+            XCTAssertTrue(fetchResult.output!.contains("Resolved version"))
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testFetchPackagesInLinux() {
+        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        let helper = XcodeHelper()
+        
+        do {
+            let fetchResult = try helper.fetchPackages(at: sourcePath!, forLinux: true, inDockerImage: "saltzmanjoelh/swiftubuntu")
+            if let fetchError = fetchResult.error {
+                XCTFail("Error: \(fetchError)")
+            }
+            XCTAssertNotNil(fetchResult.output)
+            XCTAssertTrue(fetchResult.output!.contains("Resolved version"), "Should have found \"Resolved version\" in output.")
+            var isDirectory: ObjCBool = false
+            XCTAssertTrue(FileManager.default.fileExists(atPath: sourcePath!.appending("/Packages"), isDirectory: &isDirectory), "Failed to find Packages dir")
+            XCTAssertTrue(isDirectory.boolValue, "Packages symlink is not a directory")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
     }
     
     func testUpdateSymLinks() {
@@ -66,10 +107,10 @@ class XcodeHelperTests: XCTestCase {
         }
         
         for package in packages{
-            let path = sourcePath!.appending("Packages/\(package)")
+            let path = sourcePath!.appending("/Packages/\(package)")
             var isDirectory: ObjCBool = false
-            XCTAssertTrue(FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), "Failed to find \(path)")
-            XCTAssertTrue(isDirectory.boolValue, "\(path) was not a directory")
+            XCTAssertTrue(FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), "Failed to find symlink: \(path)")
+            XCTAssertTrue(isDirectory.boolValue, "Symlink was not a directory: \(path)")
         }
     }
     func testShouldClean(){
@@ -112,7 +153,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)test.tar"
         
         do{
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: true)
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
@@ -131,7 +172,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)test.tar"
         
         do{
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: false)
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: false)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending(String(UUID()))//untar into subdir and make sure that there are no subsubdirs
@@ -152,7 +193,7 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
             let archiveName = "test.tar"
             let archivePath = "\(sourcePath!)\(archiveName)"
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)Package.swift", "\(sourcePath!)Sources/Hello.swift"], flatList: true)
+            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
             
             let destination = "s3://saltzman.test/test.tar"

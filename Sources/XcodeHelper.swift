@@ -2,7 +2,7 @@
 //PreBuild -> Packages/XcodeHelpers*/ 
 
 import Foundation
-import TaskExtension
+import SynchronousTask
 import DockerTask
 
 
@@ -26,6 +26,7 @@ enum BuildConfiguration {
 
 enum XcodeHelperError : Error {
     case clean(message:String)
+    case fetch(message:String)
     case build(message:String)
     case updateSymLinks(message:String)
     case createArchive(message:String)
@@ -33,6 +34,26 @@ enum XcodeHelperError : Error {
 }
 
 struct XcodeHelper {
+    
+    @discardableResult
+    func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> DockerTaskResult {
+        if forLinux {
+            //TODO: updated toolbox task to wrap in strings?
+            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
+            let result = DockerToolboxTask(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+            if let error = result.error, result.exitCode != 0 {
+                throw XcodeHelperError.fetch(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
+            }
+            return result
+        }else{
+            let result = Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
+            if let error = result.error, result.exitCode != 0 {
+                throw XcodeHelperError.fetch(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
+            }
+            return result
+        }
+    }
+    
     @discardableResult
     func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> DockerTaskResult {
         //check if we need to clean first
@@ -44,7 +65,7 @@ struct XcodeHelper {
 //        let buildDir = configuration.buildDirectory(inSourcePath: sourcePath)
 //        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
         //simple build doesn't work
-        let commandArgs = ["/bin/bash", "-c", "hostname && cd \(sourcePath) && pwd && ls -al && swift build"]
+        let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
         let result = DockerToolboxTask(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.build(message: "Error building in Linux (\(result.exitCode)):\n\(error)")

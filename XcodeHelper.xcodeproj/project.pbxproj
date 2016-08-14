@@ -10,12 +10,12 @@
 		CC1BCCD21D5B11870031B0F1 /* XcodeHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1BCCD11D5B11870031B0F1 /* XcodeHelperTests.swift */; };
 		CC1BCCD41D5B11870031B0F1 /* XcodeHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_XcodeHelper" /* XcodeHelper.framework */; };
 		_LinkFileRef_DockerTask_via_XcodeHelper /* DockerTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_DockerTask" /* DockerTask.framework */; };
-		_LinkFileRef_TaskExtension_via_DockerTask /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
-		_LinkFileRef_TaskExtension_via_XcodeHelper /* TaskExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* TaskExtension.framework */; };
+		_LinkFileRef_TaskExtension_via_DockerTask /* SynchronousTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* SynchronousTask.framework */; };
+		_LinkFileRef_TaskExtension_via_XcodeHelper /* SynchronousTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_TaskExtension" /* SynchronousTask.framework */; };
 		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift */; };
 		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift */; };
 		"__src_cc_ref_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift */; };
-		"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */; };
+		"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* SynchronousTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = "__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* SynchronousTask.swift */; };
 		__src_cc_ref_Sources/XcodeHelper.swift /* XcodeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/XcodeHelper.swift /* XcodeHelper.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,13 +52,13 @@
 		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerForMacTask.swift" /* DockerForMacTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerForMacTask.swift; sourceTree = "<group>"; };
 		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerTask.swift" /* DockerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerTask.swift; sourceTree = "<group>"; };
 		"__PBXFileRef_Packages/DockerTask-1.0.5/Sources/DockerToolboxTask.swift" /* DockerToolboxTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerToolboxTask.swift; sourceTree = "<group>"; };
-		"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExtension.swift; sourceTree = "<group>"; };
+		"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* SynchronousTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronousTask.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/XcodeHelper.swift /* XcodeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelper.swift; sourceTree = "<group>"; };
-		__PBXFileRef_TaskExtension_Info.plist /* XcodeHelper.xcodeproj/TaskExtension_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/TaskExtension_Info.plist; sourceTree = SOURCE_ROOT; };
+		__PBXFileRef_TaskExtension_Info.plist /* SynchronousTask_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = SynchronousTask_Info.plist; path = XcodeHelper.xcodeproj/SynchronousTask_Info.plist; sourceTree = SOURCE_ROOT; };
 		__PBXFileRef_XcodeHelper.xcodeproj/Configs/Project.xcconfig /* XcodeHelper.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XcodeHelper.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_XcodeHelper_Info.plist /* XcodeHelper.xcodeproj/XcodeHelper_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = XcodeHelper.xcodeproj/XcodeHelper_Info.plist; sourceTree = SOURCE_ROOT; };
 		"_____Product_DockerTask" /* DockerTask.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DockerTask.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"_____Product_TaskExtension" /* TaskExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TaskExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		"_____Product_TaskExtension" /* SynchronousTask.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SynchronousTask.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"_____Product_XcodeHelper" /* XcodeHelper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XcodeHelper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -75,7 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				_LinkFileRef_TaskExtension_via_DockerTask /* TaskExtension.framework in Frameworks */,
+				_LinkFileRef_TaskExtension_via_DockerTask /* SynchronousTask.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				_LinkFileRef_TaskExtension_via_XcodeHelper /* TaskExtension.framework in Frameworks */,
+				_LinkFileRef_TaskExtension_via_XcodeHelper /* SynchronousTask.framework in Frameworks */,
 				_LinkFileRef_DockerTask_via_XcodeHelper /* DockerTask.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,7 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				"_______Group_DockerTask" /* DockerTask */,
-				"_______Group_TaskExtension" /* TaskExtension */,
+				"_______Group_TaskExtension" /* SynchronousTask */,
 			);
 			name = Dependencies;
 			sourceTree = "<group>";
@@ -131,7 +131,7 @@
 		"____Products_" /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				"_____Product_TaskExtension" /* TaskExtension.framework */,
+				"_____Product_TaskExtension" /* SynchronousTask.framework */,
 				"_____Product_DockerTask" /* DockerTask.framework */,
 				"_____Product_XcodeHelper" /* XcodeHelper.framework */,
 				CC1BCCCF1D5B11860031B0F1 /* XcodeHelperTests.xctest */,
@@ -164,17 +164,17 @@
 				__PBXFileRef_DockerTask_Info.plist /* XcodeHelper.xcodeproj/DockerTask_Info.plist */,
 			);
 			name = DockerTask;
-			path = "Packages/DockerTask-1.0.5/Sources";
+			path = "Packages/DockerTask-1.0.6/Sources";
 			sourceTree = "<group>";
 		};
-		"_______Group_TaskExtension" /* TaskExtension */ = {
+		"_______Group_TaskExtension" /* SynchronousTask */ = {
 			isa = PBXGroup;
 			children = (
-				"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift */,
-				__PBXFileRef_TaskExtension_Info.plist /* XcodeHelper.xcodeproj/TaskExtension_Info.plist */,
+				"__PBXFileRef_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* SynchronousTask.swift */,
+				__PBXFileRef_TaskExtension_Info.plist /* SynchronousTask_Info.plist */,
 			);
-			name = TaskExtension;
-			path = "Packages/TaskExtension-1.0.5/Sources";
+			name = SynchronousTask;
+			path = "Packages/SynchronousTask-1.0.6/Sources";
 			sourceTree = "<group>";
 		};
 		"_______Group_XcodeHelper" /* XcodeHelper */ = {
@@ -225,9 +225,9 @@
 			productReference = "_____Product_DockerTask" /* DockerTask.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		"______Target_TaskExtension" /* TaskExtension */ = {
+		"______Target_TaskExtension" /* SynchronousTask */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = "_______Confs_TaskExtension" /* Build configuration list for PBXNativeTarget "TaskExtension" */;
+			buildConfigurationList = "_______Confs_TaskExtension" /* Build configuration list for PBXNativeTarget "SynchronousTask" */;
 			buildPhases = (
 				CompilePhase_TaskExtension /* Sources */,
 				"___LinkPhase_TaskExtension" /* Frameworks */,
@@ -236,9 +236,9 @@
 			);
 			dependencies = (
 			);
-			name = TaskExtension;
+			name = SynchronousTask;
 			productName = TaskExtension;
-			productReference = "_____Product_TaskExtension" /* TaskExtension.framework */;
+			productReference = "_____Product_TaskExtension" /* SynchronousTask.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		"______Target_XcodeHelper" /* XcodeHelper */ = {
@@ -286,7 +286,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				"______Target_TaskExtension" /* TaskExtension */,
+				"______Target_TaskExtension" /* SynchronousTask */,
 				"______Target_DockerTask" /* DockerTask */,
 				"______Target_XcodeHelper" /* XcodeHelper */,
 				CC1BCCCE1D5B11860031B0F1 /* XcodeHelperTests */,
@@ -327,7 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* TaskExtension.swift in Sources */,
+				"__src_cc_ref_Packages/TaskExtension-1.0.5/Sources/TaskExtension.swift" /* SynchronousTask.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,7 +354,7 @@
 		};
 		__Dependency_TaskExtension /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = "______Target_TaskExtension" /* TaskExtension */;
+			target = "______Target_TaskExtension" /* SynchronousTask */;
 			targetProxy = CC1BCCC91D5B11430031B0F1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -483,11 +483,11 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				INFOPLIST_FILE = XcodeHelper.xcodeproj/TaskExtension_Info.plist;
+				INFOPLIST_FILE = XcodeHelper.xcodeproj/SynchronousTask_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = TaskExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = SynchronousTask;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SWIFT_VERSION = 3.0;
@@ -532,11 +532,11 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				INFOPLIST_FILE = XcodeHelper.xcodeproj/TaskExtension_Info.plist;
+				INFOPLIST_FILE = XcodeHelper.xcodeproj/SynchronousTask_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = TaskExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = SynchronousTask;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -585,6 +585,7 @@
 				CC1BCCD91D5B11870031B0F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 		"___RootConfs_" /* Build configuration list for PBXProject "XcodeHelper" */ = {
 			isa = XCConfigurationList;
@@ -604,7 +605,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		"_______Confs_TaskExtension" /* Build configuration list for PBXNativeTarget "TaskExtension" */ = {
+		"_______Confs_TaskExtension" /* Build configuration list for PBXNativeTarget "SynchronousTask" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				"___DebugConf_TaskExtension" /* Debug */,
