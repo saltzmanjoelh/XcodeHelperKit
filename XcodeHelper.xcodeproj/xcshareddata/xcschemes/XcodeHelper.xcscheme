@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_TaskExtension"
+               BlueprintIdentifier = "______Target_SynchronousTask"
                BuildableName = "SynchronousTask.framework"
                BlueprintName = "SynchronousTask"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
@@ -43,8 +43,22 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "______Target_XcodeHelper"
-               BuildableName = "XcodeHelper.framework"
+               BuildableName = "XcodeHelper"
                BlueprintName = "XcodeHelper"
+               ReferencedContainer = "container:XcodeHelper.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_XcodeHelperKit"
+               BuildableName = "XcodeHelperKit.framework"
+               BlueprintName = "XcodeHelperKit"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -61,9 +75,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CC1BCCCE1D5B11860031B0F1"
-               BuildableName = "XcodeHelperTests.xctest"
-               BlueprintName = "XcodeHelperTests"
+               BlueprintIdentifier = "CC3472691D60B9660071D99F"
+               BuildableName = "XcodeHelperKitTests.xctest"
+               BlueprintName = "XcodeHelperKitTests"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -71,7 +85,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_TaskExtension"
+            BlueprintIdentifier = "______Target_SynchronousTask"
             BuildableName = "SynchronousTask.framework"
             BlueprintName = "SynchronousTask"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
@@ -93,7 +107,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_TaskExtension"
+            BlueprintIdentifier = "______Target_SynchronousTask"
             BuildableName = "SynchronousTask.framework"
             BlueprintName = "SynchronousTask"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
@@ -111,7 +125,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_TaskExtension"
+            BlueprintIdentifier = "______Target_SynchronousTask"
             BuildableName = "SynchronousTask.framework"
             BlueprintName = "SynchronousTask"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">

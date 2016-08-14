@@ -1,6 +1,6 @@
 //
-//  XcodeHelpersTests.swift
-//  XcodeHelpersTests
+//  XcodeHelperKitTests.swift
+//  XcodeHelperKitTests
 //
 //  Created by Joel Saltzman on 7/30/16.
 //
@@ -16,9 +16,9 @@ import DockerTask
 #endif
 
 @testable
-import XcodeHelper
+import XcodeHelperKit
 
-class XcodeHelperTests: XCTestCase {
+class XcodeHelperKitTests: XCTestCase {
     
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
     let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
@@ -40,7 +40,7 @@ class XcodeHelperTests: XCTestCase {
     //returns the temp dir that we cloned into
     private func cloneToTempDirectory(repoURL:String) -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
-        let tempDir = FileManager.default.homeDirectoryForCurrentUser.path.appending("/Documents/XcodeHelperTests/\(UUID())")
+        let tempDir = FileManager.default.homeDirectoryForCurrentUser.path.appending("/Documents/XcodeHelperKitTests/\(UUID())")
         if !FileManager.default.fileExists(atPath: tempDir) {
             do {
                 try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
