@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_SynchronousTask"
-               BuildableName = "SynchronousTask.framework"
-               BlueprintName = "SynchronousTask"
+               BlueprintIdentifier = "______Target_SynchronousProcess"
+               BuildableName = "SynchronousProcess.framework"
+               BlueprintName = "SynchronousProcess"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,9 +28,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_DockerTask"
-               BuildableName = "DockerTask.framework"
-               BlueprintName = "DockerTask"
+               BlueprintIdentifier = "______Target_DockerProcess"
+               BuildableName = "DockerProcess.framework"
+               BlueprintName = "DockerProcess"
+               ReferencedContainer = "container:XcodeHelper.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CLIRunnable"
+               BuildableName = "CLIRunnable.framework"
+               BlueprintName = "CLIRunnable"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -68,29 +82,19 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CC3472691D60B9660071D99F"
+               BlueprintIdentifier = "______Target_XcodeHelperKitTests"
                BuildableName = "XcodeHelperKitTests.xctest"
                BlueprintName = "XcodeHelperKitTests"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_SynchronousTask"
-            BuildableName = "SynchronousTask.framework"
-            BlueprintName = "SynchronousTask"
-            ReferencedContainer = "container:XcodeHelper.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -107,9 +111,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_SynchronousTask"
-            BuildableName = "SynchronousTask.framework"
-            BlueprintName = "SynchronousTask"
+            BlueprintIdentifier = "______Target_SynchronousProcess"
+            BuildableName = "SynchronousProcess.framework"
+            BlueprintName = "SynchronousProcess"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -122,15 +126,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_SynchronousTask"
-            BuildableName = "SynchronousTask.framework"
-            BlueprintName = "SynchronousTask"
-            ReferencedContainer = "container:XcodeHelper.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

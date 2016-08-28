@@ -1,5 +1,5 @@
 //
-//  XcodeHelperKitTests.swift
+//  XcodeHelperTests.swift
 //  XcodeHelperKitTests
 //
 //  Created by Joel Saltzman on 7/30/16.
@@ -7,8 +7,8 @@
 //
 
 import XCTest
-import SynchronousTask
-import DockerTask
+import SynchronousProcess
+import DockerProcess
 #if os(OSX) || os(iOS)
     import Darwin
 #elseif os(Linux)
@@ -18,7 +18,7 @@ import DockerTask
 @testable
 import XcodeHelperKit
 
-class XcodeHelperKitTests: XCTestCase {
+class XcodeHelperTests: XCTestCase {
     
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
     let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
@@ -34,13 +34,16 @@ class XcodeHelperKitTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
         if sourcePath != nil {
-            Task.run(launchPath: "/bin/rm", arguments: ["-Rf", sourcePath!])
+            Process.run("/bin/rm", arguments: ["-Rf", sourcePath!])
         }
     }
     //returns the temp dir that we cloned into
     private func cloneToTempDirectory(repoURL:String) -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
-        let tempDir = FileManager.default.homeDirectoryForCurrentUser.path.appending("/Documents/XcodeHelperKitTests/\(UUID())")
+        guard let tempDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).path.appending("/XcodeHelperKitTests/\(UUID())") else{
+            XCTFail("Failed to get user dir")
+            return nil
+        }
         if !FileManager.default.fileExists(atPath: tempDir) {
             do {
                 try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
@@ -48,7 +51,7 @@ class XcodeHelperKitTests: XCTestCase {
                 
             }
         }
-        let cloneResult = Task.run(launchPath: "/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], silenceOutput: false)
+        let cloneResult = Process.run("/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], silenceOutput: false)
         XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
@@ -116,8 +119,8 @@ class XcodeHelperKitTests: XCTestCase {
     func testShouldClean(){
         //build it in macOS so we know that it needs to be cleaned
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
+        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after building in macOS")
         
         do{
             let ans = try XcodeHelper().shouldClean(sourcePath: sourcePath!, forConfiguration: .debug)
@@ -134,7 +137,7 @@ class XcodeHelperKitTests: XCTestCase {
     func testCleanLinuxBuilds() {
         //build first so that we have something to clean
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Task.run(launchPath: "/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
         XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
         let helper = XcodeHelper()
         
@@ -157,7 +160,7 @@ class XcodeHelperKitTests: XCTestCase {
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
-            Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+            Process.run("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
             XCTAssertEqual(contents.count, 2, "There should be exactly 2 files")
@@ -176,7 +179,7 @@ class XcodeHelperKitTests: XCTestCase {
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
-            Task.run(launchPath: "/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+            Process.run("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
             XCTAssertEqual(contents.count, 1, "There should be a root tmp directory")
@@ -205,7 +208,7 @@ class XcodeHelperKitTests: XCTestCase {
             XCTAssertNotNil(uploadResult.output)
             XCTAssertTrue(uploadResult.output!.hasPrefix("upload:"))
             XCTAssertTrue(uploadResult.output!.hasSuffix(archiveName.appending("\n")), "Output should end with \(archiveName)")
-            let lsResult = Task.run(launchPath: "/usr/local/bin/aws", arguments: ["s3", "ls", destination])
+            let lsResult = Process.run("/usr/local/bin/aws", arguments: ["s3", "ls", destination])
             if let lsError = lsResult.error {
                 XCTFail("Error: \(lsError)")
             }

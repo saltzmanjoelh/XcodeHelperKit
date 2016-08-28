@@ -4,55 +4,30 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>SynchronousTask.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
-		</dict>
 		<key>XcodeHelper.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<key>XcodeHelper.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>XcodeHelperKitTests.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>3</integer>
-		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>38BCE6631D51C7C600D09F56</key>
+		<key>______Target_CLIRunnable</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>CC1BCCCE1D5B11860031B0F1</key>
+		<key>______Target_DockerProcess</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>CC3472691D60B9660071D99F</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>______Target_DockerTask</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>______Target_SynchronousTask</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>______Target_TaskExtension</key>
+		<key>______Target_SynchronousProcess</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -67,12 +42,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>______Target_XcodeHelperTests</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>______Target_untitled_folder</key>
+		<key>______Target_XcodeHelperKitTests</key>
 		<dict>
 			<key>primary</key>
 			<true/>
