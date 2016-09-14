@@ -42,9 +42,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_CLIRunnable"
-               BuildableName = "CLIRunnable.framework"
-               BlueprintName = "CLIRunnable"
+               BlueprintIdentifier = "______Target_CliRunnable"
+               BuildableName = "CliRunnable.framework"
+               BlueprintName = "CliRunnable"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -56,9 +56,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_XcodeHelper"
-               BuildableName = "XcodeHelper"
-               BlueprintName = "XcodeHelper"
+               BlueprintIdentifier = "______Target_xchelper"
+               BuildableName = "xchelper"
+               BlueprintName = "xchelper"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

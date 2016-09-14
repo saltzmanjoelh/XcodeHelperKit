@@ -4,7 +4,6 @@
 import Foundation
 import SynchronousProcess
 import DockerProcess
-import CLIRunnable
 
 public enum BuildConfiguration {
     case debug
@@ -20,6 +19,13 @@ public enum BuildConfiguration {
     public static var allValues : [BuildConfiguration] {
         get {
             return [debug, release]
+        }
+    }
+    public init(from string:String) {
+        if string == "release" {
+            self = .release
+        }else{
+            self = .debug
         }
     }
 }
@@ -68,7 +74,7 @@ public struct XcodeHelper {
     public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> DockerProcessResult {
         //check if we need to clean first
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
-            try clean(sourcePath: sourcePath)
+            try clean(source: sourcePath)
         }
         //At the moment, building directly from a mounted volume gives errors like "error: Could not create file ... /.Package.toml"
         //rsync the files to the root of the disk (excluding .build dir) the replace the build
@@ -94,9 +100,9 @@ public struct XcodeHelper {
         return FileManager.default.fileExists(atPath: configuration.buildDirectory(inSourcePath: sourcePath))
     }
     @discardableResult
-    public func clean(sourcePath:String) throws -> DockerProcessResult {
+    public func clean(source:String) throws -> DockerProcessResult {
         //We can use Process instead of firing up Docker because the end result is the same. A clean .build dir
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/swift build --clean"])
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(source) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
         }
@@ -126,9 +132,9 @@ public struct XcodeHelper {
         }
     }
     @discardableResult
-    public func create(archive archivePath:String, files filePaths:[String], flatList:Bool = true) throws -> DockerProcessResult {
+    public func createArchive(at destinationPath:String, with filePaths:[String], flatList:Bool = true) throws -> DockerProcessResult {
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
-        let arguments = ["-cvzf", archivePath]+args
+        let arguments = ["-cvzf", destinationPath]+args
         let result = Process.run("/usr/bin/tar", arguments: arguments)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
@@ -150,73 +156,3 @@ public struct XcodeHelper {
 //    func commit(to branch:String, tag)
 }
 
-
-// MARK: CLI Options
-extension XcodeHelper: CLIRunnable {
-    
-    public var description: String? {
-        get {
-            return "Usage: xchelper COMMAND [options]"
-        }
-    }
-    public var cliOptionGroups: [CLIOptionGroup] {
-        get {
-            var fetchPackages = FetchPackagesOption.command
-            fetchPackages.requiredArguments = [FetchPackagesOption.sourcePath]
-            fetchPackages.optionalArguments = [FetchPackagesOption.linuxPackages, FetchPackagesOption.imageName]
-            fetchPackages.action = handleFetchPackages
-          
-            
-            return [CLIOptionGroup(description:"Commands:",
-                                   options:[fetchPackages])]
-        }
-    }
-    // MARK: FetchPackages
-    struct FetchPackagesOption {
-        static let command          = CLIOption(keys:["fetch-packages"],
-                                                description:"Fetch the package dependencies via 'swift package fetch'",
-                                                requiresValue: false)
-        static let sourcePath       = CLIOption(keys:["-s", "--source-path"],
-                                                description:"The root of your package to call 'swift package fetch' in")
-        static let linuxPackages    = CLIOption(keys:["-l", "--linux-packages"],
-                                                description:"Fetch the Linux version of the packages. Some packages have Linux specific dependencies. Some Linux dependencies are not compatible with the macOS dependencies. I `swift build --clean` is performed before they are fetched. Default is false",
-                                                requiresValue:true,
-                                                defaultValue:"false")
-        static let imageName        = CLIOption(keys:["-i", "--image-name"],
-                                                description:"The Docker image name to run the commands in. Defaults to saltzmanjoelh/swiftubuntu",
-                                                requiresValue:true,
-                                                defaultValue:"saltzmanjoelh/swiftubuntu")
-    }
-    public func handleFetchPackages(option:CLIOption) throws {
-        let index = option.argumentIndex
-        guard let sourcePath = index[FetchPackagesOption.sourcePath.keys.first!]?.first else {
-            throw XcodeHelperError.fetch(message: "\(FetchPackagesOption.sourcePath.keys) not provided.")
-        }
-        guard let forLinux = index[FetchPackagesOption.linuxPackages.keys.first!]?.first else {
-            throw XcodeHelperError.fetch(message: "\(FetchPackagesOption.linuxPackages.keys) not provided.")
-        }
-        
-        guard let imageName = index[FetchPackagesOption.imageName.keys.first!]?.first else {
-            throw XcodeHelperError.fetch(message: "\(FetchPackagesOption.imageName.keys) not provided.")
-        }
-        try fetchPackages(at:sourcePath, forLinux:(forLinux as NSString).boolValue, inDockerImage: imageName)
-    }
-    
-    // MARK: Build
-    struct BuildOption {
-        static let command              = CLIOption(keys: ["build"],
-                                            description: "Build a Swift package in Linux and have the build errors appear in Xcode.",
-                                            requiresValue: false)
-        static let sourcePath           = CLIOption(keys:["-s", "--source-path"],
-                                                description:"The root of your package to call 'swift build' in")
-        static let buildConfiguration   = CLIOption(keys:["-c", "--build-configuration"],
-                                                description:"debug or release mode. Defaults to debug",
-                                                requiresValue:true,
-                                                defaultValue:"debug")
-        static let imageName            = CLIOption(keys:["-i", "--image-name"],
-                                                description:"The Docker image name to run the commands in. Defaults to saltzmanjoelh/swiftubuntu",
-                                                requiresValue:true,
-                                                defaultValue:"saltzmanjoelh/swiftubuntu")
-    }
-    
-}

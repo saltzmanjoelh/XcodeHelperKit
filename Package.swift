@@ -8,11 +8,11 @@ let package = Package(
     name: "XcodeHelper",
     targets:[
         Target(name: "XcodeHelperKit"),
-        Target(name: "XcodeHelper", dependencies: ["XcodeHelperKit"]),
+        Target(name: "xchelper", dependencies: ["XcodeHelperKit"]),
     ],
     dependencies: [
         .Package(url: "https://github.com/saltzmanjoelh/SynchronousProcess.git", versions: Version(0,0,0)..<Version(10,0,0)),
         .Package(url: "https://github.com/saltzmanjoelh/DockerProcess.git", versions: Version(0,0,0)..<Version(10,0,0)),
-        .Package(url: "https://github.com/saltzmanjoelh/CLIRunnable.git", versions: Version(0,0,0)..<Version(10,0,0))
+        .Package(url: "https://github.com/saltzmanjoelh/CliRunnable.git", versions: Version(0,0,0)..<Version(10,0,0))
     ]
 )
