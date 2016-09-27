@@ -9,6 +9,8 @@
 import XCTest
 import SynchronousProcess
 import DockerProcess
+import S3Kit
+
 #if os(OSX) || os(iOS)
     import Darwin
 #elseif os(Linux)
@@ -142,7 +144,7 @@ class XcodeHelperTests: XCTestCase {
         let helper = XcodeHelper()
         
         do {
-            try helper.clean(sourcePath: sourcePath!)
+            try helper.clean(source: sourcePath!)
             
             XCTAssertFalse(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory should not found after cleaning")
         } catch let e {
@@ -156,7 +158,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)/test.tar"
         
         do{
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
@@ -175,7 +177,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)/test.tar"
         
         do{
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: false)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: false)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
@@ -191,30 +193,24 @@ class XcodeHelperTests: XCTestCase {
     }
 
     func testUploadArchive(){
+        
         do{
+            let credentialsPath = "/Users/joelsaltzman/Sites/XcodeHelper/s3Credentials.csv"
+            let bucket = "saltzman.test"
+            let region = "us-east-1"
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            let archiveName = "test.tar"
+            let archiveName = "test.zip"
             let archivePath = "\(sourcePath!)/\(archiveName)"
-            try helper.create(archive:archivePath, files: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
+            
+            try helper.uploadArchive(at: archivePath, to: bucket, in: region, using: credentialsPath)
             
             
-            let destination = "s3://saltzman.test/test.tar"
-            let uploadResult = try helper.upload(archive: archivePath, to: destination)
-            
-            if let error = uploadResult.error {
-                XCTFail("Error: \(error)")
-            }
-            XCTAssertNotNil(uploadResult.output)
-            XCTAssertTrue(uploadResult.output!.hasPrefix("upload:"))
-            XCTAssertTrue(uploadResult.output!.hasSuffix(archiveName.appending("\n")), "Output should end with \(archiveName)")
-            let lsResult = Process.run("/usr/local/bin/aws", arguments: ["s3", "ls", destination])
-            if let lsError = lsResult.error {
-                XCTFail("Error: \(lsError)")
-            }
             
         } catch let e {
             XCTFail("Error: \(e)")
         }
+        
     }
 }

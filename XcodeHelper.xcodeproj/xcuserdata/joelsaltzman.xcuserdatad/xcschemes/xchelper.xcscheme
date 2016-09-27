@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_XcodeHelper"
-               BuildableName = "XcodeHelper"
-               BlueprintName = "XcodeHelper"
+               BlueprintIdentifier = "______Target_xchelper"
+               BuildableName = "xchelper"
+               BlueprintName = "xchelper"
                ReferencedContainer = "container:XcodeHelper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_XcodeHelper"
-            BuildableName = "XcodeHelper"
-            BlueprintName = "XcodeHelper"
+            BlueprintIdentifier = "______Target_xchelper"
+            BuildableName = "xchelper"
+            BlueprintName = "xchelper"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,18 +55,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_XcodeHelper"
-            BuildableName = "XcodeHelper"
-            BlueprintName = "XcodeHelper"
+            BlueprintIdentifier = "______Target_xchelper"
+            BuildableName = "xchelper"
+            BlueprintName = "xchelper"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "fetch-packages --source-path $(PROJECT_DIR)"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -80,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_XcodeHelper"
-            BuildableName = "XcodeHelper"
-            BlueprintName = "XcodeHelper"
+            BlueprintIdentifier = "______Target_xchelper"
+            BuildableName = "xchelper"
+            BlueprintName = "xchelper"
             ReferencedContainer = "container:XcodeHelper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

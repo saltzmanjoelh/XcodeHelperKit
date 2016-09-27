@@ -4,6 +4,7 @@
 import Foundation
 import SynchronousProcess
 import DockerProcess
+import S3Kit
 
 public enum BuildConfiguration {
     case debug
@@ -53,7 +54,7 @@ public struct XcodeHelper {
     public init(){}
     
     @discardableResult
-    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> DockerProcessResult {
+    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
             let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
             let result = DockerToolboxProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
@@ -71,7 +72,7 @@ public struct XcodeHelper {
     }
     
     @discardableResult
-    public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> DockerProcessResult {
+    public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         //check if we need to clean first
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
             try clean(source: sourcePath)
@@ -100,7 +101,7 @@ public struct XcodeHelper {
         return FileManager.default.fileExists(atPath: configuration.buildDirectory(inSourcePath: sourcePath))
     }
     @discardableResult
-    public func clean(source:String) throws -> DockerProcessResult {
+    public func clean(source:String) throws -> ProcessResult {
         //We can use Process instead of firing up Docker because the end result is the same. A clean .build dir
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(source) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
@@ -132,9 +133,9 @@ public struct XcodeHelper {
         }
     }
     @discardableResult
-    public func createArchive(at destinationPath:String, with filePaths:[String], flatList:Bool = true) throws -> DockerProcessResult {
+    public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true) throws -> ProcessResult {
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
-        let arguments = ["-cvzf", destinationPath]+args
+        let arguments = ["-cvzf", archivePath]+args
         let result = Process.run("/usr/bin/tar", arguments: arguments)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
@@ -142,17 +143,34 @@ public struct XcodeHelper {
         return result
     }
     
-    //Currently requires aws cli tool, use like cp {source} s3://{destination}
-    //TODO: use REST API
-    @discardableResult
-    public func upload(archive archivePath:String, to s3Path:String, using awsCliPath:String = "/usr/local/bin/aws") throws -> DockerProcessResult {
-        let result = Process.run(awsCliPath, arguments: ["s3", "cp", archivePath, s3Path])
-        if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.uploadArchive(message: "Error uploading archive: \(error)")
-        }
-        return result
-    }
     
-//    func commit(to branch:String, tag)
+    @discardableResult
+    public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String) throws  {
+        let result = try S3.with(key: key, and: secret).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
+        if result.response.statusCode != 200 {
+            var description = result.response.description
+            if let data = result.data as? Data {
+                if let text = NSString(data:data, encoding:String.Encoding.utf8.rawValue) as? String {
+                    description += "\n\(text)"
+                }
+            }
+            throw XcodeHelperError.uploadArchive(message: description)
+        }
+        
+    }
+    @discardableResult
+    public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String) throws  {
+        let result = try S3.with(credentials: credentialsPath).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
+        if result.response.statusCode != 200 {
+            var description = result.response.description
+            if let data = result.data as? Data {
+                if let text = NSString(data:data, encoding:String.Encoding.utf8.rawValue) as? String {
+                    description += "\n\(text)"
+                }
+            }
+            throw XcodeHelperError.uploadArchive(message: description)
+        }
+        
+    }
 }
 
