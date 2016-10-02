@@ -93,9 +93,24 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
     }
-    
-    func testUpdateSymLinks() {
+    func testProjectFilePath() {
         sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+        let helper = XcodeHelper()
+        do {
+            
+            let path = try helper.projectFilePath(at: sourcePath!)
+            XCTAssert(path.contains("/HelloSwift.xcodeproj/project.pbxproj"))
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+        
+    }
+    
+    func testSymLinkDependencies() {
+        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
         let packages = ["Hello"]
         let helper = XcodeHelper()
         
@@ -106,7 +121,7 @@ class XcodeHelperTests: XCTestCase {
                 XCTFail("Error: \(buildError)")
             }
             
-            try helper.updateSymLinks(sourcePath: sourcePath!)
+            try helper.symLinkDependencies(sourcePath: sourcePath!)
         } catch let e {
             XCTFail("Error: \(e)")
         }
