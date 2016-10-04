@@ -68,6 +68,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "sym-link-dependencies $(PROJECT_DIR)"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "fetch-packages $(PROJECT_DIR) -l true"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

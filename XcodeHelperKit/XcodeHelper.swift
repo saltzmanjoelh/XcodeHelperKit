@@ -31,6 +31,12 @@ public enum BuildConfiguration {
     }
 }
 
+public enum GitTagComponent : Int {
+    case major = 0
+    case minor = 1
+    case patch = 2
+}
+
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
     case fetch(message:String)
@@ -39,6 +45,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case symLinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
+    case gitTag(message:String)
     case unknownOption(message:String)
     public var description : String {
         get {
@@ -50,6 +57,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
                 case let .symLinkDependencies(message): return message
                 case let .createArchive(message): return message
                 case let .uploadArchive(message): return message
+                case let .gitTag(message): return message
                 case let .unknownOption(message): return message
             }
         }
@@ -242,6 +250,52 @@ public struct XcodeHelper {
             throw XcodeHelperError.uploadArchive(message: description)
         }
         
+    }
+    
+    
+    func getGitTag(sourcePath:String) throws -> String {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"])
+        if result.exitCode != 0, let error = result.error {
+            throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
+        }
+        guard let tag = result.output!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n").last else {
+            throw XcodeHelperError.gitTag(message: "Git tag not found: \(result.output)")
+        }
+        return tag
+    }
+    @discardableResult
+    public func incrementGitTag(components: [GitTagComponent] = [.patch], at sourcePath:String) throws -> String {
+        let tag = try getGitTag(sourcePath: sourcePath)
+        let oldVersionComponents = tag.components(separatedBy: ".")
+        if oldVersionComponents.count != 3 {
+            throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
+        }
+        let newVersionComponents = oldVersionComponents.enumerated().map { (offset: Int, element: String) -> String in
+            if let component = GitTagComponent.init(rawValue: offset), components.contains(component) {
+                if let newValue = Int(element) {
+                    return String(describing: newValue+1)
+                }
+            }
+            return element
+        }
+        let updatedTag = newVersionComponents.joined(separator: ".")
+        try gitTag(tag: updatedTag, at: sourcePath)
+        
+        return try getGitTag(sourcePath: sourcePath)
+    }
+    
+    public func gitTag(tag: String, at sourcePath:String) throws {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"])
+        if result.exitCode != 0, let error = result.error {
+            throw XcodeHelperError.gitTag(message: "Error tagging git repo: \(error)")
+        }
+    }
+    
+    public func pushGitTag(tag: String, at sourcePath:String) throws {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git push origin && /usr/bin/git push origin \(tag)"])
+        if let error = result.error, result.exitCode != 0 || !error.contains("new tag") {
+            throw XcodeHelperError.gitTag(message: "Error pushing git tag: \(error)")
+        }
     }
 }
 

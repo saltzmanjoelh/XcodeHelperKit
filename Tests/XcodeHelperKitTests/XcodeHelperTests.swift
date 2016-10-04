@@ -20,6 +20,12 @@ import S3Kit
 @testable
 import XcodeHelperKit
 
+enum LibraryTag: Int {
+    case major = 1
+    case minor = 0
+    case patch = 3
+}
+
 class XcodeHelperTests: XCTestCase {
     
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
@@ -115,7 +121,7 @@ class XcodeHelperTests: XCTestCase {
         let helper = XcodeHelper()
         
         do {
-            print("updating sym links at: \(sourcePath)")
+//            print("updating sym links at: \(sourcePath)")
             let buildResult = try helper.build(source: sourcePath!, usingConfiguration: .debug)
             if let buildError = buildResult.error {
                 XCTFail("Error: \(buildError)")
@@ -228,4 +234,154 @@ class XcodeHelperTests: XCTestCase {
         }
         
     }
+    
+    func testGetGitTag() {
+        do {
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            
+            let tag = try helper.getGitTag(sourcePath:sourcePath!)
+            
+            XCTAssertEqual(tag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue)")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testIncrementGitTagMajor() {
+        do {
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            
+            try helper.incrementGitTag(components: [GitTagComponent.major], at: sourcePath!)
+            
+            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue+1).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue)")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testIncrementGitTagMinor() {
+        do {
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            
+            try helper.incrementGitTag(components: [GitTagComponent.minor], at: sourcePath!)
+            
+            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue+1).\(LibraryTag.patch.rawValue)")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testIncrementGitTagPatch() {
+        do {
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            
+            try helper.incrementGitTag(components: [GitTagComponent.patch], at: sourcePath!)
+            
+            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue+1)")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testPushGitTagFailure() {
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            
+            try helper.pushGitTag(tag:"99.99.99", at: sourcePath!)
+            
+        } catch _ {
+            return
+        }
+        XCTFail("Pushing an invalid tag should have thrown an error")
+    }
+    func testPushGitTag() {
+        let helper = XcodeHelper()
+        //get the current tag
+        var tag: String?
+        do {
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            tag = try helper.incrementGitTag(components: [GitTagComponent.patch], at: sourcePath!)
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+        defer { //cleanup
+            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/git tag --delete \(tag!) && /usr/bin/git push origin :refs/tags/\(tag!)"])
+            if result.exitCode != 0, let error = result.error {
+                XCTFail("Error deleting git tag: \(error)")
+            }
+        }
+        
+        do{
+            try helper.pushGitTag(tag:tag!, at: sourcePath!)
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testHandleGitTagMajor() {
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            var gitTagOption = helper.cliOptionGroups.first!.options.last!
+            gitTagOption.values = [sourcePath!]
+            var majorOption = gitTagOption.optionalArguments![0]
+            majorOption.values = ["999"]
+            gitTagOption.optionalArguments = [majorOption]
+            
+            try helper.handleGitTag(option: gitTagOption)
+            
+            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[0], "999")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testHandleGitTagMinor() {
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            var gitTagOption = helper.cliOptionGroups.first!.options.last!
+            gitTagOption.values = [sourcePath!]
+            var minorOption = gitTagOption.optionalArguments![1]
+            minorOption.values = ["999"]
+            gitTagOption.optionalArguments = [minorOption]
+            
+            try helper.handleGitTag(option: gitTagOption)
+            
+            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[1], "999")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testHandleGitTagPatch() {
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            var gitTagOption = helper.cliOptionGroups.first!.options.last!
+            gitTagOption.values = [sourcePath!]
+            var minorOption = gitTagOption.optionalArguments![2]
+            minorOption.values = ["999"]
+            gitTagOption.optionalArguments = [minorOption]
+            
+            try helper.handleGitTag(option: gitTagOption)
+            
+            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[2], "999")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
 }
