@@ -65,13 +65,16 @@ extension XcodeHelper: CliRunnable {
         static let command          = CliOption(keys: ["fetch-packages", "FETCH_PACKAGES"],
                                                 description: "Fetch the package dependencies via 'swift package fetch'.",
                                                 usage: "xchelper fetch-packages SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package to call 'swift package fetch' in.",
-                                                requiresValue: true)
+                                                requiresValue: true,
+                                                defaultValue:nil)
         static let linuxPackages    = CliOption(keys:["-l", "--linux-packages", "FETCH_PACKAGES_LINUX_PACKAGES"],
                                                 description:"Fetch the Linux version of the packages. Some packages have Linux specific dependencies which may not be compatible with the macOS dependencies. `swift build --clean` is performed before they are fetched.",
+                                                usage:nil,
                                                 requiresValue:true,
                                                 defaultValue:"false")
         static let imageName        = CliOption(keys:["-i", "--image-name", "FETCH_PACKAGES_DOCKER_IMAGE_NAME"],
                                                 description:"The Docker image name to run the commands in.",
+                                                usage:nil,
                                                 requiresValue:true,
                                                 defaultValue:"saltzmanjoelh/swiftubuntu")
     }
@@ -95,13 +98,16 @@ extension XcodeHelper: CliRunnable {
         static let command          = CliOption(keys: ["update-packages", "UPDATE_PACKAGES"],
                                                 description: "Update the package dependencies via 'swift package update'.",
                                                 usage: "xchelper update-packages SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package to call 'swift package update' in.",
-                                                requiresValue: true)
+                                                requiresValue: true,
+                                                defaultValue:nil)
         static let linuxPackages    = CliOption(keys:["-l", "--linux-packages", "UPDATE_PACKAGES_LINUX_PACKAGES"],
                                                 description:"Update the Linux version of the packages. Some packages have Linux specific dependencies which may not be compatible with the macOS dependencies. `swift build --clean` is performed before they are updateed.",
+                                                usage: nil,
                                                 requiresValue:true,
                                                 defaultValue:"false")
         static let imageName        = CliOption(keys:["-i", "--image-name", "UPDATE_PACKAGES_DOCKER_IMAGE_NAME"],
                                                 description:"The Docker image name to run the commands in.",
+                                                usage: nil,
                                                 requiresValue:true,
                                                 defaultValue:"saltzmanjoelh/swiftubuntu")
     }
@@ -125,13 +131,16 @@ extension XcodeHelper: CliRunnable {
         static let command              = CliOption(keys: ["build", "BUILD"],
                                                     description: "Build a Swift package in Linux and have the build errors appear in Xcode.",
                                                     usage: "xchelper build SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package to call 'swift build' in.",
-                                                    requiresValue: true)
+                                                    requiresValue: true,
+                                                    defaultValue:nil)
         static let buildConfiguration   = CliOption(keys:["-c", "--build-configuration", "BUILD_CONFIGURATION"],
                                                     description:"debug or release mode.",
+                                                    usage: nil,
                                                     requiresValue:true,
                                                     defaultValue:"debug")
         static let imageName            = CliOption(keys:["-i", "--image-name", "BUILD_DOCKER_IMAGE_NAME"],
                                                     description:"The Docker image name to run the commands in. Defaults to saltzmanjoelh/swiftubuntu",
+                                                    usage: nil,
                                                     requiresValue:true,
                                                     defaultValue:"saltzmanjoelh/swiftubuntu")
     }
@@ -156,7 +165,8 @@ extension XcodeHelper: CliRunnable {
         static let command              = CliOption(keys: ["clean", "CLEAN"],
                                                     description: "Run swift build --clean on your package.",
                                                     usage: "xchelper clean SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package to call 'swift build --clean' in.",
-                                                    requiresValue: true)
+                                                    requiresValue: true,
+                                                    defaultValue:nil)
     }
     public func handleClean(option:CliOption) throws {
         let index = option.argumentIndex
@@ -171,7 +181,8 @@ extension XcodeHelper: CliRunnable {
         static let command              = CliOption(keys: ["sym-link-dependencies", "SYM_LINK_DEPENDENCIES"],
                                                     description: "Create symbolic links for Xcode 'Dependencies' after `swift package update` so you don't have to generate a new xcode project.",
                                                     usage: "xchelper sym-link-dependencies SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package to call 'swift build' in.",
-                                                    requiresValue: true)
+                                                    requiresValue: true,
+                                                    defaultValue:nil)
     }
     public func handleSymLinkDependencies(option:CliOption) throws {
         let index = option.argumentIndex
@@ -185,11 +196,14 @@ extension XcodeHelper: CliRunnable {
     struct CreateArchive {
         static let command              = CliOption(keys: ["create-archive", "CREATE_ARCHIVE"],
                                                     description: "Archive files with tar.",
-                                                    usage: "xchelper create-archive ARCHIVE_PATH FILES [OPTIONS]. ARCHIVE_PATH the full path and filename for the archive to be created. FILES is a space separated list of full paths to the files you want to archive.")
+                                                    usage: "xchelper create-archive ARCHIVE_PATH FILES [OPTIONS]. ARCHIVE_PATH the full path and filename for the archive to be created. FILES is a space separated list of full paths to the files you want to archive.",
+                                                    requiresValue: false,
+                                                    defaultValue: nil)
         static let flatList   = CliOption(keys:["-f", "--flat-list", "CREATE_ARCHIVE_FLAT_LIST"],
-                                                    description:"Put all the files in a flat list instead of maintaining directory structure",
-                                                    requiresValue:true,
-                                                    defaultValue:"true")
+                                          description:"Put all the files in a flat list instead of maintaining directory structure",
+                                          usage: nil,
+                                          requiresValue:true,
+                                          defaultValue:"true")
     }
     public func handleCreateArchive(option:CliOption) throws {
         let index = option.argumentIndex
@@ -211,23 +225,33 @@ extension XcodeHelper: CliRunnable {
         static let command              = CliOption(keys: ["upload-archive", "UPLOAD_ARCHIVE"],
                                                     description: "Upload an archive to S3",
                                                     usage: "xchelper upload-archive ARCHIVE_PATH [OPTIONS]. ARCHIVE_PATH the path of the archive that you want to upload to S3.",
-                                                    requiresValue: true)
+                                                    requiresValue: true,
+                                                    defaultValue:nil)
         static let bucket               = CliOption(keys:["-b", "--bucket", "UPLOAD_ARCHIVE_S3_BUCKET"],
                                                     description:"The bucket that you want to upload your archive to.",
-                                                    requiresValue:true)
+                                                    usage: nil,
+                                                    requiresValue:true,
+                                                    defaultValue:nil)
         static let region               = CliOption(keys:["-r", "--region", "UPLOAD_ARCHIVE_S3_REGION"],
                                                     description:"The bucket's region.",
+                                                    usage: nil,
                                                     requiresValue:true,
                                                     defaultValue:"us-east-1")
         static let key                  = CliOption(keys:["-k", "--key", "UPLOAD_ARCHIVE_S3_KEY"],
                                                     description:"The S3 key for the bucket.",
-                                                    requiresValue:true)
+                                                    usage: nil,
+                                                    requiresValue:true,
+                                                    defaultValue:nil)
         static let secret               = CliOption(keys:["-s", "--secret", "UPLOAD_ARCHIVE_S3_SECRET"],
                                                     description:"The secret for the key.",
-                                                    requiresValue:true)
+                                                    usage: nil,
+                                                    requiresValue:true,
+                                                    defaultValue:nil)
         static let credentialsFile      = CliOption(keys:["-c", "--credentials", "UPLOAD_ARCHIVE_CREDENTIALS"],
                                                     description:"The secret for the key.",
-                                                    requiresValue:true)
+                                                    usage: nil,
+                                                    requiresValue:true,
+                                                    defaultValue:nil)
     }
     public func handleUploadArchive(option:CliOption) throws {
         let index = option.argumentIndex
@@ -266,9 +290,21 @@ extension XcodeHelper: CliRunnable {
                                                     usage: "xchelper git-tag SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package's git repo to call `git tag ...` in.",
                                                     requiresValue: true,
                                                     defaultValue: "patch")
-        static let majorOption          = CliOption(keys: ["-m", "--major", "GIT_TAG_MAJOR"], description: "Increment the major portion of the repo's tag.")
-        static let minorOption          = CliOption(keys: ["-n", "--minor", "GIT_TAG_MINOR"], description: "Increment the minor portion of the repo's tag.")
-        static let patchOption          = CliOption(keys: ["-p", "--patch", "GIT_TAG_PATCH"], description: "Increment the patch portion of the repo's tag.")
+        static let majorOption          = CliOption(keys: ["-m", "--major", "GIT_TAG_MAJOR"],
+                                                    description: "Increment the major portion of the repo's tag.",
+                                                    usage: nil,
+                                                    requiresValue: false,
+                                                    defaultValue: nil)
+        static let minorOption          = CliOption(keys: ["-n", "--minor", "GIT_TAG_MINOR"],
+                                                    description: "Increment the minor portion of the repo's tag.",
+                                                    usage: nil,
+                                                    requiresValue: false,
+                                                    defaultValue: nil)
+        static let patchOption          = CliOption(keys: ["-p", "--patch", "GIT_TAG_PATCH"],
+                                                    description: "Increment the patch portion of the repo's tag.",
+                                                    usage: nil,
+                                                    requiresValue: false,
+                                                    defaultValue: nil)
     }
     public func handleGitTag(option:CliOption) throws {
         let index = option.argumentIndex
