@@ -1,10 +1,42 @@
-Build your Swift code on Linux with Xcode
-Archive your project and upload to S3 for automatic deployment with Xcode Server
-Keep the Xcode references to Swift dependency sources updated so that you don't have to keep change them when your dependencies update.
+XcodeHelper keeps you in Xcode and off the command line. You can:
 
-Helps with the Linux side of cross-platform Swift. Building and testing your Swift code in Xcode on the macOS is one thing. But, you then have to fire up Docker and make sure that there aren't any language differences or library differences on the Linux side of things. It's kind of a pain.
+* [Build and run tests on Linux through Docker](#build)
+* [Fetch/Update Swift packages](#fetch)
+* [Keep your "Dependencies" group in Xcode referencing the correct paths](#symlink)
+* [Tar and upload you Linux binary to AWS S3 buckets.](#archive)
 
-You can use the XcodeHelper as a binary. Then, create a new External Build target in Xcode. Now, when you are building your project, you can see the LInux errors right in Xcode. You can also have XcodeHelper archive your project into a tar file and upload to S3. The goal is to let Xcode Server handle the continuous integration for both macOS and Linux (via Docker) so that we don't have to use a intermediary build server like Jenkins. 
+Combining all these features gives Xcode and Xcode Server the ability to handle the continuous integration and delivery for both macOS and Linux (via Docker) so that we don't have to use an intermediary build server like Jenkins. 
+
+There is a sample project available to see the full configuration.
+
+## Build and run tests on Linux through Docker
+Build a Swift package in Linux and have the build errors appear in Xcode.
+```
+xchelper build SOURCE_CODE_PATH [OPTIONS]
+```
+`SOURCE_CODE_PATH` is the root of your package to call `swift build` in.
+
+Option  | Description
+------------- | ------------- 
+`-c`, `--build-configuration` or env var `BUILD_CONFIGURATION`| debug or release mode    
+`-i`, `--image-name` or env var `BUILD_DOCKER_IMAGE_NAME`| The Docker image name to run the commands in. Defaults to saltzmanjoelh/swiftubuntu                
+
+Building and testing your Swift code in Xcode on the macOS is one thing. But, you then have to fire up Docker and make sure that there aren't any language differences or library differences on the Linux side of things. It's kind of a pain. This helps with the Linux side of cross-platform Swift.
+
+You can use the xchelper as a binary. Then, create a new External Build target in Xcode. Now, when you are building your project, you can see the Linux errors right in Xcode. 
+
+![Create External Build Target](https://raw.githubusercontent.com/saltzmanjoelh/XcodeHelper/assets/build1.png)
+![Build Tool is /usr/bin/env](https://raw.githubusercontent.com/saltzmanjoelh/XcodeHelper/assets/build2.png)
+![Arguments are /path/to/xchelper build $\(PROJECT_DIR\)](https://raw.githubusercontent.com/saltzmanjoelh/XcodeHelper/assets/build2.png)
 
 
-Detailed instructions to come later 
+
+##Fetch/Update Swift packages
+Instead of going to the command line to update dependencies
+
+##Keep your "Dependencies" group in Xcode referencing the correct paths
+
+##Tar and upload you Linux binary to AWS S3 buckets.
+
+You can also have xchelper archive your project into a tar file and upload to S3. 
+

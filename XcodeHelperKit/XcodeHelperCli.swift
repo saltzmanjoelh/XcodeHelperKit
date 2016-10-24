@@ -18,7 +18,7 @@ extension XcodeHelper: CliRunnable {
     }    
     public var description: String? {
         get {
-            return "xchelper helps you stay in Xcode and off the command line. You can build and run tests on Linux through Docker, fetch Swift packages, keep your \"Dependencies\" group in Xcode referencing the correct paths and tar and upload you Linux binary to AWS S3 buckets."
+            return "xchelper keeps in Xcode and off the command line. You can build and run tests on Linux through Docker, fetch Swift packages, keep your \"Dependencies\" group in Xcode referencing the correct paths and tar and upload you Linux binary to AWS S3 buckets."
         }
     }
     public var appUsage: String? {
@@ -134,12 +134,12 @@ extension XcodeHelper: CliRunnable {
                                                     requiresValue: true,
                                                     defaultValue:nil)
         static let buildConfiguration   = CliOption(keys:["-c", "--build-configuration", "BUILD_CONFIGURATION"],
-                                                    description:"debug or release mode.",
+                                                    description:"debug or release mode",
                                                     usage: nil,
                                                     requiresValue:true,
                                                     defaultValue:"debug")
         static let imageName            = CliOption(keys:["-i", "--image-name", "BUILD_DOCKER_IMAGE_NAME"],
-                                                    description:"The Docker image name to run the commands in. Defaults to saltzmanjoelh/swiftubuntu",
+                                                    description:"The Docker image name to run the commands in",
                                                     usage: nil,
                                                     requiresValue:true,
                                                     defaultValue:"saltzmanjoelh/swiftubuntu")
