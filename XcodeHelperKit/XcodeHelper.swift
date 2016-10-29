@@ -30,11 +30,34 @@ public enum BuildConfiguration {
         }
     }
 }
+extension ExpressibleByUnicodeScalarLiteral where Self: ExpressibleByStringLiteral, Self.StringLiteralType == String {
+    public init(unicodeScalarLiteral value: String) {
+        self.init(stringLiteral: value)
+    }
+}
 
-public enum GitTagComponent : Int {
-    case major = 0
-    case minor = 1
-    case patch = 2
+extension ExpressibleByExtendedGraphemeClusterLiteral where Self: ExpressibleByStringLiteral, Self.StringLiteralType == String {
+    public init(extendedGraphemeClusterLiteral value: String) {
+        self.init(stringLiteral: value)
+    }
+}
+
+public enum GitTagComponent : String {
+    case major = "major"
+    case minor = "minor"
+    case patch = "patch"
+    static func from(intValue: Int) -> GitTagComponent? {
+        switch intValue {
+        case 0:
+            return .major
+        case 1:
+            return .minor
+        case 2:
+            return .patch
+        default:
+            return nil
+        }
+    }
 }
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
@@ -45,6 +68,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case symLinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
+    case gitTagParse(message:String)
     case gitTag(message:String)
     case unknownOption(message:String)
     public var description : String {
@@ -57,6 +81,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
                 case let .symLinkDependencies(message): return message
                 case let .createArchive(message): return message
                 case let .uploadArchive(message): return message
+                case let .gitTagParse(message): return message
                 case let .gitTag(message): return message
                 case let .unknownOption(message): return message
             }
@@ -256,13 +281,37 @@ public struct XcodeHelper {
     func getGitTag(sourcePath:String) throws -> String {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"])
         if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
+            throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
         }
-        guard let tag = result.output!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n").last else {
-            throw XcodeHelperError.gitTag(message: "Git tag not found: \(result.output)")
+
+        //guard let tags = result.output!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n").last else {
+        guard let tagStrings = result.output?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n") else {
+            throw XcodeHelperError.gitTag(message: "Error parsing git tags: \(result.output)")
         }
-        return tag
+        return try largestGitTag(tagStrings: tagStrings)
     }
+    
+    
+    func gitTagTuple(_ tagString: String) -> (Int, Int, Int)? {
+        let components = tagString.components(separatedBy: ".")
+        guard components.count == 3, let major = Int(components[0]), let minor = Int(components[1]), let patch = Int(components[2]) else {
+            return nil
+        }
+        return (major, minor, patch)
+    }
+    func gitTagSortValue(_ tag:(Int, Int, Int)) -> Int {
+        let multiplier = Int(ceil((Double(max(tag.0, tag.1, tag.2)) / 10) * 10))
+        return tag.0*multiplier*100 + tag.1*multiplier*10 + tag.2
+    }
+    func largestGitTag(tagStrings:[String]) throws -> String {
+        let tags = tagStrings.flatMap(gitTagTuple)
+        guard let tag = tags.sorted(by: {gitTagSortValue($0) < gitTagSortValue($1)}).last else {
+            throw XcodeHelperError.gitTag(message: "Git tag not found: \(tagStrings)")
+        }
+        
+        return "\(tag.0).\(tag.1).\(tag.2)"
+    }
+    
     @discardableResult
     public func incrementGitTag(components: [GitTagComponent] = [.patch], at sourcePath:String) throws -> String {
         let tag = try getGitTag(sourcePath: sourcePath)
@@ -271,7 +320,7 @@ public struct XcodeHelper {
             throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
         }
         let newVersionComponents = oldVersionComponents.enumerated().map { (offset: Int, element: String) -> String in
-            if let component = GitTagComponent.init(rawValue: offset), components.contains(component) {
+            if let component = GitTagComponent.from(intValue: offset), components.contains(component) {
                 if let newValue = Int(element) {
                     return String(describing: newValue+1)
                 }

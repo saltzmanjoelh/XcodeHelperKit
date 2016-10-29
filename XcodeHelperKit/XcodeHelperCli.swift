@@ -54,7 +54,8 @@ extension XcodeHelper: CliRunnable {
             uploadArchve.requiredArguments = [UploadArchive.bucket, UploadArchive.region]//(key,secret) OR credentials check in handler
             
             var gitTagOption = GitTag.command
-            gitTagOption.optionalArguments = [GitTag.majorOption, GitTag.minorOption, GitTag.patchOption]
+            gitTagOption.optionalArguments = [GitTag.versionOption, GitTag.incrementOption]
+            gitTagOption.action = handleGitTag
             
             return [CliOptionGroup(description:"Commands:",
                                    options:[fetchPackagesOption, updatePackagesOption, buildOption, cleanOption, symLinkDependenciesOption, createArchiveOption, uploadArchve, gitTagOption])]
@@ -285,49 +286,44 @@ extension XcodeHelper: CliRunnable {
     
     // MARK: GitTag
     struct GitTag {
+        //TODO: how do I set a default flag here?
         static let command              = CliOption(keys: ["git-tag", "GIT_TAG"],
-                                                    description: "Increment and optionally tag your package's git repo",
-                                                    usage: "xchelper git-tag SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package's git repo to call `git tag ...` in.",
+                                                    description: "Update your package's git repo",
+                                                    usage: "xchelper git-tag SOURCE_CODE_PATH [OPTIONS]. SOURCE_CODE_PATH is the root of your package's git repo to call `git tag X.X.X` in. ",
+                                                    requiresValue: true,
+                                                    defaultValue: nil)
+        static let versionOption          = CliOption(keys: ["-v", "--version", "GIT_TAG_VERSION"],
+                                                    description: "Specify exactly what the version should be.",
+                                                    usage: nil,
+                                                    requiresValue: true,
+                                                    defaultValue: nil)
+        static let incrementOption          = CliOption(keys: ["-i", "--increment", "GIT_TAG_INCREMENT"],
+                                                    description: "Automatically increment a portion of the repo's tag. Valid values are [major, minor, patch]",
+                                                    usage: nil,
                                                     requiresValue: true,
                                                     defaultValue: "patch")
-        static let majorOption          = CliOption(keys: ["-m", "--major", "GIT_TAG_MAJOR"],
-                                                    description: "Increment the major portion of the repo's tag.",
-                                                    usage: nil,
-                                                    requiresValue: false,
-                                                    defaultValue: nil)
-        static let minorOption          = CliOption(keys: ["-n", "--minor", "GIT_TAG_MINOR"],
-                                                    description: "Increment the minor portion of the repo's tag.",
-                                                    usage: nil,
-                                                    requiresValue: false,
-                                                    defaultValue: nil)
-        static let patchOption          = CliOption(keys: ["-p", "--patch", "GIT_TAG_PATCH"],
-                                                    description: "Increment the patch portion of the repo's tag.",
-                                                    usage: nil,
-                                                    requiresValue: false,
-                                                    defaultValue: nil)
     }
     public func handleGitTag(option:CliOption) throws {
         let index = option.argumentIndex
         guard let sourcePath = index[GitTag.command.keys.first!]?.first else {
-            throw XcodeHelperError.gitTag(message: "SOURCE_CODE_PATH was not provided.")
+            throw XcodeHelperError.gitTagParse(message: "SOURCE_CODE_PATH was not provided.")
         }
         do {
-            //get the current tag
-            let currentTag = try getGitTag(sourcePath: sourcePath)
-            var components = currentTag.components(separatedBy: ".")
-            
+
             //update from user input
-            let keys = [GitTag.majorOption.keys.first!, GitTag.minorOption.keys.first!, GitTag.patchOption.keys.first!]
-            for (i, key) in keys.enumerated() {
-                if let component = index[key]?.first {
-                    components[i] = component
+            if let version = index[GitTag.versionOption.keys.first!]?.first {
+                try gitTag(tag: version, at: sourcePath)
+                
+            }else if let componentString = index[GitTag.incrementOption.keys.first!]?.first {
+                guard let component = GitTagComponent(rawValue: componentString) else {
+                    throw XcodeHelperError.gitTagParse(message: "Unknown value \(componentString)")
                 }
+                try incrementGitTag(components: [component], at: sourcePath)
+            }else{
+                throw XcodeHelperError.gitTagParse(message: "You must provide either \(GitTag.versionOption.keys) OR \(GitTag.incrementOption.keys)")
             }
             
-            //save the new tag
-            try gitTag(tag: components.joined(separator: ".") , at: sourcePath)
-            
-        } catch _ {
+        } catch XcodeHelperError.gitTag(_) {
             //no current tag, just start it at 0.0.1
             try gitTag(tag: "0.0.1" , at: sourcePath)
         }

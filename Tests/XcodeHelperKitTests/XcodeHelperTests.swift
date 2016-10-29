@@ -248,6 +248,82 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
     }
+    func testGitTagTuple() {
+        let helper = XcodeHelper()
+        
+        let tag = helper.gitTagTuple("1.2.3")
+        
+        XCTAssertNotNil(tag)
+        XCTAssert(tag!.0 == 1)
+        XCTAssert(tag!.1 == 2)
+        XCTAssert(tag!.2 == 3)
+    }
+    func testGitTagTuple_InvalidFormat() {
+        let helper = XcodeHelper()
+        
+        let tag = helper.gitTagTuple("0.0")
+        
+        XCTAssertNil(tag)
+    }
+    func testGitTagSortValue_Major() {
+        let helper = XcodeHelper()
+        let tag = (1000, 1, 100)
+        
+        let sortValue = helper.gitTagSortValue(tag)
+        
+        XCTAssertEqual(sortValue, 100010100)
+    }
+    func testGitTagSortValue_Minor() {
+        let helper = XcodeHelper()
+        let tag = (1, 1000, 100)
+        
+        let sortValue = helper.gitTagSortValue(tag)
+        
+        XCTAssertEqual(sortValue, 10100100)
+    }
+    func testGitTagSortValue_Patch() {
+        let helper = XcodeHelper()
+        let tag = (1, 100, 1000)
+        
+        let sortValue = helper.gitTagSortValue(tag)
+        
+        XCTAssertEqual(sortValue, 1101000)
+    }
+    func testLargestGitTag_Major() {
+        do {
+            let helper = XcodeHelper()
+            
+            let tag = try helper.largestGitTag(tagStrings: ["1000.1.1", "999.1.1", "1.1000.1", "1.1.1000"])
+            
+            XCTAssertEqual(tag, "1000.1.1")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testLargestGitTag_Minor() {
+        do {
+            let helper = XcodeHelper()
+            
+            let tag = try helper.largestGitTag(tagStrings: ["1.1.1", "1.1000.1", "1.999.1", "1.1.1000"])
+            
+            XCTAssertEqual(tag, "1.1000.1")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testLargestGitTag_Patch() {
+        do {
+            let helper = XcodeHelper()
+            
+            let tag = try helper.largestGitTag(tagStrings: ["1.1.1", "1.1000.1", "1.1000.1000"])
+            
+            XCTAssertEqual(tag, "1.1000.1000")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
+    
     func testIncrementGitTagMajor() {
         do {
             let helper = XcodeHelper()
@@ -330,16 +406,18 @@ class XcodeHelperTests: XCTestCase {
         do{
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagOption = helper.cliOptionGroups.first!.options.last!
-            gitTagOption.values = [sourcePath!]
-            var majorOption = gitTagOption.optionalArguments![0]
-            majorOption.values = ["999"]
-            gitTagOption.optionalArguments = [majorOption]
+            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
+            gitTagCommand.values = [sourcePath!]
+            var incrementOption = gitTagCommand.optionalArguments![1]
+            incrementOption.values = [GitTagComponent.major.rawValue]//simulate -i "patch"
+            gitTagCommand.optionalArguments = [incrementOption]
+            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
+            let targetTag = Int(currentTag.components(separatedBy: ".")[0])!+1
             
-            try helper.handleGitTag(option: gitTagOption)
+            try helper.handleGitTag(option: gitTagCommand)
             
             let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[0], "999")
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[0], String(targetTag))
             
         } catch let e {
             XCTFail("Error: \(e)")
@@ -349,16 +427,18 @@ class XcodeHelperTests: XCTestCase {
         do{
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagOption = helper.cliOptionGroups.first!.options.last!
-            gitTagOption.values = [sourcePath!]
-            var minorOption = gitTagOption.optionalArguments![1]
-            minorOption.values = ["999"]
-            gitTagOption.optionalArguments = [minorOption]
+            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
+            gitTagCommand.values = [sourcePath!]
+            var incrementOption = gitTagCommand.optionalArguments![1]
+            incrementOption.values = [GitTagComponent.minor.rawValue]//simulate -i "patch"
+            gitTagCommand.optionalArguments = [incrementOption]
+            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
+            let targetTag = Int(currentTag.components(separatedBy: ".")[1])!+1
             
-            try helper.handleGitTag(option: gitTagOption)
+            try helper.handleGitTag(option: gitTagCommand)
             
             let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[1], "999")
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[1], String(targetTag))
             
         } catch let e {
             XCTFail("Error: \(e)")
@@ -368,16 +448,18 @@ class XcodeHelperTests: XCTestCase {
         do{
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagOption = helper.cliOptionGroups.first!.options.last!
-            gitTagOption.values = [sourcePath!]
-            var minorOption = gitTagOption.optionalArguments![2]
-            minorOption.values = ["999"]
-            gitTagOption.optionalArguments = [minorOption]
+            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
+            gitTagCommand.values = [sourcePath!]
+            var incrementOption = gitTagCommand.optionalArguments![1]
+            incrementOption.values = [GitTagComponent.patch.rawValue]//simulate -i "patch"
+            gitTagCommand.optionalArguments = [incrementOption]
+            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
+            let targetTag = Int(currentTag.components(separatedBy: ".")[2])!+1
             
-            try helper.handleGitTag(option: gitTagOption)
+            try helper.handleGitTag(option: gitTagCommand)
             
             let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[2], "999")
+            XCTAssertEqual(updatedTag.components(separatedBy: ".")[2], String(targetTag))
             
         } catch let e {
             XCTFail("Error: \(e)")

@@ -72,7 +72,15 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "fetch-packages $(PROJECT_DIR) -l true"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "git-tag $(PROJECT_DIR) -i"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "build $(PROJECT_DIR)"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
