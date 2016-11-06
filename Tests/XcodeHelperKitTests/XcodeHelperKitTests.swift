@@ -11,11 +11,11 @@ import SynchronousProcess
 import DockerProcess
 import S3Kit
 
-#if os(OSX) || os(iOS)
+//#if os(OSX) || os(iOS)
     import Darwin
-#elseif os(Linux)
-    import Glibc
-#endif
+//#elseif os(Linux)
+//    import Glibc
+//#endif
 
 @testable
 import XcodeHelperKit
@@ -397,69 +397,6 @@ class XcodeHelperTests: XCTestCase {
         
         do{
             try helper.pushGitTag(tag:tag!, at: sourcePath!)
-            
-        } catch let e {
-            XCTFail("Error: \(e)")
-        }
-    }
-    func testHandleGitTagMajor() {
-        do{
-            let helper = XcodeHelper()
-            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
-            gitTagCommand.values = [sourcePath!]
-            var incrementOption = gitTagCommand.optionalArguments![1]
-            incrementOption.values = [GitTagComponent.major.rawValue]//simulate -i "patch"
-            gitTagCommand.optionalArguments = [incrementOption]
-            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
-            let targetTag = Int(currentTag.components(separatedBy: ".")[0])!+1
-            
-            try helper.handleGitTag(option: gitTagCommand)
-            
-            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[0], String(targetTag))
-            
-        } catch let e {
-            XCTFail("Error: \(e)")
-        }
-    }
-    func testHandleGitTagMinor() {
-        do{
-            let helper = XcodeHelper()
-            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
-            gitTagCommand.values = [sourcePath!]
-            var incrementOption = gitTagCommand.optionalArguments![1]
-            incrementOption.values = [GitTagComponent.minor.rawValue]//simulate -i "patch"
-            gitTagCommand.optionalArguments = [incrementOption]
-            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
-            let targetTag = Int(currentTag.components(separatedBy: ".")[1])!+1
-            
-            try helper.handleGitTag(option: gitTagCommand)
-            
-            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[1], String(targetTag))
-            
-        } catch let e {
-            XCTFail("Error: \(e)")
-        }
-    }
-    func testHandleGitTagPatch() {
-        do{
-            let helper = XcodeHelper()
-            sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            var gitTagCommand = helper.cliOptionGroups.first!.options.last!//get the command
-            gitTagCommand.values = [sourcePath!]
-            var incrementOption = gitTagCommand.optionalArguments![1]
-            incrementOption.values = [GitTagComponent.patch.rawValue]//simulate -i "patch"
-            gitTagCommand.optionalArguments = [incrementOption]
-            let currentTag = try helper.getGitTag(sourcePath: sourcePath!)
-            let targetTag = Int(currentTag.components(separatedBy: ".")[2])!+1
-            
-            try helper.handleGitTag(option: gitTagCommand)
-            
-            let updatedTag = try helper.getGitTag(sourcePath: sourcePath!)
-            XCTAssertEqual(updatedTag.components(separatedBy: ".")[2], String(targetTag))
             
         } catch let e {
             XCTFail("Error: \(e)")
