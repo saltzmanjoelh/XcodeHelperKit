@@ -5,11 +5,7 @@ import PackageDescription
  */
 
 let package = Package(
-    name: "XcodeHelper",
-    targets:[
-        Target(name: "XcodeHelperKit"),
-        Target(name: "xchelper", dependencies: ["XcodeHelperKit"]),
-    ],
+    name: "XcodeHelperKit",
     dependencies: [
         .Package(url: "https://github.com/saltzmanjoelh/SynchronousProcess.git", versions: Version(0,0,0)..<Version(10,0,0)),
         .Package(url: "https://github.com/saltzmanjoelh/DockerProcess.git", versions: Version(0,0,0)..<Version(10,0,0)),
