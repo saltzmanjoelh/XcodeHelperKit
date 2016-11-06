@@ -2,7 +2,7 @@ XcodeHelperKit keeps you in Xcode and off the command line. You can:
 
 * Build and run tests on Linux through Docker
 * Fetch/Update Swift packages
-* Symlink your Packages so that you don't have to update Xcode when you update your packages
+* Keep your "Dependencies" group / Packages in Xcode referencing the correct paths
 * Tar and upload you Linux binary to AWS S3 buckets
 
 Combining all these features gives Xcode and Xcode Server the ability to handle the continuous integration and delivery for both macOS and Linux (via Docker) so that we don't have to use an intermediary build server like Jenkins.

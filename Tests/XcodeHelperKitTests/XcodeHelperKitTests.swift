@@ -216,7 +216,7 @@ class XcodeHelperTests: XCTestCase {
     func testUploadArchive(){
         
         do{
-            let credentialsPath = "/Users/joelsaltzman/Sites/XcodeHelper/s3Credentials.csv"
+            let credentialsPath = "/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv"
             let bucket = "saltzman.test"
             let region = "us-east-1"
             let helper = XcodeHelper()

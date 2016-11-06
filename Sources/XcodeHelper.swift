@@ -209,7 +209,7 @@ public struct XcodeHelper {
         }
     }
     
-    func projectFilePath(at sourcePath:String) throws -> String {
+    public func projectFilePath(at sourcePath:String) throws -> String {
         var xcodeProjectPath: String?
         var pbProjectPath: String?
         do{
@@ -278,7 +278,7 @@ public struct XcodeHelper {
     }
     
     
-    func getGitTag(sourcePath:String) throws -> String {
+    public func getGitTag(sourcePath:String) throws -> String {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
@@ -292,18 +292,18 @@ public struct XcodeHelper {
     }
     
     
-    func gitTagTuple(_ tagString: String) -> (Int, Int, Int)? {
+    public func gitTagTuple(_ tagString: String) -> (Int, Int, Int)? {
         let components = tagString.components(separatedBy: ".")
         guard components.count == 3, let major = Int(components[0]), let minor = Int(components[1]), let patch = Int(components[2]) else {
             return nil
         }
         return (major, minor, patch)
     }
-    func gitTagSortValue(_ tag:(Int, Int, Int)) -> Int {
+    public func gitTagSortValue(_ tag:(Int, Int, Int)) -> Int {
         let multiplier = Int(ceil((Double(max(tag.0, tag.1, tag.2)) / 10) * 10))
         return tag.0*multiplier*100 + tag.1*multiplier*10 + tag.2
     }
-    func largestGitTag(tagStrings:[String]) throws -> String {
+    public func largestGitTag(tagStrings:[String]) throws -> String {
         let tags = tagStrings.flatMap(gitTagTuple)
         guard let tag = tags.sorted(by: {gitTagSortValue($0) < gitTagSortValue($1)}).last else {
             throw XcodeHelperError.gitTag(message: "Git tag not found: \(tagStrings)")
