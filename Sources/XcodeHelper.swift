@@ -137,6 +137,7 @@ public struct XcodeHelper {
         }
     }
     
+    //TODO: use a data container to hold the source code so that we don't have to build everything from scratch each time
     @discardableResult
     public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         //check if we need to clean first
