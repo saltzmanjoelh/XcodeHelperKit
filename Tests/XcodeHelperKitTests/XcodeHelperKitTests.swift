@@ -173,6 +173,19 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     
+    func testBuildInLinux(){
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let helper = XcodeHelper()
+        
+        do {
+            let result = try helper.build(source: sourcePath!, usingConfiguration: .debug, inDockerImage: "saltzmanjoelh/swiftubuntu", removeWhenDone: true)
+            
+            XCTAssertNil(result.error, result.error!)
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
     func testArchiveFlatList(){
         let helper = XcodeHelper()
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)

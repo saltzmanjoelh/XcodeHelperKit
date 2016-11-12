@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		OBJ_39 /* SynchronousProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* SynchronousProcess.swift */; };
-		OBJ_46 /* DockerForMacProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* DockerForMacProcess.swift */; };
 		OBJ_47 /* DockerProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* DockerProcess.swift */; };
-		OBJ_48 /* DockerToolboxProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* DockerToolboxProcess.swift */; };
 		OBJ_50 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SynchronousProcess.framework */; };
 		OBJ_57 /* CliOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* CliOption.swift */; };
 		OBJ_58 /* CliRunnable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* CliRunnable.swift */; };
@@ -105,9 +103,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		OBJ_11 /* DockerForMacProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerForMacProcess.swift; sourceTree = "<group>"; };
 		OBJ_12 /* DockerProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerProcess.swift; sourceTree = "<group>"; };
-		OBJ_13 /* DockerToolboxProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerToolboxProcess.swift; sourceTree = "<group>"; };
 		OBJ_15 /* CliOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliOption.swift; sourceTree = "<group>"; };
 		OBJ_16 /* CliRunnable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliRunnable.swift; sourceTree = "<group>"; };
 		OBJ_17 /* Helpable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpable.swift; sourceTree = "<group>"; };
@@ -185,12 +181,10 @@
 		OBJ_10 /* DockerProcess */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_11 /* DockerForMacProcess.swift */,
 				OBJ_12 /* DockerProcess.swift */,
-				OBJ_13 /* DockerToolboxProcess.swift */,
 			);
 			name = DockerProcess;
-			path = "Packages/DockerProcess-1.0.8/Sources";
+			path = Packages/DockerProcess/Sources;
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_14 /* CliRunnable */ = {
@@ -201,7 +195,7 @@
 				OBJ_17 /* Helpable.swift */,
 			);
 			name = CliRunnable;
-			path = "Packages/CliRunnable-1.0.20/Sources";
+			path = Packages/CliRunnable/Sources;
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_18 /* S3Kit */ = {
@@ -212,7 +206,7 @@
 				OBJ_21 /* S3V4Signer.swift */,
 			);
 			name = S3Kit;
-			path = "Packages/S3Kit-1.0.8/Sources";
+			path = Packages/S3Kit/Sources;
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_22 /* XcodeHelperKit */ = {
@@ -254,7 +248,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -262,7 +256,6 @@
 				OBJ_24 /* Tests */,
 				OBJ_27 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -283,7 +276,7 @@
 				OBJ_9 /* SynchronousProcess.swift */,
 			);
 			name = SynchronousProcess;
-			path = "Packages/SynchronousProcess-1.0.10/Sources";
+			path = Packages/SynchronousProcess/Sources;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
@@ -410,7 +403,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_27 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -438,9 +431,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_46 /* DockerForMacProcess.swift in Sources */,
 				OBJ_47 /* DockerProcess.swift in Sources */,
-				OBJ_48 /* DockerToolboxProcess.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,7 +688,7 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/S3Kit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -717,7 +708,7 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/S3Kit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -737,7 +728,7 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -757,7 +748,7 @@
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -777,7 +768,7 @@
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKitTests_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -794,7 +785,7 @@
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto-1.0.5";
+				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKitTests_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";

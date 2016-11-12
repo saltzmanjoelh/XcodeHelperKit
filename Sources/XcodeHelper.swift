@@ -105,7 +105,7 @@ public struct XcodeHelper {
     public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
             let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
-            let result = DockerToolboxProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
             if let error = result.error, result.exitCode != 0 {
                 throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
             }
@@ -123,7 +123,7 @@ public struct XcodeHelper {
     public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
             let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
-            let result = DockerToolboxProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
             if let error = result.error, result.exitCode != 0 {
                 throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
             }
@@ -139,7 +139,7 @@ public struct XcodeHelper {
     
     //TODO: use a data container to hold the source code so that we don't have to build everything from scratch each time
     @discardableResult
-    public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu", removeWhenDone: Bool = true) throws -> ProcessResult {
         //check if we need to clean first
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
             try clean(source: sourcePath)
@@ -150,7 +150,7 @@ public struct XcodeHelper {
 //        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
         //simple build doesn't work
         let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
-        let result = DockerToolboxProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+        let result = DockerProcess(command: "run", commandOptions: [removeWhenDone ? "--rm" : "", "-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.build(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
         }
