@@ -64,7 +64,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
     case fetch(message:String)
     case update(message:String)
-    case build(message:String)
+    case build(message:String, exitCode: Int32)
     case symLinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
@@ -77,7 +77,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
                 case let .clean(message): return message
                 case let .fetch(message): return message
                 case let .update(message): return message
-                case let .build(message): return message
+                case let .build(message, _): return message
                 case let .symLinkDependencies(message): return message
                 case let .createArchive(message): return message
                 case let .uploadArchive(message): return message
@@ -152,7 +152,7 @@ public struct XcodeHelper {
         let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
         let result = DockerProcess(command: "run", commandOptions: [removeWhenDone ? "--rm" : "", "-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.build(message: "Error building in Linux (\(result.exitCode)):\n\(error)")
+            throw XcodeHelperError.build(message: "Error building in Linux: \(error)", exitCode: result.exitCode)
         }
         return result
     }

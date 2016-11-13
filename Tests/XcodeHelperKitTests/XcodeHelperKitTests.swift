@@ -26,6 +26,8 @@ enum LibraryTag: Int {
     case patch = 3
 }
 
+//TODO: add an exitCode to .build errors so that we can still throw an error and have the cli main file handle the exit code
+
 class XcodeHelperTests: XCTestCase {
     
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
