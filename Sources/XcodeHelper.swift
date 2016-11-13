@@ -70,6 +70,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case uploadArchive(message:String)
     case gitTagParse(message:String)
     case gitTag(message:String)
+    case xcarchivePlist(message: String)
     case unknownOption(message:String)
     public var description : String {
         get {
@@ -83,6 +84,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
                 case let .uploadArchive(message): return message
                 case let .gitTagParse(message): return message
                 case let .gitTag(message): return message
+                case let .xcarchivePlist(message): return message
                 case let .unknownOption(message): return message
             }
         }
@@ -347,5 +349,28 @@ public struct XcodeHelper {
             throw XcodeHelperError.gitTag(message: "Error pushing git tag: \(error)")
         }
     }
+    
+    private func xcarchivePlistDate(from: Date = Date()) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+        
+        return dateFormatter.string(from: from)
+    }
+    public func createXcarchivePlist(in dirPath:String, name: String, schemeName:String) throws {
+        let date = xcarchivePlistDate()
+        let dictionary = ["ArchiveVersion": "2",
+                    "CreationDate": date,
+                    "Name": name,
+                    "SchemeName": schemeName] as NSDictionary
+        do{
+            let data = try PropertyListSerialization.data(fromPropertyList: dictionary, format: .xml, options: 0)
+            try data.write(to: URL.init(fileURLWithPath: dirPath.appending("/Info.plist")) )
+        }catch let e{
+            throw XcodeHelperError.xcarchivePlist(message: "Failed to create plist in: \(dirPath). Error: \(e)")
+        }
+    }
+    
 }
 

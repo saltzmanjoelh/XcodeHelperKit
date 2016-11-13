@@ -50,10 +50,11 @@ class XcodeHelperTests: XCTestCase {
     //returns the temp dir that we cloned into
     private func cloneToTempDirectory(repoURL:String) -> String? {
         //use /tmp instead of FileManager.default.temporaryDirectory because Docker for mac specifies /tmp by default and not /var...
-        guard let tempDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).path.appending("/XcodeHelperKitTests/\(UUID())") else{
-            XCTFail("Failed to get user dir")
-            return nil
-        }
+//        guard let tempDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).path.appending("/XcodeHelperKitTests/\(UUID())") else{
+//            XCTFail("Failed to get user dir")
+//            return nil
+//        }
+        let tempDir = "/tmp"
         if !FileManager.default.fileExists(atPath: tempDir) {
             do {
                 try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
@@ -416,6 +417,24 @@ class XcodeHelperTests: XCTestCase {
         } catch let e {
             XCTFail("Error: \(e)")
         }
+    }
+    
+    func testCreateXcarchivePlist() {
+        
+        do{
+            let path = "/tmp"
+            let file = "Info.plist"
+            let helper = XcodeHelper()
+            
+            try helper.createXcarchivePlist(in: path, name: "TestApp", schemeName: "TestScheme")
+            
+            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(path)/\(file)"))
+            try! FileManager.default.removeItem(atPath: "\(path)/\(file)")
+            
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+        
     }
     
 }
