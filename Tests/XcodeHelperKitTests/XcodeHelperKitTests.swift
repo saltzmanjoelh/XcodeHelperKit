@@ -54,7 +54,7 @@ class XcodeHelperTests: XCTestCase {
 //            XCTFail("Failed to get user dir")
 //            return nil
 //        }
-        let tempDir = "/tmp"
+        let tempDir = "/tmp/\(UUID())"
         if !FileManager.default.fileExists(atPath: tempDir) {
             do {
                 try FileManager.default.createDirectory(atPath: tempDir, withIntermediateDirectories: false, attributes: nil)
