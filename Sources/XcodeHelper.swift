@@ -101,6 +101,8 @@ public enum DockerEnvironmentVariable: String {
 
 public struct XcodeHelper {
     
+    let dateFormatter = DateFormatter()
+    
     public init(){}
     
     @discardableResult
@@ -241,6 +243,7 @@ public struct XcodeHelper {
     
     @discardableResult
     public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true) throws -> ProcessResult {
+        try FileManager.default.createDirectory(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
         let arguments = ["-cvzf", archivePath]+args
         let result = Process.run("/usr/bin/tar", arguments: arguments)
@@ -350,15 +353,43 @@ public struct XcodeHelper {
         }
     }
     
-    private func xcarchivePlistDate(from: Date = Date()) -> String {
-        let dateFormatter = DateFormatter()
+    //returns a String for the path of the xcarchive
+    public func createXcarchive(in dirPath:String, with binaryPath: String, from schemeName:String) throws -> String {
+        let name = URL(fileURLWithPath: binaryPath).lastPathComponent
+        let date = Date()
+        let directoryDate = xcarchiveDirectoryDate(from: date)
+        let archiveDate = xcarchiveDate(from: date)
+        let archiveName = "xchelper-\(name) \(archiveDate).xcarchive"
+        let path = "\(dirPath)/\(directoryDate)/\(archiveName)"
+        try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+        try createXcarchivePlist(in: path, name: name, schemeName: schemeName)
+        try createArchive(at: path.appending("/Products/\(name).tar"), with: [binaryPath])
+        return path
+    }
+    
+    private func xcarchiveDirectoryDate(from: Date = Date()) -> String {
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        return dateFormatter.string(from: from)
+    }
+
+    internal func xcarchiveDate(from: Date = Date()) -> String {
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "MM-dd-yyyy, h.mm.ss a"
+        
+        return dateFormatter.string(from: from)
+    }
+    internal func xcarchivePlistDate(from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
         
         return dateFormatter.string(from: from)
     }
-    public func createXcarchivePlist(in dirPath:String, name: String, schemeName:String) throws {
+    internal func createXcarchivePlist(in dirPath:String, name: String, schemeName:String) throws {
         let date = xcarchivePlistDate()
         let dictionary = ["ArchiveVersion": "2",
                     "CreationDate": date,

@@ -419,17 +419,23 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     
-    func testCreateXcarchivePlist() {
+    func testCreateXcarchive() {
         
         do{
             let path = "/tmp"
-            let file = "Info.plist"
+            let appName = "TestApp"
+            let schemeName = "TestAppScheme"
+            let plist = "Info.plist"
+            let binaryPath = "/tmp/\(appName)"
+            FileManager.default.createFile(atPath: binaryPath, contents: "Hi".data(using: String.Encoding.utf8), attributes: nil)
             let helper = XcodeHelper()
             
-            try helper.createXcarchivePlist(in: path, name: "TestApp", schemeName: "TestScheme")
+            let archivePath = try helper.createXcarchive(in: path, with: binaryPath, from: schemeName)
             
-            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(path)/\(file)"))
-            try! FileManager.default.removeItem(atPath: "\(path)/\(file)")
+            XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath)/\(plist)"))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath)/Products/\(appName).tar"))
+            try! FileManager.default.removeItem(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path)
             
         } catch let e {
             XCTFail("Error: \(e)")
