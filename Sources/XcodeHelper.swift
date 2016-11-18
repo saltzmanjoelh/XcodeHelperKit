@@ -1,6 +1,3 @@
-//xcode -> swift package fetch
-//PreBuild -> Packages/XcodeHelpers*/ 
-
 import Foundation
 import SynchronousProcess
 import DockerProcess
@@ -28,17 +25,6 @@ public enum BuildConfiguration {
         }else{
             self = .debug
         }
-    }
-}
-extension ExpressibleByUnicodeScalarLiteral where Self: ExpressibleByStringLiteral, Self.StringLiteralType == String {
-    public init(unicodeScalarLiteral value: String) {
-        self.init(stringLiteral: value)
-    }
-}
-
-extension ExpressibleByExtendedGraphemeClusterLiteral where Self: ExpressibleByStringLiteral, Self.StringLiteralType == String {
-    public init(extendedGraphemeClusterLiteral value: String) {
-        self.init(stringLiteral: value)
     }
 }
 
@@ -99,11 +85,28 @@ public enum DockerEnvironmentVariable: String {
     case containerName = "DOCKER_CONTAINER_NAME"
 }
 
-public struct XcodeHelper {
+public protocol XcodeHelpable {
     
+    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String?) throws -> ProcessResult
+    @discardableResult func updatePackages(at sourcePath: String, forLinux: Bool, inDockerImage imageName: String?) throws -> ProcessResult
+    @discardableResult func build(source sourcePath: String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName: String, removeWhenDone: Bool) throws -> ProcessResult
+    @discardableResult func clean(source: String) throws -> ProcessResult
+    @discardableResult func symLinkDependencies(sourcePath: String) throws
+    @discardableResult func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
+    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
+    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws
+    @discardableResult func incrementGitTag(components: [GitTagComponent], at sourcePath: String) throws -> String
+    func gitTag(tag: String, at sourcePath: String) throws
+    func pushGitTag(tag: String, at sourcePath: String) throws
+    @discardableResult func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String) throws -> String
+}
+
+public struct XcodeHelper: XcodeHelpable {
     let dateFormatter = DateFormatter()
     
-    public init(){}
+    public init() {
+        
+    }
     
     @discardableResult
     public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
@@ -150,8 +153,8 @@ public struct XcodeHelper {
         }
         //At the moment, building directly from a mounted volume gives errors like "error: Could not create file ... /.Package.toml"
         //rsync the files to the root of the disk (excluding .build dir) the replace the build
-//        let buildDir = configuration.buildDirectory(inSourcePath: sourcePath)
-//        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
+        //        let buildDir = configuration.buildDirectory(inSourcePath: sourcePath)
+        //        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
         //simple build doesn't work
         let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
         let result = DockerProcess(command: "run", commandOptions: [removeWhenDone ? "--rm" : "", "-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
@@ -171,6 +174,7 @@ public struct XcodeHelper {
         //otherwise, clean if there is a build path but the file isn't readable
         return FileManager.default.fileExists(atPath: configuration.buildDirectory(inSourcePath: sourcePath))
     }
+    
     @discardableResult
     public func clean(source:String) throws -> ProcessResult {
         //We can use Process instead of firing up Docker because the end result is the same. A clean .build dir
@@ -268,6 +272,7 @@ public struct XcodeHelper {
         }
         
     }
+    
     @discardableResult
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String) throws  {
         let result = try S3.with(credentials: credentialsPath).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
@@ -289,7 +294,7 @@ public struct XcodeHelper {
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
         }
-
+        
         //guard let tags = result.output!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n").last else {
         guard let tagStrings = result.output?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n") else {
             throw XcodeHelperError.gitTag(message: "Error parsing git tags: \(result.output)")
@@ -305,10 +310,12 @@ public struct XcodeHelper {
         }
         return (major, minor, patch)
     }
+    
     public func gitTagSortValue(_ tag:(Int, Int, Int)) -> Int {
         let multiplier = Int(ceil((Double(max(tag.0, tag.1, tag.2)) / 10) * 10))
         return tag.0*multiplier*100 + tag.1*multiplier*10 + tag.2
     }
+    
     public func largestGitTag(tagStrings:[String]) throws -> String {
         let tags = tagStrings.flatMap(gitTagTuple)
         guard let tag = tags.sorted(by: {gitTagSortValue($0) < gitTagSortValue($1)}).last else {
@@ -356,9 +363,8 @@ public struct XcodeHelper {
     //returns a String for the path of the xcarchive
     public func createXcarchive(in dirPath:String, with binaryPath: String, from schemeName:String) throws -> String {
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
-        let date = Date()
-        let directoryDate = xcarchiveDirectoryDate(from: date)
-        let archiveDate = xcarchiveDate(from: date)
+        let directoryDate = xcarchiveDirectoryDate(formatter: dateFormatter)
+        let archiveDate = xcarchiveDate(formatter: dateFormatter)
         let archiveName = "xchelper-\(name) \(archiveDate).xcarchive"
         let path = "\(dirPath)/\(directoryDate)/\(archiveName)"
         try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
@@ -367,34 +373,36 @@ public struct XcodeHelper {
         return path
     }
     
-    private func xcarchiveDirectoryDate(from: Date = Date()) -> String {
+    private func xcarchiveDirectoryDate(formatter: DateFormatter, from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone.current
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         return dateFormatter.string(from: from)
     }
-
-    internal func xcarchiveDate(from: Date = Date()) -> String {
+    
+    internal func xcarchiveDate(formatter: DateFormatter, from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone.current
         dateFormatter.dateFormat = "MM-dd-yyyy, h.mm.ss a"
         
         return dateFormatter.string(from: from)
     }
-    internal func xcarchivePlistDate(from: Date = Date()) -> String {
+    
+    internal func xcarchivePlistDateString(formatter: DateFormatter, from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
         
         return dateFormatter.string(from: from)
     }
+    
     internal func createXcarchivePlist(in dirPath:String, name: String, schemeName:String) throws {
-        let date = xcarchivePlistDate()
+        let date = xcarchivePlistDateString(formatter: dateFormatter)
         let dictionary = ["ArchiveVersion": "2",
-                    "CreationDate": date,
-                    "Name": name,
-                    "SchemeName": schemeName] as NSDictionary
+                          "CreationDate": date,
+                          "Name": name,
+                          "SchemeName": schemeName] as NSDictionary
         do{
             let data = try PropertyListSerialization.data(fromPropertyList: dictionary, format: .xml, options: 0)
             try data.write(to: URL.init(fileURLWithPath: dirPath.appending("/Info.plist")) )
