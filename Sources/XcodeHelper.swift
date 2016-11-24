@@ -48,7 +48,7 @@ public enum GitTagComponent : String {
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
-    case fetch(message:String)
+//    case fetch(message:String)
     case update(message:String)
     case build(message:String, exitCode: Int32)
     case symLinkDependencies(message:String)
@@ -62,7 +62,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
         get {
             switch (self) {
                 case let .clean(message): return message
-                case let .fetch(message): return message
+//                case let .fetch(message): return message
                 case let .update(message): return message
                 case let .build(message, _): return message
                 case let .symLinkDependencies(message): return message
@@ -87,8 +87,8 @@ public enum DockerEnvironmentVariable: String {
 
 public protocol XcodeHelpable {
     
-    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String?) throws -> ProcessResult
-    @discardableResult func updatePackages(at sourcePath: String, forLinux: Bool, inDockerImage imageName: String?) throws -> ProcessResult
+//    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String) throws -> ProcessResult
+    @discardableResult func updatePackages(at sourcePath: String, forLinux: Bool, inDockerImage imageName: String) throws -> ProcessResult
     @discardableResult func build(source sourcePath: String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName: String, removeWhenDone: Bool) throws -> ProcessResult
     @discardableResult func clean(source: String) throws -> ProcessResult
     @discardableResult func symLinkDependencies(sourcePath: String) throws
@@ -108,26 +108,26 @@ public struct XcodeHelper: XcodeHelpable {
         
     }
     
-    @discardableResult
-    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
-        if forLinux {
-            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
-            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
-            if let error = result.error, result.exitCode != 0 {
-                throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
-            }
-            return result
-        }else{
-            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
-            if let error = result.error, result.exitCode != 0 {
-                throw XcodeHelperError.fetch(message: "Error fetching packages in macOS (\(result.exitCode)):\n\(error)")
-            }
-            return result
-        }
-    }
+//    @discardableResult
+//    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+//        if forLinux {
+//            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
+//            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+//            if let error = result.error, result.exitCode != 0 {
+//                throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
+//            }
+//            return result
+//        }else{
+//            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
+//            if let error = result.error, result.exitCode != 0 {
+//                throw XcodeHelperError.fetch(message: "Error fetching packages in macOS (\(result.exitCode)):\n\(error)")
+//            }
+//            return result
+//        }
+//    }
     
     @discardableResult
-    public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
             let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
             let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)

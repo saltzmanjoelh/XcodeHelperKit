@@ -68,7 +68,7 @@ class XcodeHelperTests: XCTestCase {
         print("done cloning temp dir: \(tempDir)")
         return tempDir
     }
-    
+    /*
     func testFetchPackages() {
         sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
         let helper = XcodeHelper()
@@ -102,6 +102,7 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
     }
+ */
     func testProjectFilePath() {
         sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
         _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
