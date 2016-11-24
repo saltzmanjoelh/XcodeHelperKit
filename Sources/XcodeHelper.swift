@@ -302,7 +302,7 @@ public struct XcodeHelper: XcodeHelpable {
     
     
     public func getGitTag(sourcePath:String) throws -> String {
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"])
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"], silenceOutput: true)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
         }
@@ -359,7 +359,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     public func gitTag(tag: String, at sourcePath:String) throws {
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"])
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"], silenceOutput: true)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error tagging git repo: \(error)")
         }
