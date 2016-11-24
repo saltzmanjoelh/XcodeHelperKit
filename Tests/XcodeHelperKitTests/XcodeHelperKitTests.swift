@@ -119,7 +119,7 @@ class XcodeHelperTests: XCTestCase {
     }
     
     func testSymLinkDependencies() {
-        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+        sourcePath = "/tmp/E03F15AA-5295-485B-98F6-30A5F7B9FCCF"//cloneToTempDirectory(repoURL: executableRepoURL)
         _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
         let packages = ["Hello"]
         let helper = XcodeHelper()

@@ -198,12 +198,24 @@ public struct XcodeHelper: XcodeHelpable {
         }
         for directory in try FileManager.default.contentsOfDirectory(atPath: packagesPath) {
             let versionedPackageName = "\(directory)"
-            if versionedPackageName.hasPrefix(".") || versionedPackageName.range(of: "-")?.lowerBound == nil {
+            if versionedPackageName.hasPrefix(".") || versionedPackageName.range(of: "-")?.lowerBound == nil{
                 continue//if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
             }
             //remove the - version number from name and create sym link
             let packageName = versionedPackageName.substring(to: versionedPackageName.range(of: "-")!.lowerBound)
-            let result = Process.run("/bin/ln", arguments: ["-s", packagesPath.appending(versionedPackageName), packagesPath.appending(packageName)])
+            let sourcePath = packagesPath.appending(versionedPackageName)
+            let newPath = packagesPath.appending(packageName)
+            do{
+                let path = try FileManager.default.destinationOfSymbolicLink(atPath: newPath)
+                if path == sourcePath {
+                    //we already have a symbolic link, skip it
+                    continue
+                }
+            }catch _ {
+                //it was not a symbolic link, catch and keep going
+            }
+            print("\(packagesPath)\(versionedPackageName) -> \(packageName)")
+            let result = Process.run("/bin/ln", arguments: ["-s", sourcePath, newPath], silenceOutput: true)
             if result.exitCode != 0, let error = result.error {
                 throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
             }
