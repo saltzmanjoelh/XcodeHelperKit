@@ -85,21 +85,6 @@ public enum DockerEnvironmentVariable: String {
     case containerName = "DOCKER_CONTAINER_NAME"
 }
 
-public protocol XcodeHelpable {
-    
-    //    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String) throws -> ProcessResult
-    @discardableResult func updatePackages(at sourcePath: String, forLinux: Bool, inDockerImage imageName: String) throws -> ProcessResult
-    @discardableResult func build(source sourcePath: String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName: String, removeWhenDone: Bool) throws -> ProcessResult
-    @discardableResult func clean(sourcePath: String) throws -> ProcessResult
-    @discardableResult func symlinkDependencies(sourcePath: String) throws
-    @discardableResult func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
-    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
-    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws
-    @discardableResult func incrementGitTag(components: [GitTagComponent], at sourcePath: String) throws -> String
-    func gitTag(tag: String, at sourcePath: String) throws
-    func pushGitTag(tag: String, at sourcePath: String) throws
-    @discardableResult func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String) throws -> String
-}
 
 public struct XcodeHelper: XcodeHelpable {
     let dateFormatter = DateFormatter()
@@ -108,24 +93,7 @@ public struct XcodeHelper: XcodeHelpable {
         
     }
     
-    //    @discardableResult
-    //    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
-    //        if forLinux {
-    //            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
-    //            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
-    //            if let error = result.error, result.exitCode != 0 {
-    //                throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
-    //            }
-    //            return result
-    //        }else{
-    //            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
-    //            if let error = result.error, result.exitCode != 0 {
-    //                throw XcodeHelperError.fetch(message: "Error fetching packages in macOS (\(result.exitCode)):\n\(error)")
-    //            }
-    //            return result
-    //        }
-    //    }
-    
+    //MARK: Update Packages
     @discardableResult
     public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
@@ -144,6 +112,7 @@ public struct XcodeHelper: XcodeHelpable {
         }
     }
     
+    //MARK: Build
     //TODO: use a data container to hold the source code so that we don't have to build everything from scratch each time
     @discardableResult
     public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu", removeWhenDone: Bool = true) throws -> ProcessResult {
@@ -164,6 +133,7 @@ public struct XcodeHelper: XcodeHelpable {
         return result
     }
     
+    //MARK: Clean
     public func shouldClean(sourcePath:String, forConfiguration configuration:BuildConfiguration) throws -> Bool {
         let yamlPath = configuration.yamlPath(inSourcePath:sourcePath)
         if FileManager.default.isReadableFile(atPath: yamlPath) {
@@ -185,6 +155,7 @@ public struct XcodeHelper: XcodeHelpable {
         return result
     }
     
+    //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     @discardableResult
     public func symlinkDependencies(sourcePath:String) throws {
@@ -264,6 +235,7 @@ public struct XcodeHelper: XcodeHelpable {
         return "\(xcodeProjectPath!)/\(pbProjectPath!)"
     }
     
+    //MARK: Create Archive
     @discardableResult
     public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true) throws -> ProcessResult {
         try FileManager.default.createDirectory(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)
@@ -276,7 +248,7 @@ public struct XcodeHelper: XcodeHelpable {
         return result
     }
     
-    
+    //MARK: Upload Archive
     @discardableResult
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String) throws  {
         let result = try S3.with(key: key, and: secret).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
@@ -307,7 +279,7 @@ public struct XcodeHelper: XcodeHelpable {
         
     }
     
-    
+    //MARK: Git Tag
     public func getGitTag(sourcePath:String) throws -> String {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"], silenceOutput: true)
         if result.exitCode != 0, let error = result.error {
@@ -379,6 +351,7 @@ public struct XcodeHelper: XcodeHelpable {
         }
     }
     
+    //MARK: Create XCArchive
     //returns a String for the path of the xcarchive
     public func createXcarchive(in dirPath:String, with binaryPath: String, from schemeName:String) throws -> String {
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
