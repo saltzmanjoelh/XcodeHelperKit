@@ -48,7 +48,7 @@ public enum GitTagComponent : String {
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
-//    case fetch(message:String)
+    //    case fetch(message:String)
     case update(message:String)
     case build(message:String, exitCode: Int32)
     case symLinkDependencies(message:String)
@@ -61,17 +61,17 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     public var description : String {
         get {
             switch (self) {
-                case let .clean(message): return message
-//                case let .fetch(message): return message
-                case let .update(message): return message
-                case let .build(message, _): return message
-                case let .symLinkDependencies(message): return message
-                case let .createArchive(message): return message
-                case let .uploadArchive(message): return message
-                case let .gitTagParse(message): return message
-                case let .gitTag(message): return message
-                case let .xcarchivePlist(message): return message
-                case let .unknownOption(message): return message
+            case let .clean(message): return message
+            //                case let .fetch(message): return message
+            case let .update(message): return message
+            case let .build(message, _): return message
+            case let .symLinkDependencies(message): return message
+            case let .createArchive(message): return message
+            case let .uploadArchive(message): return message
+            case let .gitTagParse(message): return message
+            case let .gitTag(message): return message
+            case let .xcarchivePlist(message): return message
+            case let .unknownOption(message): return message
             }
         }
     }
@@ -87,11 +87,11 @@ public enum DockerEnvironmentVariable: String {
 
 public protocol XcodeHelpable {
     
-//    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String) throws -> ProcessResult
+    //    @discardableResult func fetchPackages(at sourcePath: String, forLinux:Bool, inDockerImage imageName: String) throws -> ProcessResult
     @discardableResult func updatePackages(at sourcePath: String, forLinux: Bool, inDockerImage imageName: String) throws -> ProcessResult
     @discardableResult func build(source sourcePath: String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName: String, removeWhenDone: Bool) throws -> ProcessResult
-    @discardableResult func clean(source: String) throws -> ProcessResult
-    @discardableResult func symLinkDependencies(sourcePath: String) throws
+    @discardableResult func clean(sourcePath: String) throws -> ProcessResult
+    @discardableResult func symlinkDependencies(sourcePath: String) throws
     @discardableResult func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
     @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
     @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws
@@ -108,23 +108,23 @@ public struct XcodeHelper: XcodeHelpable {
         
     }
     
-//    @discardableResult
-//    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
-//        if forLinux {
-//            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
-//            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
-//            if let error = result.error, result.exitCode != 0 {
-//                throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
-//            }
-//            return result
-//        }else{
-//            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
-//            if let error = result.error, result.exitCode != 0 {
-//                throw XcodeHelperError.fetch(message: "Error fetching packages in macOS (\(result.exitCode)):\n\(error)")
-//            }
-//            return result
-//        }
-//    }
+    //    @discardableResult
+    //    public func fetchPackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String? = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    //        if forLinux {
+    //            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package fetch"]
+    //            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+    //            if let error = result.error, result.exitCode != 0 {
+    //                throw XcodeHelperError.fetch(message: "Error fetching packages in Linux (\(result.exitCode)):\n\(error)")
+    //            }
+    //            return result
+    //        }else{
+    //            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package fetch"])
+    //            if let error = result.error, result.exitCode != 0 {
+    //                throw XcodeHelperError.fetch(message: "Error fetching packages in macOS (\(result.exitCode)):\n\(error)")
+    //            }
+    //            return result
+    //        }
+    //    }
     
     @discardableResult
     public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
@@ -149,7 +149,7 @@ public struct XcodeHelper: XcodeHelpable {
     public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu", removeWhenDone: Bool = true) throws -> ProcessResult {
         //check if we need to clean first
         if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
-            try clean(source: sourcePath)
+            try clean(sourcePath: sourcePath)
         }
         //At the moment, building directly from a mounted volume gives errors like "error: Could not create file ... /.Package.toml"
         //rsync the files to the root of the disk (excluding .build dir) the replace the build
@@ -176,9 +176,9 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     @discardableResult
-    public func clean(source:String) throws -> ProcessResult {
+    public func clean(sourcePath:String) throws -> ProcessResult {
         //We can use Process instead of firing up Docker because the end result is the same. A clean .build dir
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(source) && /usr/bin/swift build --clean"])
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
         }
@@ -187,47 +187,54 @@ public struct XcodeHelper: XcodeHelpable {
     
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     @discardableResult
-    public func symLinkDependencies(sourcePath:String) throws {
-        //find the xcodeproj
-        let projectPath = try projectFilePath(at: sourcePath)
-        
+    public func symlinkDependencies(sourcePath:String) throws {
         //iterate Packages dir and create symlinks without the -Ver.sion.#
-        let packagesPath = sourcePath.hasSuffix("/") ? sourcePath.appending("Packages/") : sourcePath.appending("/Packages/")
-        guard FileManager.default.fileExists(atPath: packagesPath) else {
+        for directory in try packageNames(from: sourcePath) {
+            if let packageName = try symlink(dependencyPath: directory) {
+                //update the xcode references to the symlink
+                try updateXcodeReferences(sourcePath: sourcePath, versionedPackageName: directory, symlinkName: packageName)
+            }
+        }
+    }
+    func packageNames(from sourcePath: String) throws -> [String] {
+        //find the Packages directory
+        let packagesPath = URL(fileURLWithPath: sourcePath).appendingPathComponent("Packages").path
+        guard FileManager.default.fileExists(atPath: packagesPath)  else {
             throw XcodeHelperError.symLinkDependencies(message: "Failed to find directory: \(packagesPath)")
         }
-        for directory in try FileManager.default.contentsOfDirectory(atPath: packagesPath) {
-            let versionedPackageName = "\(directory)"
-            if versionedPackageName.hasPrefix(".") || versionedPackageName.range(of: "-")?.lowerBound == nil{
-                continue//if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
-            }
-            //remove the - version number from name and create sym link
-            let packageName = versionedPackageName.substring(to: versionedPackageName.range(of: "-")!.lowerBound)
-            let sourcePath = packagesPath.appending(versionedPackageName)
-            let newPath = packagesPath.appending(packageName)
-            do{
-                let path = try FileManager.default.destinationOfSymbolicLink(atPath: newPath)
-                if path == sourcePath {
-                    //we already have a symbolic link, skip it
-                    continue
-                }
-            }catch _ {
-                //it was not a symbolic link, catch and keep going
-            }
-            print("\(packagesPath)\(versionedPackageName) -> \(packageName)")
-            let result = Process.run("/bin/ln", arguments: ["-s", sourcePath, newPath], silenceOutput: true)
-            if result.exitCode != 0, let error = result.error {
-                throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
-            }
-            //update the xcode references to the symlink
-            do{
-                let file = try String(contentsOfFile: projectPath)
-                let updatedFile = file.replacingOccurrences(of: versionedPackageName, with: packageName)
-                try updatedFile.write(toFile: projectPath, atomically: false, encoding: String.Encoding.utf8)
-            } catch let e {
-                throw XcodeHelperError.clean(message: "Error opening project file: \(e)")
-            }
+        return try FileManager.default.contentsOfDirectory(atPath: packagesPath)
+    }
+    func symlink(dependencyPath: String) throws -> String? {
+        let directory = URL(fileURLWithPath: dependencyPath).lastPathComponent
+        guard !directory.hasPrefix(".") && directory.range(of: "-")?.lowerBound != nil else {
+            //if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
+            return nil
         }
+        //remove the - version number from name and create sym link
+        let packagesURL = URL(fileURLWithPath: dependencyPath.substring(to: dependencyPath.range(of: "Packages", options: .backwards)!.upperBound))
+        let packageName = directory.substring(to: directory.range(of: "-", options: .backwards)!.lowerBound)
+        let sourcePath = packagesURL.appendingPathComponent(directory).path
+        let newPath = packagesURL.appendingPathComponent(packageName).path
+        do{
+            //create the symlink
+            if !FileManager.default.fileExists(atPath: newPath){
+                try FileManager.default.createSymbolicLink(at: URL(fileURLWithPath: newPath), withDestinationURL: URL(fileURLWithPath: sourcePath))
+            }
+        } catch let e {
+            throw XcodeHelperError.clean(message: "Error creating symlink: \(e)")
+        }
+        
+        return packageName
+    }
+    func updateXcodeReferences(sourcePath: String, versionedPackageName: String, symlinkName: String) throws {
+        //find the xcodeproj
+        let projectPath = try projectFilePath(at: sourcePath)
+        //open the project
+        let file = try String(contentsOfFile: projectPath)
+        //replace versioned package name with symlink name
+        let updatedFile = file.replacingOccurrences(of: versionedPackageName, with: symlinkName)
+        //save the project
+        try updatedFile.write(toFile: projectPath, atomically: false, encoding: String.Encoding.utf8)
     }
     
     public func projectFilePath(at sourcePath:String) throws -> String {

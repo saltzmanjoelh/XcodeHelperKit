@@ -26,7 +26,8 @@ enum LibraryTag: Int {
     case patch = 3
 }
 
-//TODO: add an exitCode to .build errors so that we can still throw an error and have the cli main file handle the exit code
+let testPackageName = "Hello"
+let testVersionedPackageName = "Hello-1.0.3"
 
 class XcodeHelperTests: XCTestCase {
     
@@ -117,30 +118,54 @@ class XcodeHelperTests: XCTestCase {
         }
         
     }
-    
-    func testSymLinkDependencies() {
-        sourcePath = "/tmp/E03F15AA-5295-485B-98F6-30A5F7B9FCCF"//cloneToTempDirectory(repoURL: executableRepoURL)
-        _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
-        let packages = ["Hello"]
-        let helper = XcodeHelper()
-        
-        do {
-//            print("updating sym links at: \(sourcePath)")
-            let buildResult = try helper.build(source: sourcePath!, usingConfiguration: .debug)
-            if let buildError = buildResult.error {
-                XCTFail("Error: \(buildError)")
-            }
+    func testPackageNames(){
+        do{
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            let helper = XcodeHelper()
             
-            try helper.symLinkDependencies(sourcePath: sourcePath!)
+            let packageNames = try helper.packageNames(from: sourcePath!)
+            
+            XCTAssertTrue(packageNames.count == 1)
+            XCTAssertEqual(packageNames.first, testVersionedPackageName)
         } catch let e {
             XCTFail("Error: \(e)")
         }
-        
-        for package in packages{
-            let path = sourcePath!.appending("/Packages/\(package)")
-            var isDirectory: ObjCBool = false
-            XCTAssertTrue(FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), "Failed to find symlink: \(path)")
-            XCTAssertTrue(isDirectory.boolValue, "Symlink was not a directory: \(path)")
+    }
+    func testSymlinkDependencyPath(){
+        do{
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            let packages = [testPackageName]
+            let helper = XcodeHelper()
+            let packagesURL = URL(fileURLWithPath: sourcePath!).appendingPathComponent("Packages")
+            let packageName = try helper.packageNames(from: sourcePath!).first
+            let dependencyURL = packagesURL.appendingPathComponent(packageName!)
+            
+            let result = try helper.symlink(dependencyPath: dependencyURL.path)
+            
+            XCTAssertEqual(result, packages[0])
+            let symlink = packagesURL.appendingPathComponent(result!).path
+            let destination = try FileManager.default.destinationOfSymbolicLink(atPath: symlink)
+            XCTAssertEqual(destination, dependencyURL.path)
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
+    func testUpdateXcodeReferences() {
+        do {
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            let helper = XcodeHelper()
+            
+            try helper.updateXcodeReferences(sourcePath: sourcePath!, versionedPackageName: testVersionedPackageName, symlinkName: testPackageName)
+            
+            let projectPath = try helper.projectFilePath(at: sourcePath!)
+            let file = try String(contentsOfFile: projectPath)
+            XCTAssertFalse(file.contains(testVersionedPackageName), "Xcode project should not contain any package versions")
+        } catch let e {
+            XCTFail("Error: \(e)")
         }
     }
     func testShouldClean(){
@@ -169,7 +194,7 @@ class XcodeHelperTests: XCTestCase {
         let helper = XcodeHelper()
         
         do {
-            try helper.clean(source: sourcePath!)
+            try helper.clean(sourcePath: sourcePath!)
             
             XCTAssertFalse(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory should not found after cleaning")
         } catch let e {
