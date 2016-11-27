@@ -160,8 +160,9 @@ public struct XcodeHelper: XcodeHelpable {
     @discardableResult
     public func symlinkDependencies(sourcePath:String) throws {
         //iterate Packages dir and create symlinks without the -Ver.sion.#
+        let packagesURL = URL(fileURLWithPath: sourcePath).appendingPathComponent("Packages")
         for directory in try packageNames(from: sourcePath) {
-            if let packageName = try symlink(dependencyPath: directory) {
+            if let packageName = try symlink(dependencyPath: packagesURL.appendingPathComponent(directory).path) {
                 //update the xcode references to the symlink
                 try updateXcodeReferences(sourcePath: sourcePath, versionedPackageName: directory, symlinkName: packageName)
             }
@@ -177,7 +178,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     func symlink(dependencyPath: String) throws -> String? {
         let directory = URL(fileURLWithPath: dependencyPath).lastPathComponent
-        guard !directory.hasPrefix(".") && directory.range(of: "-")?.lowerBound != nil else {
+        if directory.hasPrefix(".") || directory.range(of: "-")?.lowerBound == nil {
             //if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
             return nil
         }
