@@ -190,7 +190,10 @@ public struct XcodeHelper: XcodeHelpable {
         do{
             //create the symlink
             if !FileManager.default.fileExists(atPath: newPath){
-                try FileManager.default.createSymbolicLink(at: URL(fileURLWithPath: newPath), withDestinationURL: URL(fileURLWithPath: sourcePath))
+                let symlinkURL = URL(fileURLWithPath: newPath)
+                let destinationURL = URL(fileURLWithPath: sourcePath)
+                try FileManager.default.createSymbolicLink(at: symlinkURL, withDestinationURL: destinationURL)
+                print("\(symlinkURL.path) -> \(destinationURL.lastPathComponent)")
             }
         } catch let e {
             throw XcodeHelperError.clean(message: "Error creating symlink: \(e)")

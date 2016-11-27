@@ -4,7 +4,17 @@
 <dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>OBJ_33</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>OBJ_34</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>OBJ_40</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -14,7 +24,17 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>OBJ_49</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>OBJ_52</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>OBJ_58</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -24,7 +44,17 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>OBJ_67</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>OBJ_70</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>OBJ_83</key>
 		<dict>
 			<key>primary</key>
 			<true/>

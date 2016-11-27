@@ -7,173 +7,173 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		384FBFE21DEA49CA0039DE25 /* XcodeHelpable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384FBFE11DEA49CA0039DE25 /* XcodeHelpable.swift */; };
-		OBJ_39 /* SynchronousProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* SynchronousProcess.swift */; };
-		OBJ_47 /* DockerProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* DockerProcess.swift */; };
-		OBJ_50 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SynchronousProcess.framework */; };
-		OBJ_57 /* CliOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* CliOption.swift */; };
-		OBJ_58 /* CliRunnable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* CliRunnable.swift */; };
-		OBJ_59 /* Helpable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Helpable.swift */; };
-		OBJ_66 /* Data+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* Data+SHA256.swift */; };
-		OBJ_67 /* S3.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* S3.swift */; };
-		OBJ_68 /* S3V4Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* S3V4Signer.swift */; };
-		OBJ_75 /* XcodeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* XcodeHelper.swift */; };
-		OBJ_77 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SynchronousProcess.framework */; };
-		OBJ_78 /* DockerProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* DockerProcess.framework */; };
-		OBJ_79 /* CliRunnable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* CliRunnable.framework */; };
-		OBJ_80 /* S3Kit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* S3Kit.framework */; };
-		OBJ_90 /* XcodeHelperKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* XcodeHelperKitTests.swift */; };
-		OBJ_92 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SynchronousProcess.framework */; };
-		OBJ_93 /* DockerProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* DockerProcess.framework */; };
-		OBJ_94 /* CliRunnable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* CliRunnable.framework */; };
-		OBJ_95 /* S3Kit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* S3Kit.framework */; };
-		OBJ_96 /* XcodeHelperKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* XcodeHelperKit.framework */; };
+		OBJ_38 /* SynchronousProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* SynchronousProcess.swift */; };
+		OBJ_45 /* DockerProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* DockerProcess.swift */; };
+		OBJ_47 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* SynchronousProcess.framework */; };
+		OBJ_54 /* CliOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* CliOption.swift */; };
+		OBJ_55 /* CliRunnable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* CliRunnable.swift */; };
+		OBJ_56 /* Helpable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Helpable.swift */; };
+		OBJ_63 /* Data+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Data+SHA256.swift */; };
+		OBJ_64 /* S3.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* S3.swift */; };
+		OBJ_65 /* S3V4Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* S3V4Signer.swift */; };
+		OBJ_72 /* XcodeHelpable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* XcodeHelpable.swift */; };
+		OBJ_73 /* XcodeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* XcodeHelper.swift */; };
+		OBJ_75 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* SynchronousProcess.framework */; };
+		OBJ_76 /* DockerProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* DockerProcess.framework */; };
+		OBJ_77 /* CliRunnable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* CliRunnable.framework */; };
+		OBJ_78 /* S3Kit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* S3Kit.framework */; };
+		OBJ_88 /* XcodeHelperKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* XcodeHelperKitTests.swift */; };
+		OBJ_90 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* SynchronousProcess.framework */; };
+		OBJ_91 /* DockerProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* DockerProcess.framework */; };
+		OBJ_92 /* CliRunnable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* CliRunnable.framework */; };
+		OBJ_93 /* S3Kit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* S3Kit.framework */; };
+		OBJ_94 /* XcodeHelperKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* XcodeHelperKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		38E908201DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FBFFE1DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_34;
+			remoteGlobalIDString = OBJ_33;
 			remoteInfo = SynchronousProcess;
 		};
-		38E908211DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FBFFF1DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_34;
+			remoteGlobalIDString = OBJ_33;
 			remoteInfo = SynchronousProcess;
 		};
-		38E908221DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0001DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_41;
+			remoteGlobalIDString = OBJ_40;
 			remoteInfo = DockerProcess;
 		};
-		38E908231DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0011DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_52;
+			remoteGlobalIDString = OBJ_49;
 			remoteInfo = CliRunnable;
 		};
-		38E908241DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0021DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_61;
+			remoteGlobalIDString = OBJ_58;
 			remoteInfo = S3Kit;
 		};
-		38E908251DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0031DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_34;
+			remoteGlobalIDString = OBJ_33;
 			remoteInfo = SynchronousProcess;
 		};
-		38E908261DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0041DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_41;
+			remoteGlobalIDString = OBJ_40;
 			remoteInfo = DockerProcess;
 		};
-		38E908271DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0051DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_52;
+			remoteGlobalIDString = OBJ_49;
 			remoteInfo = CliRunnable;
 		};
-		38E908281DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0061DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_61;
+			remoteGlobalIDString = OBJ_58;
 			remoteInfo = S3Kit;
 		};
-		38E908291DCFEB1300C4B401 /* PBXContainerItemProxy */ = {
+		384FC0071DEA77750039DE25 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_70;
+			remoteGlobalIDString = OBJ_67;
 			remoteInfo = XcodeHelperKit;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		384FBFE11DEA49CA0039DE25 /* XcodeHelpable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XcodeHelpable.swift; sourceTree = "<group>"; };
-		OBJ_12 /* DockerProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerProcess.swift; sourceTree = "<group>"; };
-		OBJ_15 /* CliOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliOption.swift; sourceTree = "<group>"; };
-		OBJ_16 /* CliRunnable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliRunnable.swift; sourceTree = "<group>"; };
-		OBJ_17 /* Helpable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpable.swift; sourceTree = "<group>"; };
-		OBJ_19 /* Data+SHA256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+SHA256.swift"; sourceTree = "<group>"; };
-		OBJ_20 /* S3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = S3.swift; sourceTree = "<group>"; };
-		OBJ_21 /* S3V4Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = S3V4Signer.swift; sourceTree = "<group>"; };
-		OBJ_23 /* XcodeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelper.swift; sourceTree = "<group>"; };
-		OBJ_26 /* XcodeHelperKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelperKitTests.swift; sourceTree = "<group>"; };
-		OBJ_28 /* SynchronousProcess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SynchronousProcess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_29 /* DockerProcess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DockerProcess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_30 /* CliRunnable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CliRunnable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_31 /* S3Kit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = S3Kit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_32 /* XcodeHelperKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XcodeHelperKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_33 /* XcodeHelperKitTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = XcodeHelperKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_11 /* DockerProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerProcess.swift; sourceTree = "<group>"; };
+		OBJ_13 /* CliOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliOption.swift; sourceTree = "<group>"; };
+		OBJ_14 /* CliRunnable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CliRunnable.swift; sourceTree = "<group>"; };
+		OBJ_15 /* Helpable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpable.swift; sourceTree = "<group>"; };
+		OBJ_17 /* Data+SHA256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+SHA256.swift"; sourceTree = "<group>"; };
+		OBJ_18 /* S3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = S3.swift; sourceTree = "<group>"; };
+		OBJ_19 /* S3V4Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = S3V4Signer.swift; sourceTree = "<group>"; };
+		OBJ_21 /* XcodeHelpable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelpable.swift; sourceTree = "<group>"; };
+		OBJ_22 /* XcodeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelper.swift; sourceTree = "<group>"; };
+		OBJ_25 /* XcodeHelperKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelperKitTests.swift; sourceTree = "<group>"; };
+		OBJ_27 /* SynchronousProcess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SynchronousProcess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_28 /* DockerProcess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DockerProcess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_29 /* CliRunnable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CliRunnable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_30 /* S3Kit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = S3Kit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_31 /* XcodeHelperKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XcodeHelperKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_32 /* XcodeHelperKitTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = XcodeHelperKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* SynchronousProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronousProcess.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_40 /* Frameworks */ = {
+		OBJ_39 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_49 /* Frameworks */ = {
+		OBJ_46 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_50 /* SynchronousProcess.framework in Frameworks */,
+				OBJ_47 /* SynchronousProcess.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_60 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_69 /* Frameworks */ = {
+		OBJ_57 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_76 /* Frameworks */ = {
+		OBJ_66 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_77 /* SynchronousProcess.framework in Frameworks */,
-				OBJ_78 /* DockerProcess.framework in Frameworks */,
-				OBJ_79 /* CliRunnable.framework in Frameworks */,
-				OBJ_80 /* S3Kit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_91 /* Frameworks */ = {
+		OBJ_74 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_92 /* SynchronousProcess.framework in Frameworks */,
-				OBJ_93 /* DockerProcess.framework in Frameworks */,
-				OBJ_94 /* CliRunnable.framework in Frameworks */,
-				OBJ_95 /* S3Kit.framework in Frameworks */,
-				OBJ_96 /* XcodeHelperKit.framework in Frameworks */,
+				OBJ_75 /* SynchronousProcess.framework in Frameworks */,
+				OBJ_76 /* DockerProcess.framework in Frameworks */,
+				OBJ_77 /* CliRunnable.framework in Frameworks */,
+				OBJ_78 /* S3Kit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_89 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_90 /* SynchronousProcess.framework in Frameworks */,
+				OBJ_91 /* DockerProcess.framework in Frameworks */,
+				OBJ_92 /* CliRunnable.framework in Frameworks */,
+				OBJ_93 /* S3Kit.framework in Frameworks */,
+				OBJ_94 /* XcodeHelperKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,82 +183,83 @@
 		OBJ_10 /* DockerProcess */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_12 /* DockerProcess.swift */,
+				OBJ_11 /* DockerProcess.swift */,
 			);
 			name = DockerProcess;
-			path = Packages/DockerProcess/Sources;
+			path = "Packages/DockerProcess/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_14 /* CliRunnable */ = {
+		OBJ_12 /* CliRunnable */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_15 /* CliOption.swift */,
-				OBJ_16 /* CliRunnable.swift */,
-				OBJ_17 /* Helpable.swift */,
+				OBJ_13 /* CliOption.swift */,
+				OBJ_14 /* CliRunnable.swift */,
+				OBJ_15 /* Helpable.swift */,
 			);
 			name = CliRunnable;
-			path = Packages/CliRunnable/Sources;
+			path = "Packages/CliRunnable/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_18 /* S3Kit */ = {
+		OBJ_16 /* S3Kit */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_19 /* Data+SHA256.swift */,
-				OBJ_20 /* S3.swift */,
-				OBJ_21 /* S3V4Signer.swift */,
+				OBJ_17 /* Data+SHA256.swift */,
+				OBJ_18 /* S3.swift */,
+				OBJ_19 /* S3V4Signer.swift */,
 			);
 			name = S3Kit;
-			path = Packages/S3Kit/Sources;
+			path = "Packages/S3Kit/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_22 /* XcodeHelperKit */ = {
+		OBJ_20 /* XcodeHelperKit */ = {
 			isa = PBXGroup;
 			children = (
-				384FBFE11DEA49CA0039DE25 /* XcodeHelpable.swift */,
-				OBJ_23 /* XcodeHelper.swift */,
+				OBJ_21 /* XcodeHelpable.swift */,
+				OBJ_22 /* XcodeHelper.swift */,
 			);
 			name = XcodeHelperKit;
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_24 /* Tests */ = {
+		OBJ_23 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_25 /* XcodeHelperKitTests */,
+				OBJ_24 /* XcodeHelperKitTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		OBJ_25 /* XcodeHelperKitTests */ = {
+		OBJ_24 /* XcodeHelperKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_26 /* XcodeHelperKitTests.swift */,
+				OBJ_25 /* XcodeHelperKitTests.swift */,
 			);
 			name = XcodeHelperKitTests;
 			path = Tests/XcodeHelperKitTests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_27 /* Products */ = {
+		OBJ_26 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_28 /* SynchronousProcess.framework */,
-				OBJ_29 /* DockerProcess.framework */,
-				OBJ_30 /* CliRunnable.framework */,
-				OBJ_31 /* S3Kit.framework */,
-				OBJ_32 /* XcodeHelperKit.framework */,
-				OBJ_33 /* XcodeHelperKitTests.xctest */,
+				OBJ_27 /* SynchronousProcess.framework */,
+				OBJ_28 /* DockerProcess.framework */,
+				OBJ_29 /* CliRunnable.framework */,
+				OBJ_30 /* S3Kit.framework */,
+				OBJ_31 /* XcodeHelperKit.framework */,
+				OBJ_32 /* XcodeHelperKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 = {
+		OBJ_5 /*  */ = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
-				OBJ_24 /* Tests */,
-				OBJ_27 /* Products */,
+				OBJ_23 /* Tests */,
+				OBJ_26 /* Products */,
 			);
+			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -266,9 +267,9 @@
 			children = (
 				OBJ_8 /* SynchronousProcess */,
 				OBJ_10 /* DockerProcess */,
-				OBJ_14 /* CliRunnable */,
-				OBJ_18 /* S3Kit */,
-				OBJ_22 /* XcodeHelperKit */,
+				OBJ_12 /* CliRunnable */,
+				OBJ_16 /* S3Kit */,
+				OBJ_20 /* XcodeHelperKit */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -279,18 +280,18 @@
 				OBJ_9 /* SynchronousProcess.swift */,
 			);
 			name = SynchronousProcess;
-			path = Packages/SynchronousProcess/Sources;
+			path = "Packages/SynchronousProcess/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		OBJ_34 /* SynchronousProcess */ = {
+		OBJ_33 /* SynchronousProcess */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_35 /* Build configuration list for PBXNativeTarget "SynchronousProcess" */;
+			buildConfigurationList = OBJ_34 /* Build configuration list for PBXNativeTarget "SynchronousProcess" */;
 			buildPhases = (
-				OBJ_38 /* Sources */,
-				OBJ_40 /* Frameworks */,
+				OBJ_37 /* Sources */,
+				OBJ_39 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -298,32 +299,32 @@
 			);
 			name = SynchronousProcess;
 			productName = SynchronousProcess;
-			productReference = OBJ_28 /* SynchronousProcess.framework */;
+			productReference = OBJ_27 /* SynchronousProcess.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_41 /* DockerProcess */ = {
+		OBJ_40 /* DockerProcess */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_42 /* Build configuration list for PBXNativeTarget "DockerProcess" */;
+			buildConfigurationList = OBJ_41 /* Build configuration list for PBXNativeTarget "DockerProcess" */;
 			buildPhases = (
-				OBJ_45 /* Sources */,
-				OBJ_49 /* Frameworks */,
+				OBJ_44 /* Sources */,
+				OBJ_46 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_51 /* PBXTargetDependency */,
+				OBJ_48 /* PBXTargetDependency */,
 			);
 			name = DockerProcess;
 			productName = DockerProcess;
-			productReference = OBJ_29 /* DockerProcess.framework */;
+			productReference = OBJ_28 /* DockerProcess.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_52 /* CliRunnable */ = {
+		OBJ_49 /* CliRunnable */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_53 /* Build configuration list for PBXNativeTarget "CliRunnable" */;
+			buildConfigurationList = OBJ_50 /* Build configuration list for PBXNativeTarget "CliRunnable" */;
 			buildPhases = (
-				OBJ_56 /* Sources */,
-				OBJ_60 /* Frameworks */,
+				OBJ_53 /* Sources */,
+				OBJ_57 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -331,15 +332,15 @@
 			);
 			name = CliRunnable;
 			productName = CliRunnable;
-			productReference = OBJ_30 /* CliRunnable.framework */;
+			productReference = OBJ_29 /* CliRunnable.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_61 /* S3Kit */ = {
+		OBJ_58 /* S3Kit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_62 /* Build configuration list for PBXNativeTarget "S3Kit" */;
+			buildConfigurationList = OBJ_59 /* Build configuration list for PBXNativeTarget "S3Kit" */;
 			buildPhases = (
-				OBJ_65 /* Sources */,
-				OBJ_69 /* Frameworks */,
+				OBJ_62 /* Sources */,
+				OBJ_66 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -347,48 +348,48 @@
 			);
 			name = S3Kit;
 			productName = S3Kit;
-			productReference = OBJ_31 /* S3Kit.framework */;
+			productReference = OBJ_30 /* S3Kit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_70 /* XcodeHelperKit */ = {
+		OBJ_67 /* XcodeHelperKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_71 /* Build configuration list for PBXNativeTarget "XcodeHelperKit" */;
+			buildConfigurationList = OBJ_68 /* Build configuration list for PBXNativeTarget "XcodeHelperKit" */;
 			buildPhases = (
-				OBJ_74 /* Sources */,
-				OBJ_76 /* Frameworks */,
+				OBJ_71 /* Sources */,
+				OBJ_74 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				OBJ_79 /* PBXTargetDependency */,
+				OBJ_80 /* PBXTargetDependency */,
 				OBJ_81 /* PBXTargetDependency */,
 				OBJ_82 /* PBXTargetDependency */,
-				OBJ_83 /* PBXTargetDependency */,
-				OBJ_84 /* PBXTargetDependency */,
 			);
 			name = XcodeHelperKit;
 			productName = XcodeHelperKit;
-			productReference = OBJ_32 /* XcodeHelperKit.framework */;
+			productReference = OBJ_31 /* XcodeHelperKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_85 /* XcodeHelperKitTests */ = {
+		OBJ_83 /* XcodeHelperKitTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_86 /* Build configuration list for PBXNativeTarget "XcodeHelperKitTests" */;
+			buildConfigurationList = OBJ_84 /* Build configuration list for PBXNativeTarget "XcodeHelperKitTests" */;
 			buildPhases = (
-				OBJ_89 /* Sources */,
-				OBJ_91 /* Frameworks */,
+				OBJ_87 /* Sources */,
+				OBJ_89 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				OBJ_95 /* PBXTargetDependency */,
+				OBJ_96 /* PBXTargetDependency */,
 				OBJ_97 /* PBXTargetDependency */,
 				OBJ_98 /* PBXTargetDependency */,
 				OBJ_99 /* PBXTargetDependency */,
-				OBJ_100 /* PBXTargetDependency */,
-				OBJ_101 /* PBXTargetDependency */,
 			);
 			name = XcodeHelperKitTests;
 			productName = XcodeHelperKitTests;
-			productReference = OBJ_33 /* XcodeHelperKitTests.xctest */;
+			productReference = OBJ_32 /* XcodeHelperKitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -406,127 +407,127 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5;
-			productRefGroup = OBJ_27 /* Products */;
+			mainGroup = OBJ_5 /*  */;
+			productRefGroup = OBJ_26 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				OBJ_34 /* SynchronousProcess */,
-				OBJ_41 /* DockerProcess */,
-				OBJ_52 /* CliRunnable */,
-				OBJ_61 /* S3Kit */,
-				OBJ_70 /* XcodeHelperKit */,
-				OBJ_85 /* XcodeHelperKitTests */,
+				OBJ_33 /* SynchronousProcess */,
+				OBJ_40 /* DockerProcess */,
+				OBJ_49 /* CliRunnable */,
+				OBJ_58 /* S3Kit */,
+				OBJ_67 /* XcodeHelperKit */,
+				OBJ_83 /* XcodeHelperKitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_38 /* Sources */ = {
+		OBJ_37 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_39 /* SynchronousProcess.swift in Sources */,
+				OBJ_38 /* SynchronousProcess.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_45 /* Sources */ = {
+		OBJ_44 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_47 /* DockerProcess.swift in Sources */,
+				OBJ_45 /* DockerProcess.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_56 /* Sources */ = {
+		OBJ_53 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_57 /* CliOption.swift in Sources */,
-				OBJ_58 /* CliRunnable.swift in Sources */,
-				OBJ_59 /* Helpable.swift in Sources */,
+				OBJ_54 /* CliOption.swift in Sources */,
+				OBJ_55 /* CliRunnable.swift in Sources */,
+				OBJ_56 /* Helpable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_65 /* Sources */ = {
+		OBJ_62 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_66 /* Data+SHA256.swift in Sources */,
-				OBJ_67 /* S3.swift in Sources */,
-				OBJ_68 /* S3V4Signer.swift in Sources */,
+				OBJ_63 /* Data+SHA256.swift in Sources */,
+				OBJ_64 /* S3.swift in Sources */,
+				OBJ_65 /* S3V4Signer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_74 /* Sources */ = {
+		OBJ_71 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				384FBFE21DEA49CA0039DE25 /* XcodeHelpable.swift in Sources */,
-				OBJ_75 /* XcodeHelper.swift in Sources */,
+				OBJ_72 /* XcodeHelpable.swift in Sources */,
+				OBJ_73 /* XcodeHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_89 /* Sources */ = {
+		OBJ_87 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_90 /* XcodeHelperKitTests.swift in Sources */,
+				OBJ_88 /* XcodeHelperKitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_100 /* PBXTargetDependency */ = {
+		OBJ_48 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_61 /* S3Kit */;
-			targetProxy = 38E908281DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_33 /* SynchronousProcess */;
+			targetProxy = 384FBFFE1DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
-		OBJ_101 /* PBXTargetDependency */ = {
+		OBJ_79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_70 /* XcodeHelperKit */;
-			targetProxy = 38E908291DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_33 /* SynchronousProcess */;
+			targetProxy = 384FBFFF1DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
-		OBJ_51 /* PBXTargetDependency */ = {
+		OBJ_80 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_34 /* SynchronousProcess */;
-			targetProxy = 38E908201DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_40 /* DockerProcess */;
+			targetProxy = 384FC0001DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 		OBJ_81 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_34 /* SynchronousProcess */;
-			targetProxy = 38E908211DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_49 /* CliRunnable */;
+			targetProxy = 384FC0011DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 		OBJ_82 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_41 /* DockerProcess */;
-			targetProxy = 38E908221DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_58 /* S3Kit */;
+			targetProxy = 384FC0021DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
-		OBJ_83 /* PBXTargetDependency */ = {
+		OBJ_95 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_52 /* CliRunnable */;
-			targetProxy = 38E908231DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_33 /* SynchronousProcess */;
+			targetProxy = 384FC0031DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
-		OBJ_84 /* PBXTargetDependency */ = {
+		OBJ_96 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_61 /* S3Kit */;
-			targetProxy = 38E908241DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_40 /* DockerProcess */;
+			targetProxy = 384FC0041DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 		OBJ_97 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_34 /* SynchronousProcess */;
-			targetProxy = 38E908251DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_49 /* CliRunnable */;
+			targetProxy = 384FC0051DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 		OBJ_98 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_41 /* DockerProcess */;
-			targetProxy = 38E908261DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_58 /* S3Kit */;
+			targetProxy = 384FC0061DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 		OBJ_99 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_52 /* CliRunnable */;
-			targetProxy = 38E908271DCFEB1300C4B401 /* PBXContainerItemProxy */;
+			target = OBJ_67 /* XcodeHelperKit */;
+			targetProxy = 384FC0071DEA77750039DE25 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -550,7 +551,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_36 /* Debug */ = {
+		OBJ_35 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -570,7 +571,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_37 /* Release */ = {
+		OBJ_36 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -607,7 +608,7 @@
 			};
 			name = Release;
 		};
-		OBJ_43 /* Debug */ = {
+		OBJ_42 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -627,7 +628,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_44 /* Release */ = {
+		OBJ_43 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -647,7 +648,7 @@
 			};
 			name = Release;
 		};
-		OBJ_54 /* Debug */ = {
+		OBJ_51 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -667,7 +668,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_55 /* Release */ = {
+		OBJ_52 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -687,12 +688,12 @@
 			};
 			name = Release;
 		};
-		OBJ_63 /* Debug */ = {
+		OBJ_60 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/S3Kit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -707,12 +708,12 @@
 			};
 			name = Debug;
 		};
-		OBJ_64 /* Release */ = {
+		OBJ_61 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/S3Kit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -727,12 +728,12 @@
 			};
 			name = Release;
 		};
-		OBJ_72 /* Debug */ = {
+		OBJ_69 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -747,12 +748,12 @@
 			};
 			name = Debug;
 		};
-		OBJ_73 /* Release */ = {
+		OBJ_70 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKit_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -767,12 +768,12 @@
 			};
 			name = Release;
 		};
-		OBJ_87 /* Debug */ = {
+		OBJ_85 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKitTests_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -784,12 +785,12 @@
 			};
 			name = Debug;
 		};
-		OBJ_88 /* Release */ = {
+		OBJ_86 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
-				HEADER_SEARCH_PATHS = Packages/CCommonCrypto;
+				HEADER_SEARCH_PATHS = "Packages/CCommonCrypto";
 				INFOPLIST_FILE = XcodeHelperKit.xcodeproj/XcodeHelperKitTests_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -813,56 +814,56 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_35 /* Build configuration list for PBXNativeTarget "SynchronousProcess" */ = {
+		OBJ_34 /* Build configuration list for PBXNativeTarget "SynchronousProcess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_36 /* Debug */,
-				OBJ_37 /* Release */,
+				OBJ_35 /* Debug */,
+				OBJ_36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_42 /* Build configuration list for PBXNativeTarget "DockerProcess" */ = {
+		OBJ_41 /* Build configuration list for PBXNativeTarget "DockerProcess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_43 /* Debug */,
-				OBJ_44 /* Release */,
+				OBJ_42 /* Debug */,
+				OBJ_43 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_53 /* Build configuration list for PBXNativeTarget "CliRunnable" */ = {
+		OBJ_50 /* Build configuration list for PBXNativeTarget "CliRunnable" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_54 /* Debug */,
-				OBJ_55 /* Release */,
+				OBJ_51 /* Debug */,
+				OBJ_52 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_62 /* Build configuration list for PBXNativeTarget "S3Kit" */ = {
+		OBJ_59 /* Build configuration list for PBXNativeTarget "S3Kit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_63 /* Debug */,
-				OBJ_64 /* Release */,
+				OBJ_60 /* Debug */,
+				OBJ_61 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_71 /* Build configuration list for PBXNativeTarget "XcodeHelperKit" */ = {
+		OBJ_68 /* Build configuration list for PBXNativeTarget "XcodeHelperKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_72 /* Debug */,
-				OBJ_73 /* Release */,
+				OBJ_69 /* Debug */,
+				OBJ_70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_86 /* Build configuration list for PBXNativeTarget "XcodeHelperKitTests" */ = {
+		OBJ_84 /* Build configuration list for PBXNativeTarget "XcodeHelperKitTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_87 /* Debug */,
-				OBJ_88 /* Release */,
+				OBJ_85 /* Debug */,
+				OBJ_86 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
