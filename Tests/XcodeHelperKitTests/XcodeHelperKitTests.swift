@@ -307,30 +307,6 @@ class XcodeHelperTests: XCTestCase {
         
         XCTAssertNil(tag)
     }
-    func testGitTagSortValue_Major() {
-        let helper = XcodeHelper()
-        let tag = (1000, 1, 100)
-        
-        let sortValue = helper.gitTagSortValue(tag)
-        
-        XCTAssertEqual(sortValue, 100010100)
-    }
-    func testGitTagSortValue_Minor() {
-        let helper = XcodeHelper()
-        let tag = (1, 1000, 100)
-        
-        let sortValue = helper.gitTagSortValue(tag)
-        
-        XCTAssertEqual(sortValue, 10100100)
-    }
-    func testGitTagSortValue_Patch() {
-        let helper = XcodeHelper()
-        let tag = (1, 100, 1000)
-        
-        let sortValue = helper.gitTagSortValue(tag)
-        
-        XCTAssertEqual(sortValue, 1101000)
-    }
     func testLargestGitTag_Major() {
         do {
             let helper = XcodeHelper()
@@ -370,11 +346,13 @@ class XcodeHelperTests: XCTestCase {
         do {
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            let expectedValue = "\(LibraryTag.major.rawValue+1).0.0"
             
-            try helper.incrementGitTag(components: [GitTagComponent.major], at: sourcePath!)
+            let value = try helper.incrementGitTag(component: GitTagComponent.major, at: sourcePath!)
             
+            XCTAssertEqual(value, expectedValue)
             let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
-            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue+1).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue)")
+            XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {
             XCTFail("Error: \(e)")
@@ -384,11 +362,13 @@ class XcodeHelperTests: XCTestCase {
         do {
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            let expectedValue = "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue+1).0"
             
-            try helper.incrementGitTag(components: [GitTagComponent.minor], at: sourcePath!)
+            let value = try helper.incrementGitTag(component: GitTagComponent.minor, at: sourcePath!)
             
+            XCTAssertEqual(value, expectedValue)
             let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
-            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue+1).\(LibraryTag.patch.rawValue)")
+            XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {
             XCTFail("Error: \(e)")
@@ -398,11 +378,13 @@ class XcodeHelperTests: XCTestCase {
         do {
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+            let expectedValue = "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue+1)"
             
-            try helper.incrementGitTag(components: [GitTagComponent.patch], at: sourcePath!)
+            let value = try helper.incrementGitTag(component: GitTagComponent.patch, at: sourcePath!)
             
+            XCTAssertEqual(value, value)
             let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
-            XCTAssertEqual(updatedTag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue+1)")
+            XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {
             XCTFail("Error: \(e)")
@@ -426,7 +408,7 @@ class XcodeHelperTests: XCTestCase {
         var tag: String?
         do {
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-            tag = try helper.incrementGitTag(components: [GitTagComponent.patch], at: sourcePath!)
+            tag = try helper.incrementGitTag(component: GitTagComponent.patch, at: sourcePath!)
         } catch let e {
             XCTFail("Error: \(e)")
         }

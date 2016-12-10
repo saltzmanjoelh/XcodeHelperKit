@@ -28,22 +28,23 @@ public enum BuildConfiguration {
     }
 }
 
-public enum GitTagComponent : String {
-    case major = "major"
-    case minor = "minor"
-    case patch = "patch"
-    static func from(intValue: Int) -> GitTagComponent? {
-        switch intValue {
-        case 0:
-            return .major
-        case 1:
-            return .minor
-        case 2:
-            return .patch
+public enum GitTagComponent: Int {
+    
+    case major, minor, patch
+    
+    public init?(stringValue: String) {
+        switch stringValue {
+        case "major":
+            self = .major
+        case "minor":
+            self = .minor
+        case "patch":
+            self = .patch
         default:
             return nil
         }
     }
+    
 }
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
@@ -56,6 +57,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case uploadArchive(message:String)
     case gitTagParse(message:String)
     case gitTag(message:String)
+    case createXcarchive(message:String)
     case xcarchivePlist(message: String)
     case unknownOption(message:String)
     public var description : String {
@@ -70,6 +72,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
             case let .uploadArchive(message): return message
             case let .gitTagParse(message): return message
             case let .gitTag(message): return message
+            case let .createXcarchive(message): return message
             case let .xcarchivePlist(message): return message
             case let .unknownOption(message): return message
             }
@@ -306,14 +309,19 @@ public struct XcodeHelper: XcodeHelpable {
         return (major, minor, patch)
     }
     
-    public func gitTagSortValue(_ tag:(Int, Int, Int)) -> Int {
-        let multiplier = Int(ceil((Double(max(tag.0, tag.1, tag.2)) / 10) * 10))
-        return tag.0*multiplier*100 + tag.1*multiplier*10 + tag.2
+    public func gitTagCompare(_ lhs:(Int, Int, Int), _ rhs: (Int, Int, Int)) -> Bool {
+        if lhs.0 != rhs.0 {
+            return lhs.0 < rhs.0
+        }
+        else if lhs.1 != rhs.1 {
+            return lhs.1 < rhs.1
+        }
+        return lhs.2 < rhs.2
     }
     
     public func largestGitTag(tagStrings:[String]) throws -> String {
         let tags = tagStrings.flatMap(gitTagTuple)
-        guard let tag = tags.sorted(by: {gitTagSortValue($0) < gitTagSortValue($1)}).last else {
+        guard let tag = tags.sorted(by: {gitTagCompare($0, $1)}).last else {
             throw XcodeHelperError.gitTag(message: "Git tag not found: \(tagStrings)")
         }
         
@@ -321,19 +329,18 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     @discardableResult
-    public func incrementGitTag(components: [GitTagComponent] = [.patch], at sourcePath:String) throws -> String {
+    public func incrementGitTag(component targetComponent: GitTagComponent = .patch, at sourcePath:String) throws -> String {
         let tag = try getGitTag(sourcePath: sourcePath)
         let oldVersionComponents = tag.components(separatedBy: ".")
         if oldVersionComponents.count != 3 {
             throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
         }
-        let newVersionComponents = oldVersionComponents.enumerated().map { (offset: Int, element: String) -> String in
-            if let component = GitTagComponent.from(intValue: offset), components.contains(component) {
-                if let newValue = Int(element) {
-                    return String(describing: newValue+1)
-                }
+        let newVersionComponents = oldVersionComponents.enumerated().map { (oldComponentValue: Int, oldStringValue: String) -> String in
+            if oldComponentValue == targetComponent.rawValue, let oldIntValue = Int(oldStringValue) {
+                return String(describing: oldIntValue+1)
+            }else{
+                return oldComponentValue > targetComponent.rawValue ? "0" : oldStringValue
             }
-            return element
         }
         let updatedTag = newVersionComponents.joined(separator: ".")
         try gitTag(tag: updatedTag, at: sourcePath)
