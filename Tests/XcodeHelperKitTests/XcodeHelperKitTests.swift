@@ -69,55 +69,51 @@ class XcodeHelperTests: XCTestCase {
         print("done cloning temp dir: \(tempDir)")
         return tempDir
     }
-    /*
-    func testFetchPackages() {
-        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-        let helper = XcodeHelper()
-        
-        do {
-            let fetchResult = try helper.fetchPackages(at: sourcePath!, forLinux: false, inDockerImage: nil)
-            if let fetchError = fetchResult.error {
-                XCTFail("Error: \(fetchError)")
-            }
-            XCTAssertNotNil(fetchResult.output)
-            XCTAssertTrue(fetchResult.output!.contains("Resolved version"))
-        } catch let e {
-            XCTFail("Error: \(e)")
+    func testXcodeHelperErrors(){
+        let errors: [XcodeHelperError] = [.clean(message: "clean"),
+                                          .update(message: "update"),
+                                          .symlinkDependencies(message: "symlinkDependencies"),
+                                          .createArchive(message: "createArchive"),
+                                          .uploadArchive(message: "uploadArchive"),
+                                          .gitTagParse(message: "gitTagParse"),
+                                          .gitTag(message: "gitTag"),
+                                          .createXcarchive(message: "createXcarchive"),
+                                          .xcarchivePlist(message: "xcarchivePlist"),
+                                          .unknownOption(message: "unknownOption")]
+        for error in errors{
+            XCTAssertEqual(error.description, "\(error)")
         }
     }
-    func testFetchPackagesInLinux() {
-        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-        let helper = XcodeHelper()
+    func testXcodeHelperError_build(){
+        let err = XcodeHelperError.build(message: "build", exitCode: 111)
         
-        do {
-            let fetchResult = try helper.fetchPackages(at: sourcePath!, forLinux: true, inDockerImage: "saltzmanjoelh/swiftubuntu")
-            if let fetchError = fetchResult.error {
-                XCTFail("Error: \(fetchError)")
-            }
-            XCTAssertNotNil(fetchResult.output)
-            XCTAssertTrue(fetchResult.output!.contains("Resolved version"), "Should have found \"Resolved version\" in output.")
-            var isDirectory: ObjCBool = false
-            XCTAssertTrue(FileManager.default.fileExists(atPath: sourcePath!.appending("/Packages"), isDirectory: &isDirectory), "Failed to find Packages dir")
-            XCTAssertTrue(isDirectory.boolValue, "Packages symlink is not a directory")
-        } catch let e {
-            XCTFail("Error: \(e)")
+        XCTAssertEqual(err.description, "build")
+        if case XcodeHelperError.build(let buildError) = err {
+            XCTAssertEqual(buildError.exitCode, 111)
+        }else{
+            XCTFail("Failed to parse build error")
         }
     }
- */
+    
+    func testInit(){
+        XCTAssertNotNil(XcodeHelper(dockerRunnable: DockerRunnableFixture.self))
+    }
+    
     func testProjectFilePath() {
-        sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-        _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
-        let helper = XcodeHelper()
         do {
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            let helper = XcodeHelper()
             
             let path = try helper.projectFilePath(at: sourcePath!)
-            XCTAssert(path.contains("/HelloSwift.xcodeproj/project.pbxproj"))
             
+            XCTAssert(path.contains("/HelloSwift.xcodeproj/project.pbxproj"))
         } catch let e {
             XCTFail("Error: \(e)")
         }
         
     }
+    
     func testPackageNames(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)

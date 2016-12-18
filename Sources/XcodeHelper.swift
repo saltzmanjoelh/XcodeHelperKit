@@ -3,6 +3,10 @@ import SynchronousProcess
 import DockerProcess
 import S3Kit
 
+//TODO: handle update-packages when there is no existing Packages dir
+//TODO: add -g option to generate-xcodeproj
+//TODO: add -s option to symlink dependencies
+
 public enum BuildConfiguration {
     case debug
     case release
@@ -52,7 +56,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     //    case fetch(message:String)
     case update(message:String)
     case build(message:String, exitCode: Int32)
-    case symLinkDependencies(message:String)
+    case symlinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
     case gitTagParse(message:String)
@@ -63,11 +67,10 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     public var description : String {
         get {
             switch (self) {
-            case let .clean(message): return message
-            //                case let .fetch(message): return message
-            case let .update(message): return message
             case let .build(message, _): return message
-            case let .symLinkDependencies(message): return message
+            case let .clean(message): return message
+            case let .update(message): return message
+            case let .symlinkDependencies(message): return message
             case let .createArchive(message): return message
             case let .uploadArchive(message): return message
             case let .gitTagParse(message): return message
@@ -90,10 +93,12 @@ public enum DockerEnvironmentVariable: String {
 
 
 public struct XcodeHelper: XcodeHelpable {
+    
+    let dockerRunnable: DockerRunnable.Type
     let dateFormatter = DateFormatter()
     
-    public init() {
-        
+    public init(dockerRunnable: DockerRunnable.Type = DockerProcess.self) {
+        self.dockerRunnable = dockerRunnable
     }
     
     //MARK: Update Packages
@@ -101,7 +106,7 @@ public struct XcodeHelper: XcodeHelpable {
     public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
             let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
-            let result = DockerProcess(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+            let result = dockerRunnable.init(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
             if let error = result.error, result.exitCode != 0 {
                 throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
             }
@@ -175,7 +180,7 @@ public struct XcodeHelper: XcodeHelpable {
         //find the Packages directory
         let packagesPath = URL(fileURLWithPath: sourcePath).appendingPathComponent("Packages").path
         guard FileManager.default.fileExists(atPath: packagesPath)  else {
-            throw XcodeHelperError.symLinkDependencies(message: "Failed to find directory: \(packagesPath)")
+            throw XcodeHelperError.symlinkDependencies(message: "Failed to find directory: \(packagesPath)")
         }
         return try FileManager.default.contentsOfDirectory(atPath: packagesPath)
     }
@@ -223,10 +228,10 @@ public struct XcodeHelper: XcodeHelpable {
                 path.hasSuffix(".xcodeproj")
             }).first
             guard xcodeProjectPath != nil else {
-                throw XcodeHelperError.symLinkDependencies(message: "Failed to find xcodeproj at path: \(sourcePath)")
+                throw XcodeHelperError.symlinkDependencies(message: "Failed to find xcodeproj at path: \(sourcePath)")
             }
         } catch let e {
-            throw XcodeHelperError.symLinkDependencies(message: "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(e)")
+            throw XcodeHelperError.symlinkDependencies(message: "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(e)")
         }
         do{
             xcodeProjectPath = "\(sourcePath)/\(xcodeProjectPath!)"
@@ -234,10 +239,10 @@ public struct XcodeHelper: XcodeHelpable {
                 path.hasSuffix(".pbxproj")
             }).first
             guard pbProjectPath != nil else {
-                throw XcodeHelperError.symLinkDependencies(message: "Failed to find pbxproj at path: \(xcodeProjectPath)")
+                throw XcodeHelperError.symlinkDependencies(message: "Failed to find pbxproj at path: \(xcodeProjectPath)")
             }
         } catch let e {
-            throw XcodeHelperError.symLinkDependencies(message: "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(e)")
+            throw XcodeHelperError.symlinkDependencies(message: "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(e)")
         }
         return "\(xcodeProjectPath!)/\(pbProjectPath!)"
     }
