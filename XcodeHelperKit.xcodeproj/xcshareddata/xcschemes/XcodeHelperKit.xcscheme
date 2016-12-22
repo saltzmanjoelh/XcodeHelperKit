@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_35"
+               BlueprintIdentifier = "OBJ_38"
                BuildableName = "SynchronousProcess.framework"
                BlueprintName = "SynchronousProcess"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_42"
+               BlueprintIdentifier = "OBJ_46"
                BuildableName = "DockerProcess.framework"
                BlueprintName = "DockerProcess"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -42,7 +42,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_51"
+               BlueprintIdentifier = "OBJ_56"
                BuildableName = "CliRunnable.framework"
                BlueprintName = "CliRunnable"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_60"
+               BlueprintIdentifier = "OBJ_65"
                BuildableName = "S3Kit.framework"
                BlueprintName = "S3Kit"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -70,7 +70,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_69"
+               BlueprintIdentifier = "OBJ_74"
                BuildableName = "XcodeHelperKit.framework"
                BlueprintName = "XcodeHelperKit"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -82,14 +82,13 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_85"
+               BlueprintIdentifier = "OBJ_90"
                BuildableName = "XcodeHelperKitTests.xctest"
                BlueprintName = "XcodeHelperKitTests"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
@@ -112,7 +111,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OBJ_35"
+            BlueprintIdentifier = "OBJ_38"
             BuildableName = "SynchronousProcess.framework"
             BlueprintName = "SynchronousProcess"
             ReferencedContainer = "container:XcodeHelperKit.xcodeproj">

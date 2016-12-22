@@ -99,6 +99,10 @@ class XcodeHelperTests: XCTestCase {
         XCTAssertNotNil(XcodeHelper(dockerRunnable: DockerRunnableFixture.self))
     }
     
+    func testUpdatePackages(){
+        _ = XcodeHelper(dockerRunnable: DockerRunnableFixture.self)
+    }
+    
     func testProjectFilePath() {
         do {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
@@ -128,6 +132,7 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
     }
+    
     func testSymlinkDependencyPath(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)

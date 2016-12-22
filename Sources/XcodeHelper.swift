@@ -103,25 +103,36 @@ public struct XcodeHelper: XcodeHelpable {
     
     //MARK: Update Packages
     @discardableResult
-    public func updatePackages(at sourcePath:String, forLinux:Bool = false, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    public func updatePackages(at sourcePath: String, forLinux: Bool = false, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         if forLinux {
-            let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
-            let result = dockerRunnable.init(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
-            if let error = result.error, result.exitCode != 0 {
-                throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
-            }
-            return result
+            return try updateLinuxPackages(at: sourcePath, inDockerImage: imageName)
         }else{
-            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
-            if let error = result.error, result.exitCode != 0 {
-                throw XcodeHelperError.update(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")
-            }
-            return result
+            return try updateMacOsPackages(at: sourcePath, inDockerImage: imageName)
         }
+    }
+    //TODO: rename updateDockerPackages since someone may want to build in docker for windows or something
+    func updateLinuxPackages(at sourcePath: String, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+        let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
+        let result = dockerRunnable.init(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+        if let error = result.error, result.exitCode != 0 {
+            throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
+        }
+        return result
+    }
+    func updateMacOsPackages(at sourcePath: String, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
+        if let error = result.error, result.exitCode != 0 {
+            throw XcodeHelperError.update(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")
+        }
+        return result
     }
     
     //MARK: Build
     //TODO: use a data container to hold the source code so that we don't have to build everything from scratch each time
+    //TODO: rename docker-build
+    //TODO: add feature to only build on success by parsing logs (ProcessInfo.processInfo.environment["BUILD_DIR"]../../)
+    //          Logs/Build/Cache.db is plist with most recent build in it with a highLevelStatus S or E, most recent build at top
+    //          there is also a log file that ends in Succeeded or Failed, most recent one is ls -t *.xcactivitylog
     @discardableResult
     public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu", removeWhenDone: Bool = true) throws -> ProcessResult {
         //check if we need to clean first
@@ -162,6 +173,8 @@ public struct XcodeHelper: XcodeHelpable {
         }
         return result
     }
+    
+    //TODO: add generateXcodeProject with -d option to add a xchelper docker-build build phase and -s to only build after successful macOS builds
     
     //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
