@@ -21,7 +21,7 @@ struct DockerRunnableFixture: DockerRunnable {
     //closure to return an expected result without actually doing anything on the filesystem
     var testLaunch:((Bool) -> ProcessResult)?
     @discardableResult
-    public func launch(silenceOutput:Bool) -> ProcessResult {
+    public func launch(printOutput:Bool) -> ProcessResult {
         return (output: nil, error: nil, exitCode: -1)
     }
 }

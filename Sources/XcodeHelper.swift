@@ -7,50 +7,6 @@ import S3Kit
 //TODO: add -g option to generate-xcodeproj
 //TODO: add -s option to symlink dependencies
 
-public enum BuildConfiguration {
-    case debug
-    case release
-    
-    public func buildDirectory(inSourcePath sourcePath:String) -> String {
-        return sourcePath.hasSuffix("/") ? "\(sourcePath).build/" : "\(sourcePath)/.build/"
-    }
-    public func yamlPath(inSourcePath sourcePath:String) -> String {
-        return buildDirectory(inSourcePath: sourcePath).appending("\(self).yaml")
-    }
-    
-    public static var allValues : [BuildConfiguration] {
-        get {
-            return [debug, release]
-        }
-    }
-    public init(from string:String) {
-        if string == "release" {
-            self = .release
-        }else{
-            self = .debug
-        }
-    }
-}
-
-public enum GitTagComponent: Int {
-    
-    case major, minor, patch
-    
-    public init?(stringValue: String) {
-        switch stringValue {
-        case "major":
-            self = .major
-        case "minor":
-            self = .minor
-        case "patch":
-            self = .patch
-        default:
-            return nil
-        }
-    }
-    
-}
-
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
     //    case fetch(message:String)
@@ -83,13 +39,13 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     }
 }
 
-public enum DockerEnvironmentVariable: String {
+/*public enum DockerEnvironmentVariable: String {
     case projectName = "PROJECT"
     case projectDirectory = "PROJECT_DIR"
     case commandOptions = "DOCKER_COMMAND_OPTIONS"
     case imageName = "DOCKER_IMAGE_NAME"
     case containerName = "DOCKER_CONTAINER_NAME"
-}
+}*/
 
 
 public struct XcodeHelper: XcodeHelpable {
@@ -103,23 +59,22 @@ public struct XcodeHelper: XcodeHelpable {
     
     //MARK: Update Packages
     @discardableResult
-    public func updatePackages(at sourcePath: String, forLinux: Bool = false, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
-        if forLinux {
-            return try updateLinuxPackages(at: sourcePath, inDockerImage: imageName)
+    public func updatePackages(at sourcePath: String, using dockerImageName: String?) throws -> ProcessResult {
+        if let dockerImage = dockerImageName {
+            return try updateDockerPackages(at: sourcePath, in: dockerImage)
         }else{
-            return try updateMacOsPackages(at: sourcePath, inDockerImage: imageName)
+            return try updateMacOsPackages(at: sourcePath)
         }
     }
-    //TODO: rename updateDockerPackages since someone may want to build in docker for windows or something
-    func updateLinuxPackages(at sourcePath: String, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    func updateDockerPackages(at sourcePath: String, in dockerImageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
         let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
-        let result = dockerRunnable.init(command: "run", commandOptions: ["-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+        let result = dockerRunnable.init(command: "run", commandOptions: ["--rm", "-v", "\(sourcePath):\(sourcePath)"], imageName: dockerImageName, commandArgs: commandArgs).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
         }
         return result
     }
-    func updateMacOsPackages(at sourcePath: String, inDockerImage imageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
+    func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.update(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")
@@ -128,32 +83,55 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     //MARK: Build
-    //TODO: use a data container to hold the source code so that we don't have to build everything from scratch each time
-    //TODO: rename docker-build
     //TODO: add feature to only build on success by parsing logs (ProcessInfo.processInfo.environment["BUILD_DIR"]../../)
     //          Logs/Build/Cache.db is plist with most recent build in it with a highLevelStatus S or E, most recent build at top
     //          there is also a log file that ends in Succeeded or Failed, most recent one is ls -t *.xcactivitylog
     @discardableResult
-    public func build(source sourcePath:String, usingConfiguration configuration:BuildConfiguration, inDockerImage imageName:String = "saltzmanjoelh/swiftubuntu", removeWhenDone: Bool = true) throws -> ProcessResult {
+    public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "saltzmanjoelh/swiftubuntu", persistentBuildDirectory: String? = nil) throws -> ProcessResult {
+        
         //check if we need to clean first
-        if try shouldClean(sourcePath:sourcePath, forConfiguration:configuration) {
+        if try shouldClean(sourcePath: sourcePath, using: configuration) {
             try clean(sourcePath: sourcePath)
         }
-        //At the moment, building directly from a mounted volume gives errors like "error: Could not create file ... /.Package.toml"
-        //rsync the files to the root of the disk (excluding .build dir) the replace the build
-        //        let buildDir = configuration.buildDirectory(inSourcePath: sourcePath)
-        //        let commandArgs = ["/bin/bash", "-c", "rsync -ar --exclude=\(buildDir) --exclude=*.git \(sourcePath) /source && cd /source && swift build && rsync -ar /source/ \(sourcePath)"]
-        //simple build doesn't work
-        let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift build"]
-        let result = DockerProcess(command: "run", commandOptions: [removeWhenDone ? "--rm" : "", "-v", "\(sourcePath):\(sourcePath)"], imageName: imageName, commandArgs: commandArgs).launch(silenceOutput: false)
+        var combinedRunOptions = [String]()
+        if let dockerRunOptions = runOptions {
+            combinedRunOptions += dockerRunOptions.flatMap{ $0.processValues } + ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath]
+        }
+        if persistentBuildDirectory != nil {
+            combinedRunOptions += try persistentBuildOptions(at: sourcePath, using: persistentBuildDirectory!).flatMap{$0.processValues}
+        }
+        let bashCommand = ["/bin/bash", "-c", "swift build --configuration \(configuration.stringValue)"]
+        let result = DockerProcess(command: "run", commandOptions: combinedRunOptions, imageName: dockerImageName, commandArgs: bashCommand).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.build(message: "Error building in Linux: \(error)", exitCode: result.exitCode)
+            throw XcodeHelperError.build(message: "Error building in Docker: \(error)", exitCode: result.exitCode)
         }
         return result
     }
+    //persistentBuildDirectory is a subdirectory of .build and we mount it with .build/persistentBuildDirectory/.build:sourcePath/.build and .build/buildDirName/.Packages:sourcePath/Packages so that we can use it's artifacts for future builds and don't have to keep rebuilding
+    func persistentBuildOptions(at sourcePath: String, using directoryName: String) throws -> [DockerRunOption] {
+        // SomePackage/.build/
+        let buildSubdirectory = URL(fileURLWithPath: sourcePath)
+                                .appendingPathComponent(".build", isDirectory: true)
+                                .appendingPathComponent(directoryName, isDirectory: true)
+        // SomePackage/.build/platform
+        return [try persistentVolume(".build", in: buildSubdirectory),
+                try persistentVolume("Packages", in: buildSubdirectory)]
+    }
+    func persistentVolume(_ name: String, in buildSubdirectory: URL) throws -> DockerRunOption {
+        // SomePackage/.build/platform
+        let sourceDirectory = buildSubdirectory.appendingPathComponent(name, isDirectory: true)// SomePackage/.build/platform/.build
+        let destinationDirectory = buildSubdirectory.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(name, isDirectory: true)// SomePackage/.build/
+        
+        
+        //make sure that the persistent directories exist before we return volume mount points
+        if !FileManager.default.fileExists(atPath: sourceDirectory.path) {
+            try FileManager.default.createDirectory(at: sourceDirectory, withIntermediateDirectories: true, attributes: nil)
+        }
+        return .volume(source: sourceDirectory.path, destination: destinationDirectory.path)
+    }
     
     //MARK: Clean
-    public func shouldClean(sourcePath:String, forConfiguration configuration:BuildConfiguration) throws -> Bool {
+    public func shouldClean(sourcePath: String, using configuration: BuildConfiguration) throws -> Bool {
         let yamlPath = configuration.yamlPath(inSourcePath:sourcePath)
         if FileManager.default.isReadableFile(atPath: yamlPath) {
             let yamlFile = try String(contentsOfFile: yamlPath)
@@ -179,13 +157,13 @@ public struct XcodeHelper: XcodeHelpable {
     //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     @discardableResult
-    public func symlinkDependencies(sourcePath:String) throws {
+    public func symlinkDependencies(_ sourcePath:String) throws {
         //iterate Packages dir and create symlinks without the -Ver.sion.#
         let packagesURL = URL(fileURLWithPath: sourcePath).appendingPathComponent("Packages")
-        for directory in try packageNames(from: sourcePath) {
-            if let packageName = try symlink(dependencyPath: packagesURL.appendingPathComponent(directory).path) {
+        for versionedPackageName in try packageNames(from: sourcePath) {
+            if let symlinkName = try symlink(dependencyPath: packagesURL.appendingPathComponent(versionedPackageName).path) {
                 //update the xcode references to the symlink
-                try updateXcodeReferences(sourcePath: sourcePath, versionedPackageName: directory, symlinkName: packageName)
+                try updateXcodeReferences(for: versionedPackageName, at: sourcePath, using: symlinkName)
             }
         }
     }
@@ -222,9 +200,9 @@ public struct XcodeHelper: XcodeHelpable {
         
         return packageName
     }
-    func updateXcodeReferences(sourcePath: String, versionedPackageName: String, symlinkName: String) throws {
+    func updateXcodeReferences(for versionedPackageName: String, at sourcePath: String, using symlinkName: String) throws {
         //find the xcodeproj
-        let projectPath = try projectFilePath(at: sourcePath)
+        let projectPath = try projectFilePath(for: sourcePath)
         //open the project
         let file = try String(contentsOfFile: projectPath)
         //replace versioned package name with symlink name
@@ -233,7 +211,7 @@ public struct XcodeHelper: XcodeHelpable {
         try updatedFile.write(toFile: projectPath, atomically: false, encoding: String.Encoding.utf8)
     }
     
-    public func projectFilePath(at sourcePath:String) throws -> String {
+    public func projectFilePath(for sourcePath:String) throws -> String {
         var xcodeProjectPath: String?
         var pbProjectPath: String?
         do{
@@ -305,8 +283,8 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     //MARK: Git Tag
-    public func getGitTag(sourcePath:String) throws -> String {
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"], silenceOutput: true)
+    public func getGitTag(at sourcePath:String) throws -> String {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"], printOutput: false)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
         }
@@ -347,8 +325,8 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     @discardableResult
-    public func incrementGitTag(component targetComponent: GitTagComponent = .patch, at sourcePath:String) throws -> String {
-        let tag = try getGitTag(sourcePath: sourcePath)
+    public func incrementGitTag(component targetComponent: GitTagComponent = .patch, at sourcePath: String) throws -> String {
+        let tag = try getGitTag(at: sourcePath)
         let oldVersionComponents = tag.components(separatedBy: ".")
         if oldVersionComponents.count != 3 {
             throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
@@ -361,13 +339,13 @@ public struct XcodeHelper: XcodeHelpable {
             }
         }
         let updatedTag = newVersionComponents.joined(separator: ".")
-        try gitTag(tag: updatedTag, at: sourcePath)
+        try gitTag(updatedTag, repo: sourcePath)
         
-        return try getGitTag(sourcePath: sourcePath)
+        return try getGitTag(at: sourcePath)
     }
     
-    public func gitTag(tag: String, at sourcePath:String) throws {
-        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"], silenceOutput: true)
+    public func gitTag(_ tag: String, repo sourcePath: String) throws {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"], printOutput: false)
         if result.exitCode != 0, let error = result.error {
             throw XcodeHelperError.gitTag(message: "Error tagging git repo: \(error)")
         }
@@ -382,10 +360,10 @@ public struct XcodeHelper: XcodeHelpable {
     
     //MARK: Create XCArchive
     //returns a String for the path of the xcarchive
-    public func createXcarchive(in dirPath:String, with binaryPath: String, from schemeName:String) throws -> String {
+    public func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String) throws -> String {
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
-        let directoryDate = xcarchiveDirectoryDate(formatter: dateFormatter)
-        let archiveDate = xcarchiveDate(formatter: dateFormatter)
+        let directoryDate = xcarchiveDirectoryDate(from: dateFormatter)
+        let archiveDate = xcarchiveDate(from: dateFormatter)
         let archiveName = "xchelper-\(name) \(archiveDate).xcarchive"
         let path = "\(dirPath)/\(directoryDate)/\(archiveName)"
         try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
@@ -394,7 +372,7 @@ public struct XcodeHelper: XcodeHelpable {
         return path
     }
     
-    private func xcarchiveDirectoryDate(formatter: DateFormatter, from: Date = Date()) -> String {
+    private func xcarchiveDirectoryDate(from formatter: DateFormatter, from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone.current
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -402,7 +380,7 @@ public struct XcodeHelper: XcodeHelpable {
         return dateFormatter.string(from: from)
     }
     
-    internal func xcarchiveDate(formatter: DateFormatter, from: Date = Date()) -> String {
+    internal func xcarchiveDate(from formatter: DateFormatter, from: Date = Date()) -> String {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone.current
         dateFormatter.dateFormat = "MM-dd-yyyy, h.mm.ss a"

@@ -12,7 +12,7 @@
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "BE33D3AD-2656-457B-843F-52C9C6F0CF7D",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "63F18719339E8DB2EED9A1860CA846C1E5E0551F" : "XcodeHelperKit\/Packages\/S3Kit-1.0.9\/",
-    "0F7D5BBEF9D6E958D4C4AF4992E7F4951DD56098" : "XcodeHelperKit\/Packages\/DockerProcess-1.0.11\/",
+    "0F7D5BBEF9D6E958D4C4AF4992E7F4951DD56098" : "XcodeHelperKit\/Packages\/DockerProcess-1.0.13\/",
     "BFE10827E65A85152FA06B4CF740BEA79F236E37" : "XcodeHelperKit\/Packages\/CliRunnable-1.0.25\/",
     "A4CF843211A6CB07022610207717040189D54B41" : "XcodeHelperKit\/"
   },

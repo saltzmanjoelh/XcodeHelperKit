@@ -63,7 +63,7 @@ class XcodeHelperTests: XCTestCase {
                 
             }
         }
-        let cloneResult = Process.run("/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], silenceOutput: false)
+        let cloneResult = Process.run("/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], printOutput: true)
         XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
@@ -109,7 +109,7 @@ class XcodeHelperTests: XCTestCase {
             _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
-            let path = try helper.projectFilePath(at: sourcePath!)
+            let path = try helper.projectFilePath(for: sourcePath!)
             
             XCTAssert(path.contains("/HelloSwift.xcodeproj/project.pbxproj"))
         } catch let e {
@@ -160,9 +160,9 @@ class XcodeHelperTests: XCTestCase {
             _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
-            try helper.updateXcodeReferences(sourcePath: sourcePath!, versionedPackageName: testVersionedPackageName, symlinkName: testPackageName)
+            try helper.updateXcodeReferences(for: testVersionedPackageName, at: sourcePath!, using: testPackageName)
             
-            let projectPath = try helper.projectFilePath(at: sourcePath!)
+            let projectPath = try helper.projectFilePath(for: sourcePath!)
             let file = try String(contentsOfFile: projectPath)
             XCTAssertFalse(file.contains(testVersionedPackageName), "Xcode project should not contain any package versions")
         } catch let e {
@@ -172,11 +172,11 @@ class XcodeHelperTests: XCTestCase {
     func testShouldClean(){
         //build it in macOS so we know that it needs to be cleaned
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: false)
         XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after building in macOS")
         
         do{
-            let ans = try XcodeHelper().shouldClean(sourcePath: sourcePath!, forConfiguration: .debug)
+            let ans = try XcodeHelper().shouldClean(sourcePath: sourcePath!, using: .debug)
             
             XCTAssertTrue(ans, "shouldClean should have returned true")
             
@@ -187,10 +187,10 @@ class XcodeHelperTests: XCTestCase {
         
     }
     
-    func testCleanLinuxBuilds() {
+    func testCleanDockerBuilds() {
         //build first so that we have something to clean
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], silenceOutput: false)
+        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: true)
         XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
         let helper = XcodeHelper()
         
@@ -203,14 +203,65 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     
-    func testBuildInLinux(){
+    func testBuildInDocker(){
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
         let helper = XcodeHelper()
         
         do {
-            let result = try helper.build(source: sourcePath!, usingConfiguration: .debug, inDockerImage: "saltzmanjoelh/swiftubuntu", removeWhenDone: true)
+            let result = try helper.dockerBuild(sourcePath!, with: [.removeWhenDone], using: .debug, in: "saltzmanjoelh/swiftubuntu", persistentBuildDirectory: "platform")
             
             XCTAssertNil(result.error, result.error!)
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testPersistentBuildOptions(){
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let helper = XcodeHelper()
+        let subdirectoryName = "platform"
+        let subdirectoryURL = URL(fileURLWithPath: sourcePath!).appendingPathComponent(".build", isDirectory: true)
+                                    .appendingPathComponent(subdirectoryName, isDirectory: true)
+        do {
+            let dockerRunOptions = try helper.persistentBuildOptions(at: sourcePath!, using: subdirectoryName)
+            
+            XCTAssertEqual(dockerRunOptions.count, 2)
+            let directories = [".build", "Packages"]
+            for index in 0..<2 {
+                switch dockerRunOptions[index] {
+                case .volume(let source, let destination):
+                    XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(directories[index]).path)
+                    XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent().path)
+                    
+                    XCTAssertTrue(FileManager.default.fileExists(atPath: source))
+                default:
+                    XCTFail("volume option should have been returned")
+                }
+            }
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testPersistentBuildVolume() {
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let helper = XcodeHelper()
+        let subdirectoryName = "platform"
+        let subdirectoryURL = URL(fileURLWithPath: sourcePath!)
+            .appendingPathComponent(".build", isDirectory: true)
+            .appendingPathComponent(subdirectoryName, isDirectory: true)
+        let volumeName = "Packages"
+        do {
+            let dockerRunOption = try helper.persistentVolume(volumeName, in: subdirectoryURL)
+            
+            switch dockerRunOption {
+            case .volume(let source, let destination):
+                XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(volumeName).path)
+                XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(volumeName, isDirectory: true).path)
+                
+                XCTAssertTrue(FileManager.default.fileExists(atPath: source))
+            default:
+                XCTFail("volume option should have been returned")
+            }
+            
         } catch let e {
             XCTFail("Error: \(e)")
         }
@@ -283,7 +334,7 @@ class XcodeHelperTests: XCTestCase {
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
             
-            let tag = try helper.getGitTag(sourcePath:sourcePath!)
+            let tag = try helper.getGitTag(at:sourcePath!)
             
             XCTAssertEqual(tag, "\(LibraryTag.major.rawValue).\(LibraryTag.minor.rawValue).\(LibraryTag.patch.rawValue)")
             
@@ -352,7 +403,7 @@ class XcodeHelperTests: XCTestCase {
             let value = try helper.incrementGitTag(component: GitTagComponent.major, at: sourcePath!)
             
             XCTAssertEqual(value, expectedValue)
-            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            let updatedTag = try helper.getGitTag(at:sourcePath!)
             XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {
@@ -368,7 +419,7 @@ class XcodeHelperTests: XCTestCase {
             let value = try helper.incrementGitTag(component: GitTagComponent.minor, at: sourcePath!)
             
             XCTAssertEqual(value, expectedValue)
-            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            let updatedTag = try helper.getGitTag(at:sourcePath!)
             XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {
@@ -384,7 +435,7 @@ class XcodeHelperTests: XCTestCase {
             let value = try helper.incrementGitTag(component: GitTagComponent.patch, at: sourcePath!)
             
             XCTAssertEqual(value, value)
-            let updatedTag = try helper.getGitTag(sourcePath:sourcePath!)
+            let updatedTag = try helper.getGitTag(at:sourcePath!)
             XCTAssertEqual(updatedTag, expectedValue)
             
         } catch let e {

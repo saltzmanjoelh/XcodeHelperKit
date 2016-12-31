@@ -193,8 +193,8 @@
 		OBJ_11 /* DockerProcess */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_12 /* DockerProcess.swift */,
 				OBJ_13 /* DockerRunnable.swift */,
+				OBJ_12 /* DockerProcess.swift */,
 			);
 			name = DockerProcess;
 			path = Packages/DockerProcess/Sources;
@@ -265,7 +265,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -273,7 +273,6 @@
 				OBJ_25 /* Tests */,
 				OBJ_31 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -422,7 +421,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_31 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
