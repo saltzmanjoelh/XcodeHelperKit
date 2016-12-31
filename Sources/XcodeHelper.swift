@@ -3,10 +3,6 @@ import SynchronousProcess
 import DockerProcess
 import S3Kit
 
-//TODO: handle update-packages when there is no existing Packages dir
-//TODO: add -g option to generate-xcodeproj
-//TODO: add -s option to symlink dependencies
-
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
     //    case fetch(message:String)
@@ -82,10 +78,16 @@ public struct XcodeHelper: XcodeHelpable {
         return result
     }
     
+    @discardableResult
+    public func generateXcodeProject(at sourcePath: String) throws -> ProcessResult {
+        let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
+        if let error = result.error, result.exitCode != 0 {
+            throw XcodeHelperError.update(message: "Error generating Xcode project (\(result.exitCode)):\n\(error)")
+        }
+        return result
+    }
+    
     //MARK: Build
-    //TODO: add feature to only build on success by parsing logs (ProcessInfo.processInfo.environment["BUILD_DIR"]../../)
-    //          Logs/Build/Cache.db is plist with most recent build in it with a highLevelStatus S or E, most recent build at top
-    //          there is also a log file that ends in Succeeded or Failed, most recent one is ls -t *.xcactivitylog
     @discardableResult
     public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "saltzmanjoelh/swiftubuntu", persistentBuildDirectory: String? = nil) throws -> ProcessResult {
         
@@ -151,8 +153,6 @@ public struct XcodeHelper: XcodeHelpable {
         }
         return result
     }
-    
-    //TODO: add generateXcodeProject with -d option to add a xchelper docker-build build phase and -s to only build after successful macOS builds
     
     //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change

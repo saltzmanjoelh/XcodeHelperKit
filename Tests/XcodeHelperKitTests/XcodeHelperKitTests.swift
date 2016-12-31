@@ -133,6 +133,21 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     
+    func testGenerateXcodeProject(){
+        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
+        let helper = XcodeHelper()
+        
+        do {
+            let result = try helper.generateXcodeProject(at: sourcePath!)
+            
+            XCTAssertNil(result.error, result.error!)
+            XCTAssertNotNil(result.output!)
+            XCTAssertEqual(result.output!, "generated: ./Hello.xcodeproj\n")
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
     func testSymlinkDependencyPath(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
