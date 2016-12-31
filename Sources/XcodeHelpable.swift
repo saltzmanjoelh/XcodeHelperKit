@@ -72,7 +72,7 @@ public protocol XcodeHelpable {
     @discardableResult func generateXcodeProject(at sourcePath: String) throws -> ProcessResult
     @discardableResult func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentBuildDirectory: String?) throws -> ProcessResult
     @discardableResult func clean(sourcePath: String) throws -> ProcessResult
-    @discardableResult func symlinkDependencies(_ sourcePath: String) throws
+    @discardableResult func symlinkDependencies(at sourcePath: String) throws
     @discardableResult func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
     @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
     @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws

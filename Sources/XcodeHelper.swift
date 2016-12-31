@@ -157,7 +157,7 @@ public struct XcodeHelper: XcodeHelpable {
     //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     @discardableResult
-    public func symlinkDependencies(_ sourcePath:String) throws {
+    public func symlinkDependencies(at sourcePath:String) throws {
         //iterate Packages dir and create symlinks without the -Ver.sion.#
         let packagesURL = URL(fileURLWithPath: sourcePath).appendingPathComponent("Packages")
         for versionedPackageName in try packageNames(from: sourcePath) {
