@@ -71,7 +71,7 @@ class XcodeHelperTests: XCTestCase {
     }
     func testXcodeHelperErrors(){
         let errors: [XcodeHelperError] = [.clean(message: "clean"),
-                                          .update(message: "update"),
+                                          .updatePackages(message: "update"),
                                           .symlinkDependencies(message: "symlinkDependencies"),
                                           .createArchive(message: "createArchive"),
                                           .uploadArchive(message: "uploadArchive"),
@@ -85,10 +85,10 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     func testXcodeHelperError_build(){
-        let err = XcodeHelperError.build(message: "build", exitCode: 111)
+        let err = XcodeHelperError.dockerBuild(message: "build", exitCode: 111)
         
         XCTAssertEqual(err.description, "build")
-        if case XcodeHelperError.build(let buildError) = err {
+        if case XcodeHelperError.dockerBuild(let buildError) = err {
             XCTAssertEqual(buildError.exitCode, 111)
         }else{
             XCTFail("Failed to parse build error")
@@ -100,7 +100,19 @@ class XcodeHelperTests: XCTestCase {
     }
     
     func testUpdatePackages(){
-        _ = XcodeHelper(dockerRunnable: DockerRunnableFixture.self)
+        do{
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            let helper = XcodeHelper(dockerRunnable: DockerProcess.self)
+            
+            let result = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            
+            XCTAssertNil(result.error)
+            XCTAssertEqual(result.exitCode, 0)
+            XCTAssertNotNil(result.output)
+            XCTAssert(result.output!.contains("Cloning \(libraryRepoURL)"))
+        }catch let e{
+            XCTFail("\(e)")
+        }
     }
     
     func testProjectFilePath() {
@@ -223,54 +235,62 @@ class XcodeHelperTests: XCTestCase {
         let helper = XcodeHelper()
         
         do {
-            let result = try helper.dockerBuild(sourcePath!, with: [.removeWhenDone], using: .debug, in: "saltzmanjoelh/swiftubuntu", persistentBuildDirectory: "platform")
+            let result = try helper.dockerBuild(sourcePath!, with: [.removeWhenDone], using: .debug, in: "saltzmanjoelh/swiftubuntu", persistentVolumeName: "platform")
             
             XCTAssertNil(result.error, result.error!)
         } catch let e {
             XCTFail("Error: \(e)")
         }
     }
-    func testPersistentBuildOptions(){
+    func testPersistentVolumeOptions(){
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
         let helper = XcodeHelper()
         let subdirectoryName = "platform"
+        // source/.build/platform/
         let subdirectoryURL = URL(fileURLWithPath: sourcePath!).appendingPathComponent(".build", isDirectory: true)
                                     .appendingPathComponent(subdirectoryName, isDirectory: true)
         do {
-            let dockerRunOptions = try helper.persistentBuildOptions(at: sourcePath!, using: subdirectoryName)
+            let dockerRunOptions = try helper.persistentVolumeOptions(at: sourcePath!, using: subdirectoryName)
             
-            XCTAssertEqual(dockerRunOptions.count, 2)
-            let directories = [".build", "Packages"]
-            for index in 0..<2 {
+            //first one should contain .build
+            //not persisting Packages directory for now since it causes swift compiler to crash
+            let directories = [".build"]//, "Packages"
+            XCTAssertEqual(dockerRunOptions.count, directories.count)
+            for index in 0..<directories.count {
                 switch dockerRunOptions[index] {
                 case .volume(let source, let destination):
-                    XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(directories[index]).path)
-                    XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent().path)
+                    XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(directories[index]).path)// source/.build/platform/.build
+                    XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent()// source/.build
+                                                .deletingLastPathComponent()
+                                                .appendingPathComponent(directories[index])
+                                                .path)
                     
                     XCTAssertTrue(FileManager.default.fileExists(atPath: source))
                 default:
                     XCTFail("volume option should have been returned")
                 }
             }
-        } catch let e {
+        }catch let e{
             XCTFail("Error: \(e)")
         }
     }
-    func testPersistentBuildVolume() {
+    func testPersistentVolume() {
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
         let helper = XcodeHelper()
-        let subdirectoryName = "platform"
-        let subdirectoryURL = URL(fileURLWithPath: sourcePath!)
-            .appendingPathComponent(".build", isDirectory: true)
-            .appendingPathComponent(subdirectoryName, isDirectory: true)
-        let volumeName = "Packages"
+        let volumeName = "platform"
+        let subdirectoryURL = URL(fileURLWithPath: sourcePath!)         // source
+            .appendingPathComponent(".build", isDirectory: true)        // source/.build
+            .appendingPathComponent(volumeName, isDirectory: true)// source/.build/platform
+        let subdirectoryName = ".build"
         do {
-            let dockerRunOption = try helper.persistentVolume(volumeName, in: subdirectoryURL)
+            let dockerRunOption = try helper.persistentVolume(subdirectoryName, in: subdirectoryURL)
             
             switch dockerRunOption {
             case .volume(let source, let destination):
-                XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(volumeName).path)
-                XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(volumeName, isDirectory: true).path)
+                // source/.build/platform/Packages
+                XCTAssertEqual(source, subdirectoryURL.appendingPathComponent(subdirectoryName).path)
+                // source/.build/platform/../../Packages
+                XCTAssertEqual(destination, subdirectoryURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(subdirectoryName, isDirectory: true).path)
                 
                 XCTAssertTrue(FileManager.default.fileExists(atPath: source))
             default:

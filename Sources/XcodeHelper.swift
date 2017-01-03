@@ -6,8 +6,8 @@ import S3Kit
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
     //    case fetch(message:String)
-    case update(message:String)
-    case build(message:String, exitCode: Int32)
+    case updatePackages(message:String)
+    case dockerBuild(message:String, exitCode: Int32)
     case symlinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
@@ -19,9 +19,9 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     public var description : String {
         get {
             switch (self) {
-            case let .build(message, _): return message
+            case let .dockerBuild(message, _): return message
             case let .clean(message): return message
-            case let .update(message): return message
+            case let .updatePackages(message): return message
             case let .symlinkDependencies(message): return message
             case let .createArchive(message): return message
             case let .uploadArchive(message): return message
@@ -36,12 +36,12 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
 }
 
 /*public enum DockerEnvironmentVariable: String {
-    case projectName = "PROJECT"
-    case projectDirectory = "PROJECT_DIR"
-    case commandOptions = "DOCKER_COMMAND_OPTIONS"
-    case imageName = "DOCKER_IMAGE_NAME"
-    case containerName = "DOCKER_CONTAINER_NAME"
-}*/
+ case projectName = "PROJECT"
+ case projectDirectory = "PROJECT_DIR"
+ case commandOptions = "DOCKER_COMMAND_OPTIONS"
+ case imageName = "DOCKER_IMAGE_NAME"
+ case containerName = "DOCKER_CONTAINER_NAME"
+ }*/
 
 
 public struct XcodeHelper: XcodeHelpable {
@@ -55,25 +55,29 @@ public struct XcodeHelper: XcodeHelpable {
     
     //MARK: Update Packages
     @discardableResult
-    public func updatePackages(at sourcePath: String, using dockerImageName: String?) throws -> ProcessResult {
-        if let dockerImage = dockerImageName {
-            return try updateDockerPackages(at: sourcePath, in: dockerImage)
+    public func updatePackages(at sourcePath: String, using dockerImageName: String?, with persistentVolume: String?) throws -> ProcessResult {
+        if let dockerImage = dockerImageName, let volume = persistentVolume {
+            return try updateDockerPackages(at: sourcePath, in: dockerImage, with: volume)
         }else{
             return try updateMacOsPackages(at: sourcePath)
         }
     }
-    func updateDockerPackages(at sourcePath: String, in dockerImageName: String = "saltzmanjoelh/swiftubuntu") throws -> ProcessResult {
-        let commandArgs = ["/bin/bash", "-c", "cd \(sourcePath) && swift package update"]
-        let result = dockerRunnable.init(command: "run", commandOptions: ["--rm", "-v", "\(sourcePath):\(sourcePath)"], imageName: dockerImageName, commandArgs: commandArgs).launch(printOutput: true)
+    // The combination of `swift package update` and persistentVolume caused "segmentation fault" and swift compiler crashes
+    // For now, when we update packages in Docker we should delete all existing packages first. ie: don't persist Packges directory
+    func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult {
+        let commandArgs = ["/bin/bash", "-c", "swift package update"]
+        var commandOptions: [DockerRunOption] = [.removeWhenDone, .volume(source: sourcePath, destination: sourcePath), .workingDirectory(at: sourcePath)]
+        commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)
+        let result = dockerRunnable.init(command: "run", commandOptions: commandOptions.flatMap{ $0.processValues }, imageName: dockerImageName, commandArgs: commandArgs).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.update(message: "Error updating packages in Linux (\(result.exitCode)):\n\(error)")
+            throw XcodeHelperError.updatePackages(message: "\(persistentVolume) - Error updating packages (\(result.exitCode)):\n\(error)")
         }
         return result
     }
     func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.update(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")
+            throw XcodeHelperError.updatePackages(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")
         }
         return result
     }
@@ -82,14 +86,14 @@ public struct XcodeHelper: XcodeHelpable {
     public func generateXcodeProject(at sourcePath: String) throws -> ProcessResult {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.update(message: "Error generating Xcode project (\(result.exitCode)):\n\(error)")
+            throw XcodeHelperError.updatePackages(message: "Error generating Xcode project (\(result.exitCode)):\n\(error)")
         }
         return result
     }
     
     //MARK: Build
     @discardableResult
-    public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "saltzmanjoelh/swiftubuntu", persistentBuildDirectory: String? = nil) throws -> ProcessResult {
+    public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "saltzmanjoelh/swiftubuntu", persistentVolumeName: String? = nil) throws -> ProcessResult {
         
         //check if we need to clean first
         if try shouldClean(sourcePath: sourcePath, using: configuration) {
@@ -99,25 +103,27 @@ public struct XcodeHelper: XcodeHelpable {
         if let dockerRunOptions = runOptions {
             combinedRunOptions += dockerRunOptions.flatMap{ $0.processValues } + ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath]
         }
-        if persistentBuildDirectory != nil {
-            combinedRunOptions += try persistentBuildOptions(at: sourcePath, using: persistentBuildDirectory!).flatMap{$0.processValues}
+        if let volumeName = persistentVolumeName {
+            combinedRunOptions += try persistentVolumeOptions(at: sourcePath, using: volumeName).flatMap{$0.processValues}
         }
         let bashCommand = ["/bin/bash", "-c", "swift build --configuration \(configuration.stringValue)"]
         let result = DockerProcess(command: "run", commandOptions: combinedRunOptions, imageName: dockerImageName, commandArgs: bashCommand).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.build(message: "Error building in Docker: \(error)", exitCode: result.exitCode)
+            let prefix = persistentVolumeName != nil ? "\(persistentVolumeName) - " : ""
+            throw XcodeHelperError.dockerBuild(message: "\(prefix)Error building in Docker: \(error)", exitCode: result.exitCode)
         }
         return result
     }
     //persistentBuildDirectory is a subdirectory of .build and we mount it with .build/persistentBuildDirectory/.build:sourcePath/.build and .build/buildDirName/.Packages:sourcePath/Packages so that we can use it's artifacts for future builds and don't have to keep rebuilding
-    func persistentBuildOptions(at sourcePath: String, using directoryName: String) throws -> [DockerRunOption] {
+    func persistentVolumeOptions(at sourcePath: String, using directoryName: String) throws -> [DockerRunOption] {
         // SomePackage/.build/
         let buildSubdirectory = URL(fileURLWithPath: sourcePath)
-                                .appendingPathComponent(".build", isDirectory: true)
-                                .appendingPathComponent(directoryName, isDirectory: true)
+            .appendingPathComponent(".build", isDirectory: true)
+            .appendingPathComponent(directoryName, isDirectory: true)
         // SomePackage/.build/platform
-        return [try persistentVolume(".build", in: buildSubdirectory),
-                try persistentVolume("Packages", in: buildSubdirectory)]
+        //not persisting Packages directory for now since it causes swift compiler to crash
+        return [try persistentVolume(".build", in: buildSubdirectory)]//try persistentVolume("Packages", in: buildSubdirectory)]
+        
     }
     func persistentVolume(_ name: String, in buildSubdirectory: URL) throws -> DockerRunOption {
         // SomePackage/.build/platform
