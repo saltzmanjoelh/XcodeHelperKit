@@ -54,17 +54,10 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     //MARK: Update Packages
-    @discardableResult
-    public func updatePackages(at sourcePath: String, using dockerImageName: String?, with persistentVolume: String?) throws -> ProcessResult {
-        if let dockerImage = dockerImageName, let volume = persistentVolume {
-            return try updateDockerPackages(at: sourcePath, in: dockerImage, with: volume)
-        }else{
-            return try updateMacOsPackages(at: sourcePath)
-        }
-    }
     // The combination of `swift package update` and persistentVolume caused "segmentation fault" and swift compiler crashes
     // For now, when we update packages in Docker we should delete all existing packages first. ie: don't persist Packges directory
-    func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult {
+    @discardableResult
+    public func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult {
         let commandArgs = ["/bin/bash", "-c", "swift package update"]
         var commandOptions: [DockerRunOption] = [.removeWhenDone, .volume(source: sourcePath, destination: sourcePath), .workingDirectory(at: sourcePath)]
         commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)
@@ -74,7 +67,8 @@ public struct XcodeHelper: XcodeHelpable {
         }
         return result
     }
-    func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult {
+    @discardableResult
+    public func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.updatePackages(message: "Error updating packages in macOS (\(result.exitCode)):\n\(error)")

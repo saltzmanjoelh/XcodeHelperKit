@@ -68,7 +68,8 @@ public enum GitTagComponent: Int {
 public protocol XcodeHelpable {
     
     
-    @discardableResult func updatePackages(at sourcePath: String, using dockerImageName: String?, with persistentVolumeName: String?) throws -> ProcessResult
+    @discardableResult func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult
+    @discardableResult func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult
     @discardableResult func generateXcodeProject(at sourcePath: String) throws -> ProcessResult
     @discardableResult func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentVolumeName: String?) throws -> ProcessResult
     @discardableResult func clean(sourcePath: String) throws -> ProcessResult
