@@ -47,10 +47,12 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
 public struct XcodeHelper: XcodeHelpable {
     
     let dockerRunnable: DockerRunnable.Type
+    let processRunnable: ProcessRunnable.Type
     let dateFormatter = DateFormatter()
     
-    public init(dockerRunnable: DockerRunnable.Type = DockerProcess.self) {
+    public init(dockerRunnable: DockerRunnable.Type = DockerProcess.self, processRunnable: ProcessRunnable.Type = Process.self) {
         self.dockerRunnable = dockerRunnable
+        self.processRunnable = processRunnable
     }
     
     //MARK: Update Packages
@@ -58,6 +60,11 @@ public struct XcodeHelper: XcodeHelpable {
     // For now, when we update packages in Docker we should delete all existing packages first. ie: don't persist Packges directory
     @discardableResult
     public func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult {
+        
+        //backup the Packages dir
+        movePackages(at: sourcePath, fromBackup: false)
+        
+        //Update the Docker Packages
         let commandArgs = ["/bin/bash", "-c", "swift package update"]
         var commandOptions: [DockerRunOption] = [.removeWhenDone, .volume(source: sourcePath, destination: sourcePath), .workingDirectory(at: sourcePath)]
         commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)
@@ -65,8 +72,20 @@ public struct XcodeHelper: XcodeHelpable {
         if let error = result.error, result.exitCode != 0 {
             throw XcodeHelperError.updatePackages(message: "\(persistentVolume) - Error updating packages (\(result.exitCode)):\n\(error)")
         }
+        
+        //Restore the Packages directory
+        movePackages(at: sourcePath, fromBackup: true)
+        
         return result
     }
+    func movePackages(at sourcePath: String, fromBackup: Bool) {
+        let originalURL = URL.init(fileURLWithPath: sourcePath).appendingPathComponent("Packages", isDirectory: true)
+        let backupURL = originalURL.appendingPathExtension("backup")
+        let arguments = fromBackup ? [backupURL.path, originalURL.path] : [originalURL.path, backupURL.path]
+        
+        processRunnable.run("/bin/mv", arguments: arguments, printOutput: false, outputPrefix: nil)
+    }
+    
     @discardableResult
     public func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult {
         let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])

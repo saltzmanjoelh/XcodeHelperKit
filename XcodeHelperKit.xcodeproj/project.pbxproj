@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		388A1A6D1E2182620070101E /* ProcessRunnableFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 388A1A6C1E2182620070101E /* ProcessRunnableFixture.swift */; };
 		OBJ_100 /* SynchronousProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* SynchronousProcess.framework */; };
 		OBJ_101 /* DockerProcess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* DockerProcess.framework */; };
 		OBJ_102 /* CliRunnable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* CliRunnable.framework */; };
@@ -36,70 +37,70 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3859E0A61E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A621E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_38;
 			remoteInfo = SynchronousProcess;
 		};
-		3859E0A71E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A631E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_38;
 			remoteInfo = SynchronousProcess;
 		};
-		3859E0A81E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A641E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_46;
 			remoteInfo = DockerProcess;
 		};
-		3859E0A91E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A651E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_56;
 			remoteInfo = CliRunnable;
 		};
-		3859E0AA1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A661E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_65;
 			remoteInfo = S3Kit;
 		};
-		3859E0AB1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A671E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_38;
 			remoteInfo = SynchronousProcess;
 		};
-		3859E0AC1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A681E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_46;
 			remoteInfo = DockerProcess;
 		};
-		3859E0AD1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A691E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_56;
 			remoteInfo = CliRunnable;
 		};
-		3859E0AE1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A6A1E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_65;
 			remoteInfo = S3Kit;
 		};
-		3859E0AF1E0BB76200D85D01 /* PBXContainerItemProxy */ = {
+		388A1A6B1E21818D0070101E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
@@ -109,6 +110,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		388A1A6C1E2182620070101E /* ProcessRunnableFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProcessRunnableFixture.swift; sourceTree = "<group>"; };
 		OBJ_10 /* SynchronousProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronousProcess.swift; sourceTree = "<group>"; };
 		OBJ_12 /* DockerProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerProcess.swift; sourceTree = "<group>"; };
 		OBJ_13 /* DockerRunnable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerRunnable.swift; sourceTree = "<group>"; };
@@ -193,8 +195,8 @@
 		OBJ_11 /* DockerProcess */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_13 /* DockerRunnable.swift */,
 				OBJ_12 /* DockerProcess.swift */,
+				OBJ_13 /* DockerRunnable.swift */,
 			);
 			name = DockerProcess;
 			path = Packages/DockerProcess/Sources;
@@ -245,6 +247,7 @@
 			children = (
 				OBJ_27 /* BuildConfigurationTests.swift */,
 				OBJ_28 /* DockerRunnableFixture.swift */,
+				388A1A6C1E2182620070101E /* ProcessRunnableFixture.swift */,
 				OBJ_29 /* GitTagComponentTests.swift */,
 				OBJ_30 /* XcodeHelperKitTests.swift */,
 			);
@@ -265,7 +268,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 = {
+		OBJ_5 /*  */ = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -273,6 +276,7 @@
 				OBJ_25 /* Tests */,
 				OBJ_31 /* Products */,
 			);
+			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -421,7 +425,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5;
+			mainGroup = OBJ_5 /*  */;
 			productRefGroup = OBJ_31 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -488,6 +492,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				388A1A6D1E2182620070101E /* ProcessRunnableFixture.swift in Sources */,
 				OBJ_95 /* BuildConfigurationTests.swift in Sources */,
 				OBJ_96 /* DockerRunnableFixture.swift in Sources */,
 				OBJ_97 /* GitTagComponentTests.swift in Sources */,
@@ -501,52 +506,52 @@
 		OBJ_105 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_38 /* SynchronousProcess */;
-			targetProxy = 3859E0AB1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A671E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_106 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_46 /* DockerProcess */;
-			targetProxy = 3859E0AC1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A681E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_107 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_56 /* CliRunnable */;
-			targetProxy = 3859E0AD1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A691E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_108 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_65 /* S3Kit */;
-			targetProxy = 3859E0AE1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A6A1E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_109 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_74 /* XcodeHelperKit */;
-			targetProxy = 3859E0AF1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A6B1E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_55 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_38 /* SynchronousProcess */;
-			targetProxy = 3859E0A61E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A621E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_86 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_38 /* SynchronousProcess */;
-			targetProxy = 3859E0A71E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A631E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_87 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_46 /* DockerProcess */;
-			targetProxy = 3859E0A81E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A641E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_88 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_56 /* CliRunnable */;
-			targetProxy = 3859E0A91E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A651E21818D0070101E /* PBXContainerItemProxy */;
 		};
 		OBJ_89 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_65 /* S3Kit */;
-			targetProxy = 3859E0AA1E0BB76200D85D01 /* PBXContainerItemProxy */;
+			targetProxy = 388A1A661E21818D0070101E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

@@ -98,12 +98,11 @@ class XcodeHelperTests: XCTestCase {
     func testInit(){
         XCTAssertNotNil(XcodeHelper(dockerRunnable: DockerRunnableFixture.self))
     }
-    
-    func testUpdatePackages(){
+    func testUpdateDockerPackages(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            let helper = XcodeHelper(dockerRunnable: DockerProcess.self)
-            
+            let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
+
             let result = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
             
             XCTAssertNil(result.error)
@@ -113,6 +112,56 @@ class XcodeHelperTests: XCTestCase {
         }catch let e{
             XCTFail("\(e)")
         }
+    }
+    func testUpdateDockerPackages_backupPackages(){
+        do{
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
+            var didBackupPackages = false
+            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+                if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("backup") {
+                    didBackupPackages = true
+                }
+                return emptyProcessResult
+            })
+            
+            _ = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            
+            XCTAssertTrue(didBackupPackages)
+        }catch let e{
+            XCTFail("\(e)")
+        }
+    }
+    func testUpdateDockerPackages_restorePackages(){
+        do{
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
+            //backup
+            ProcessRunnableFixture.instanceTests.append({(launchPath: String, arguments: [String]?,printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+                return emptyProcessResult
+            })
+            //restore
+            var didRestorePackages = false
+            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?,printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+                if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("Packages") {
+                    didRestorePackages = true
+                }
+                return emptyProcessResult
+            })
+            _ = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            
+            XCTAssertTrue(didRestorePackages)
+        }catch let e{
+            XCTFail("\(e)")
+        }
+    }
+    
+    func testUpdateMacOsPackages() {
+        
+    }
+    
+    func testSymlinkDependencies() {
+        
     }
     
     func testProjectFilePath() {
