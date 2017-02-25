@@ -1,4 +1,7 @@
 language: objective-c
 osx_image: xcode8.2
+before_install:
+- whoami
+- printenv
 script:
   - "swift test"
