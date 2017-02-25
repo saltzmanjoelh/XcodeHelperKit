@@ -532,7 +532,6 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     func testPushGitTagFailure() {
-        guard ProcessInfo.processInfo.environment["TRAVIS_OS_NAME"] == nil else { return }
         do{
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
@@ -545,6 +544,7 @@ class XcodeHelperTests: XCTestCase {
         XCTFail("Pushing an invalid tag should have thrown an error")
     }
     func testPushGitTag() {
+        guard ProcessInfo.processInfo.environment["TRAVIS_OS_NAME"] == nil else { return }
         let helper = XcodeHelper()
         //get the current tag
         var tag: String?
