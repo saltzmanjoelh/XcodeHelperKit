@@ -532,6 +532,7 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     func testPushGitTagFailure() {
+        guard ProcessInfo.processInfo.environment["TRAVIS_OS_NAME"] == nil else { return }
         do{
             let helper = XcodeHelper()
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
