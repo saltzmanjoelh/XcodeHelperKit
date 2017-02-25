@@ -394,7 +394,8 @@ class XcodeHelperTests: XCTestCase {
     func testUploadArchive(){
         
         do{
-            let credentialsPath = "/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv"
+            let key = "AKIAJYPKZDD7IU7HAYSQ"
+            let secret = "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"
             let bucket = "saltzman.test"
             let region = "us-east-1"
             let helper = XcodeHelper()
@@ -403,7 +404,7 @@ class XcodeHelperTests: XCTestCase {
             let archivePath = "\(sourcePath!)/\(archiveName)"
             try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
-            try helper.uploadArchive(at: archivePath, to: bucket, in: region, using: credentialsPath)
+            try helper.uploadArchive(at: archivePath, to: bucket, in: region, key: key, secret: secret)
             
             
             
