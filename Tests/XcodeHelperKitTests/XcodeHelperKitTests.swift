@@ -99,6 +99,7 @@ class XcodeHelperTests: XCTestCase {
         XCTAssertNotNil(XcodeHelper(dockerRunnable: DockerRunnableFixture.self))
     }
     func testUpdateDockerPackages(){
+        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
@@ -114,6 +115,7 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     func testUpdateDockerPackages_backupPackages(){
+        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
@@ -133,6 +135,7 @@ class XcodeHelperTests: XCTestCase {
         }
     }
     func testUpdateDockerPackages_restorePackages(){
+        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
@@ -280,6 +283,7 @@ class XcodeHelperTests: XCTestCase {
     }
     
     func testBuildInDocker(){
+        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
         let helper = XcodeHelper()
         
