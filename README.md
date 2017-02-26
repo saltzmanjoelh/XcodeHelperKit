@@ -1,3 +1,7 @@
+#XcodeHelperKit
+
+[![Build Status][image-1]][1] [![Swift Version][image-2]][2]
+
 XcodeHelperKit keeps you in Xcode and off the command line. You can:
 
 * Build and run tests on Linux through Docker
@@ -11,3 +15,8 @@ This kit is what [XcodeHelper](https://github.com/saltzmanjoelh/XcodeHelper) and
 
 There is an [example project](https://github.com/saltzmanjoelh/XcodeHelperExample) available to see the full configuration.
 
+[1]:	https://travis-ci.org/saltzmanjoelh/XcodeHelperKit
+[2]:	https://swift.org "Swift"
+
+[image-1]:	https://travis-ci.org/saltzmanjoelh/XcodeHelperKit.svg?branch=master
+[image-2]:	https://img.shields.io/badge/swift-version%203-blue.svg
