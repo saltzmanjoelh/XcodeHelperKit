@@ -145,7 +145,7 @@ class XcodeHelperTests: XCTestCase {
             //restore
             var didRestorePackages = false
             ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, env: [String : String]?, stdout:((FileHandle) -> Void)?, stdErr:((FileHandle) -> Void)?) -> ProcessResult in
-                if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("Packages") {
+                if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("repositories") {
                     didRestorePackages = true
                 }
                 return emptyProcessResult
@@ -410,8 +410,8 @@ class XcodeHelperTests: XCTestCase {
             if FileManager.default.fileExists(atPath: "/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
                 try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
             }else{
-                let key = ProcessInfo.processInfo.environment["KEY"]
-                let secret = ProcessInfo.processInfo.environment["SECRET"]
+                let key = ProcessInfo.processInfo.environment["KEY"]!
+                let secret = ProcessInfo.processInfo.environment["SECRET"]!
                 try helper.uploadArchive(at: archivePath, to: bucket, in: region, key: key, secret: secret)
             }
             
