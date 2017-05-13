@@ -8,7 +8,7 @@
 
 import Foundation
 import DockerProcess
-import SynchronousProcess
+import ProcessRunner
 
 struct DockerRunnableFixture: DockerRunnable {
     init(){
@@ -21,7 +21,7 @@ struct DockerRunnableFixture: DockerRunnable {
     //closure to return an expected result without actually doing anything on the filesystem
     var testLaunch:((Bool) -> ProcessResult)?
     @discardableResult
-    public func launch(printOutput:Bool) -> ProcessResult {
+    public func launch(printOutput:Bool, outputPrefix: String?) -> ProcessResult {
         return (output: nil, error: nil, exitCode: -1)
     }
 }

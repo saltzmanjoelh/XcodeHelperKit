@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import SynchronousProcess
+import ProcessRunner
 import DockerProcess
 import S3Kit
 
@@ -27,7 +27,7 @@ enum LibraryTag: Int {
 }
 
 let testPackageName = "Hello"
-let testVersionedPackageName = "Hello-1.0.3"
+let testVersionedPackageName = "Hello.git-918358885156091396"
 
 class XcodeHelperTests: XCTestCase {
     
@@ -45,7 +45,7 @@ class XcodeHelperTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
         if sourcePath != nil {
-            Process.run("/bin/rm", arguments: ["-Rf", sourcePath!])
+            ProcessRunner.synchronousRun("/bin/rm", arguments: ["-Rf", sourcePath!])
         }
     }
     //returns the temp dir that we cloned into
@@ -63,8 +63,8 @@ class XcodeHelperTests: XCTestCase {
                 
             }
         }
-        let cloneResult = Process.run("/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], printOutput: true)
-        XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(cloneResult.error)")
+        let cloneResult = ProcessRunner.synchronousRun("/usr/bin/env", arguments: ["git", "clone", repoURL, tempDir], printOutput: true)
+        XCTAssert(cloneResult.exitCode == 0, "Failed to clone repo: \(String(describing: cloneResult.error))")
         XCTAssert(FileManager.default.fileExists(atPath: tempDir))
         print("done cloning temp dir: \(tempDir)")
         return tempDir
@@ -104,7 +104,7 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
 
-            let result = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            let result = try helper.updateDockerPackages(at: sourcePath!, inImage: "swift", withVolume: "testing")
             
             XCTAssertNil(result.error)
             XCTAssertEqual(result.exitCode, 0)
@@ -120,14 +120,13 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
             var didBackupPackages = false
-            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, env: [String : String]?, stdout:((FileHandle) -> Void)?, stdErr:((FileHandle) -> Void)?) -> ProcessResult in
                 if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("backup") {
                     didBackupPackages = true
                 }
                 return emptyProcessResult
             })
-            
-            _ = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            _ = try helper.updateDockerPackages(at: sourcePath!, inImage: "swift", withVolume: "testing")
             
             XCTAssertTrue(didBackupPackages)
         }catch let e{
@@ -140,18 +139,18 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
             //backup
-            ProcessRunnableFixture.instanceTests.append({(launchPath: String, arguments: [String]?,printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+            ProcessRunnableFixture.instanceTests.append({ _ in
                 return emptyProcessResult
             })
             //restore
             var didRestorePackages = false
-            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?,printOutput: Bool, outputPrefix: String?) -> ProcessResult in
+            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, env: [String : String]?, stdout:((FileHandle) -> Void)?, stdErr:((FileHandle) -> Void)?) -> ProcessResult in
                 if launchPath.hasSuffix("mv"), let lastArg = arguments?.last, lastArg.hasSuffix("Packages") {
                     didRestorePackages = true
                 }
                 return emptyProcessResult
             })
-            _ = try helper.updateDockerPackages(at: sourcePath!, in: "saltzmanjoelh/swiftubuntu", with: "testing")
+            _ = try helper.updateDockerPackages(at: sourcePath!, inImage: "swift", withVolume: "testing")
             
             XCTAssertTrue(didRestorePackages)
         }catch let e{
@@ -170,7 +169,7 @@ class XcodeHelperTests: XCTestCase {
     func testProjectFilePath() {
         do {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
             let path = try helper.projectFilePath(for: sourcePath!)
@@ -185,13 +184,13 @@ class XcodeHelperTests: XCTestCase {
     func testPackageNames(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
             let packageNames = try helper.packageNames(from: sourcePath!)
             
-            XCTAssertTrue(packageNames.count == 1)
-            XCTAssertEqual(packageNames.first, testVersionedPackageName)
+            XCTAssertTrue(packageNames.count == 2)//one for package, one for checkouts-state.json
+            XCTAssertEqual(packageNames.last, testVersionedPackageName)
         } catch let e {
             XCTFail("Error: \(e)")
         }
@@ -215,15 +214,16 @@ class XcodeHelperTests: XCTestCase {
     func testSymlinkDependencyPath(){
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let packages = [testPackageName]
             let helper = XcodeHelper()
-            let packagesURL = URL(fileURLWithPath: sourcePath!).appendingPathComponent("Packages")
-            let packageName = try helper.packageNames(from: sourcePath!).first
+            let packagesURL = helper.packagesURL(at: sourcePath!)
+            let packageName = try helper.packageNames(from: sourcePath!).last
             let dependencyURL = packagesURL.appendingPathComponent(packageName!)
             
             let result = try helper.symlink(dependencyPath: dependencyURL.path)
             
+            XCTAssertNotNil(result)
             XCTAssertEqual(result, packages[0])
             let symlink = packagesURL.appendingPathComponent(result!).path
             let destination = try FileManager.default.destinationOfSymbolicLink(atPath: symlink)
@@ -236,7 +236,7 @@ class XcodeHelperTests: XCTestCase {
     func testUpdateXcodeReferences() {
         do {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            _ = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
+            _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
             try helper.updateXcodeReferences(for: testVersionedPackageName, at: sourcePath!, using: testPackageName)
@@ -251,7 +251,7 @@ class XcodeHelperTests: XCTestCase {
     func testShouldClean(){
         //build it in macOS so we know that it needs to be cleaned
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: false)
+        ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: false)
         XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after building in macOS")
         
         do{
@@ -269,14 +269,15 @@ class XcodeHelperTests: XCTestCase {
     func testCleanDockerBuilds() {
         //build first so that we have something to clean
         sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: true)
+        ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: true)
         XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
         let helper = XcodeHelper()
         
         do {
             try helper.clean(sourcePath: sourcePath!)
             
-            XCTAssertFalse(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory should not found after cleaning")
+            let path = BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!).appending("/build.db")
+            XCTAssertFalse(FileManager.default.fileExists(atPath: path), ".build/build.db should not found after cleaning")
         } catch let e {
             XCTFail("Error: \(e)")
         }
@@ -288,7 +289,7 @@ class XcodeHelperTests: XCTestCase {
         let helper = XcodeHelper()
         
         do {
-            let result = try helper.dockerBuild(sourcePath!, with: [.removeWhenDone], using: .debug, in: "saltzmanjoelh/swiftubuntu", persistentVolumeName: "platform")
+            let result = try helper.dockerBuild(sourcePath!, with: [.removeWhenDone], using: .debug, in: "swift", persistentVolumeName: "platform")
             
             XCTAssertNil(result.error, result.error!)
         } catch let e {
@@ -365,7 +366,7 @@ class XcodeHelperTests: XCTestCase {
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
-            Process.run("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+            ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
             XCTAssertEqual(contents.count, 2, "There should be exactly 2 files")
@@ -384,7 +385,7 @@ class XcodeHelperTests: XCTestCase {
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
-            Process.run("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
+            ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "mkdir -p \(subPath) && /usr/bin/tar -xvf \(archivePath) -C \(subPath)"])
         
             let contents = try FileManager.default.contentsOfDirectory(atPath: subPath)
             XCTAssertEqual(contents.count, 1, "There should be a root tmp directory")
@@ -398,8 +399,6 @@ class XcodeHelperTests: XCTestCase {
     func testUploadArchive(){
         
         do{
-            let key = "AKIAJYPKZDD7IU7HAYSQ"
-            let secret = "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"
             let bucket = "saltzman.test"
             let region = "us-east-1"
             let helper = XcodeHelper()
@@ -408,7 +407,13 @@ class XcodeHelperTests: XCTestCase {
             let archivePath = "\(sourcePath!)/\(archiveName)"
             try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
-            try helper.uploadArchive(at: archivePath, to: bucket, in: region, key: key, secret: secret)
+            if FileManager.default.fileExists(atPath: "/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
+                try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
+            }else{
+                let key = ProcessInfo.processInfo.environment["KEY"]
+                let secret = ProcessInfo.processInfo.environment["SECRET"]
+                try helper.uploadArchive(at: archivePath, to: bucket, in: region, key: key, secret: secret)
+            }
             
             
             
@@ -555,7 +560,7 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
         defer { //cleanup
-            let result = Process.run("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/git tag --delete \(tag!) && /usr/bin/git push origin :refs/tags/\(tag!)"])
+            let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/git tag --delete \(tag!) && /usr/bin/git push origin :refs/tags/\(tag!)"])
             if result.exitCode != 0, let error = result.error {
                 XCTFail("Error deleting git tag: \(error)")
             }

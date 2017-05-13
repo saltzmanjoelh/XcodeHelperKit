@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SynchronousProcess
+import ProcessRunner
 import DockerProcess
 
 
@@ -68,17 +68,25 @@ public enum GitTagComponent: Int {
 public protocol XcodeHelpable {
     
     
-    @discardableResult func updateDockerPackages(at sourcePath: String, in dockerImageName: String, with persistentVolumeName: String) throws -> ProcessResult
-    @discardableResult func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult
-    @discardableResult func generateXcodeProject(at sourcePath: String) throws -> ProcessResult
-    @discardableResult func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentVolumeName: String?) throws -> ProcessResult
-    @discardableResult func clean(sourcePath: String) throws -> ProcessResult
-    @discardableResult func symlinkDependencies(at sourcePath: String) throws
-    @discardableResult func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
-    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
-    @discardableResult func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws
-    @discardableResult func incrementGitTag(component: GitTagComponent, at sourcePath: String) throws -> String
+    @discardableResult
+    func updateDockerPackages(at sourcePath: String, inImage dockerImageName: String, withVolume persistentVolumeName: String) throws -> ProcessResult
+    @discardableResult
+    func updateMacOsPackages(at sourcePath: String) throws -> ProcessResult
+    @discardableResult
+    func generateXcodeProject(at sourcePath: String) throws -> ProcessResult
+    @discardableResult
+    func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentVolumeName: String?) throws -> ProcessResult
+    @discardableResult
+    func clean(sourcePath: String) throws -> ProcessResult
+    func symlinkDependencies(at sourcePath: String) throws
+    @discardableResult
+    func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool) throws -> ProcessResult
+    func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String) throws
+    func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String) throws
+    @discardableResult
+    func incrementGitTag(component: GitTagComponent, at sourcePath: String) throws -> String
     func gitTag(_ tag: String, repo sourcePath: String) throws
     func pushGitTag(tag: String, at sourcePath: String) throws
-    @discardableResult func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String) throws -> String
+    @discardableResult
+    func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String) throws -> String
 }
