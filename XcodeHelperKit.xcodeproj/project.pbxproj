@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		388739BC1EE3DDBB003B6106 /* LoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 388739BB1EE3DDBB003B6106 /* LoggerTests.swift */; };
+		389CA0A91F09D457007E2350 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389CA0A81F09D457007E2350 /* Action.swift */; };
+		38DC32921EE382F80095F5DA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DC32911EE382F80095F5DA /* Logger.swift */; };
 		OBJ_106 /* XcodeHelpable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_8 /* XcodeHelpable.swift */; };
 		OBJ_107 /* XcodeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* XcodeHelper.swift */; };
 		OBJ_109 /* ProcessRunner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* ProcessRunner.framework */; };
@@ -141,6 +144,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		388739BB1EE3DDBB003B6106 /* LoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerTests.swift; sourceTree = "<group>"; };
+		389CA0A81F09D457007E2350 /* Action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
+		38DC32911EE382F80095F5DA /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		OBJ_12 /* BuildConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfigurationTests.swift; sourceTree = "<group>"; };
 		OBJ_13 /* DockerRunnableFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockerRunnableFixture.swift; sourceTree = "<group>"; };
 		OBJ_14 /* GitTagComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitTagComponentTests.swift; sourceTree = "<group>"; };
@@ -168,7 +174,7 @@
 		OBJ_45 /* Yaml.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Yaml.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_46 /* CliRunnable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CliRunnable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_47 /* S3Kit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = S3Kit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_48 /* XcodeHelperKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XcodeHelperKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_48 /* XcodeHelperKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XcodeHelperKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_49 /* XcodeHelperKitTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = XcodeHelperKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_8 /* XcodeHelpable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodeHelpable.swift; sourceTree = "<group>"; };
@@ -257,6 +263,7 @@
 				OBJ_14 /* GitTagComponentTests.swift */,
 				OBJ_15 /* ProcessRunnableFixture.swift */,
 				OBJ_16 /* XcodeHelperKitTests.swift */,
+				388739BB1EE3DDBB003B6106 /* LoggerTests.swift */,
 			);
 			name = XcodeHelperKitTests;
 			path = Tests/XcodeHelperKitTests;
@@ -376,8 +383,10 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				389CA0A81F09D457007E2350 /* Action.swift */,
 				OBJ_8 /* XcodeHelpable.swift */,
 				OBJ_9 /* XcodeHelper.swift */,
+				38DC32911EE382F80095F5DA /* Logger.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -547,6 +556,8 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_106 /* XcodeHelpable.swift in Sources */,
+				389CA0A91F09D457007E2350 /* Action.swift in Sources */,
+				38DC32921EE382F80095F5DA /* Logger.swift in Sources */,
 				OBJ_107 /* XcodeHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -556,6 +567,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_124 /* BuildConfigurationTests.swift in Sources */,
+				388739BC1EE3DDBB003B6106 /* LoggerTests.swift in Sources */,
 				OBJ_125 /* DockerRunnableFixture.swift in Sources */,
 				OBJ_126 /* GitTagComponentTests.swift in Sources */,
 				OBJ_127 /* ProcessRunnableFixture.swift in Sources */,
