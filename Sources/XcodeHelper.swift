@@ -364,7 +364,7 @@ public struct XcodeHelper: XcodeHelpable {
         if oldVersionComponents.count != 3 {
             throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
         }
-        let newVersionComponents = oldVersionComponents.enumerated().map { (oldComponentValue: Int, oldStringValue: String) -> String in
+        let newVersionComponents = oldVersionComponents.enumerated().map { (__val:(Int, String)) -> String in let (oldComponentValue,oldStringValue) = __val;
             if oldComponentValue == targetComponent.rawValue, let oldIntValue = Int(oldStringValue) {
                 return String(describing: oldIntValue+1)
             }else{

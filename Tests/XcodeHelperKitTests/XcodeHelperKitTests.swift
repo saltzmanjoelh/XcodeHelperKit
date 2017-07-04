@@ -139,7 +139,7 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
             //backup
-            ProcessRunnableFixture.instanceTests.append({ _ in
+            ProcessRunnableFixture.instanceTests.append({ _, _, _, _, _ in
                 return emptyProcessResult
             })
             //restore
