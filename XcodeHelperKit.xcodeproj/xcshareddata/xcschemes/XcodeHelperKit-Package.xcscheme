@@ -14,51 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProcessRunner::ProcessRunner"
-               BuildableName = "ProcessRunner.framework"
-               BlueprintName = "ProcessRunner"
-               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DockerProcess::DockerProcess"
-               BuildableName = "DockerProcess.framework"
-               BlueprintName = "DockerProcess"
-               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Yaml::Yaml"
-               BuildableName = "Yaml.framework"
-               BlueprintName = "Yaml"
-               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CliRunnable::CliRunnable"
-               BuildableName = "CliRunnable.framework"
-               BlueprintName = "CliRunnable"
+               BlueprintIdentifier = "XcodeHelperKit::XcodeHelperKit"
+               BuildableName = "XcodeHelperKit.framework"
+               BlueprintName = "XcodeHelperKit"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -84,9 +42,51 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "XcodeHelperKit::XcodeHelperKit"
-               BuildableName = "XcodeHelperKit.framework"
-               BlueprintName = "XcodeHelperKit"
+               BlueprintIdentifier = "CliRunnable::CliRunnable"
+               BuildableName = "CliRunnable.framework"
+               BlueprintName = "CliRunnable"
+               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Yaml::Yaml"
+               BuildableName = "Yaml.framework"
+               BlueprintName = "Yaml"
+               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DockerProcess::DockerProcess"
+               BuildableName = "DockerProcess.framework"
+               BlueprintName = "DockerProcess"
+               ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProcessRunner::ProcessRunner"
+               BuildableName = "ProcessRunner.framework"
+               BlueprintName = "ProcessRunner"
                ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -97,8 +97,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       language = ""
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -128,9 +127,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ProcessRunner::ProcessRunner"
-            BuildableName = "ProcessRunner.framework"
-            BlueprintName = "ProcessRunner"
+            BlueprintIdentifier = "XcodeHelperKit::XcodeHelperKit"
+            BuildableName = "XcodeHelperKit.framework"
+            BlueprintName = "XcodeHelperKit"
             ReferencedContainer = "container:XcodeHelperKit.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

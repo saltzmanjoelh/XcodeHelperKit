@@ -64,9 +64,31 @@ public enum GitTagComponent: Int {
     }
     
 }
-
+public enum Command: String {
+    case updateMacOSPackages = "update-macos-packages"
+    case updateDockerPackages = "update-docker-packages"
+    case dockerBuild = "docker-build"
+    //        case clean = "clean"
+    case symlinkDependencies = "symlink-dependencies"
+    case createArchive = "create-archive"
+    case uploadArchive = "upload-archive"
+    case gitTag = "git-tag"
+    case createXcarchive = "create-xcarchive"
+    public var title: String {
+        switch self {
+        case .updateMacOSPackages:
+            return "Update Packages - macOS"
+        case .updateDockerPackages:
+            return "Update Packages - Docker"
+        default:
+            return self.rawValue.components(separatedBy: "-").flatMap({$0.capitalized}).joined(separator: " ")
+        }
+    }
+    public static var allCommands: [Command] = [.updateMacOSPackages, updateDockerPackages, .dockerBuild,
+                                                /*.clean,*/ .symlinkDependencies, .createArchive,
+                                                            .createXcarchive, .uploadArchive, .gitTag]
+}
 public protocol XcodeHelpable {
-    
     
     @discardableResult
     func updateDockerPackages(at sourcePath: String, inImage dockerImageName: String, withVolume persistentVolumeName: String, shouldLog: Bool) throws -> ProcessResult
@@ -76,8 +98,8 @@ public protocol XcodeHelpable {
     func generateXcodeProject(at sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     @discardableResult
     func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentVolumeName: String?, shouldLog: Bool) throws -> ProcessResult
-    @discardableResult
-    func clean(sourcePath: String, shouldLog: Bool) throws -> ProcessResult
+//    @discardableResult
+//    func clean(sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     func symlinkDependencies(at sourcePath: String, shouldLog: Bool) throws
     @discardableResult
     func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool, shouldLog: Bool) throws -> ProcessResult

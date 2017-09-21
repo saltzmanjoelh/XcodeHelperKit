@@ -24,7 +24,7 @@ class LoggerTests: XCTestCase {
     func testLog() {
         let logger = Logger()
 //        logger.log("one", forAction: "testLog")
-        logger.log("one", for: .buildInDocker)
+        logger.log("one", for: .dockerBuild)
         //RunLoop.current.run(until: Date.init(timeIntervalSinceNow: 2))
     }
 

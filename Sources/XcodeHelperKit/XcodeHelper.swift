@@ -49,7 +49,7 @@ public struct XcodeHelper: XcodeHelpable {
     let dockerRunnable: DockerRunnable.Type
     let processRunnable: ProcessRunnable.Type
     let dateFormatter = DateFormatter()
-    let logger = Logger()
+    public let logger = Logger()
     
     public init(dockerRunnable: DockerRunnable.Type = DockerProcess.self, processRunnable: ProcessRunnable.Type = ProcessRunner.self) {
         self.dockerRunnable = dockerRunnable
@@ -65,22 +65,28 @@ public struct XcodeHelper: XcodeHelpable {
     // For now, when we update packages in Docker we should delete all existing packages first. ie: don't persist Packges directory
     @discardableResult
     public func updateDockerPackages(at sourcePath: String, inImage dockerImageName: String, withVolume persistentVolumeName: String, shouldLog: Bool = true) throws -> ProcessResult {
-        
-        //backup the Packages dir
-        movePackages(at: sourcePath, fromBackup: false)
+        let command = Command.updateDockerPackages
+        logger.log("Updating Docker packages at \(sourcePath)", for: command)
+//        //backup the Packages dir
+//        movePackages(at: sourcePath, fromBackup: false)
         
         //Update the Docker Packages
         let commandArgs = ["/bin/bash", "-c", "swift package update"]
-        var commandOptions: [DockerRunOption] = [.removeWhenDone, .volume(source: sourcePath, destination: sourcePath), .workingDirectory(at: sourcePath)]
-        commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)
-        let result = dockerRunnable.init(command: "run", commandOptions: commandOptions.flatMap{ $0.processValues }, imageName: dockerImageName, commandArgs: commandArgs).launch(printOutput: true, outputPrefix: dockerImageName)
+        var commandOptions: [DockerRunOption] = [.volume(source: sourcePath, destination: sourcePath),//include the sourcePath
+                                                 .workingDirectory(at: sourcePath)]//move to the sourcePath
+        commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)//overwrite macOS .build with persistent volume for docker's .build dir
+        var dockerProcess = dockerRunnable.init(command: "run", commandOptions: commandOptions.flatMap{ $0.processValues }, imageName: dockerImageName, commandArgs: commandArgs)
+        dockerProcess.processRunnable = self.processRunnable
+        let result = dockerProcess.launch(printOutput: true, outputPrefix: dockerImageName)
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.updatePackages(message: "\(persistentVolume) - Error updating packages (\(result.exitCode)):\n\(error)")
+            let message = "\(persistentVolumeName) - Error updating packages (\(result.exitCode)):\n\(error)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.updatePackages(message: message)
         }
         
-        //Restore the Packages directory
-        movePackages(at: sourcePath, fromBackup: true)
-        
+//        //Restore the Packages directory
+//        movePackages(at: sourcePath, fromBackup: true)
+        logger.log("Packages updated", for: command)
         return result
     }
     func movePackages(at sourcePath: String, fromBackup: Bool) {
@@ -95,40 +101,48 @@ public struct XcodeHelper: XcodeHelpable {
     public func updateMacOsPackages(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
         var output = ""
         var error = ""
-        let action = Action.updatePackagesMacOS
-        logger.log("Starting at \(sourcePath)", for: action)
+        let command = Command.updateMacOSPackages
+        logger.log("Updating macOS packages at \(sourcePath)", for: command)
         let process = try? ProcessRunner.init(launchPath: "/bin/bash",
                                               arguments: ["-c", "cd \(sourcePath) && swift package update"],
                                               environment: nil,
-                                              stdOut: { output += self.logger.log($0, for: action) },
-                                              stdErr: { error += self.logger.log($0, for: action)})
+                                              stdOut: { output += self.logger.log($0, for: command) },
+                                              stdErr: { error += self.logger.log($0, for: command)})
         process!.launch()
         if let executingProcess = process?.executingProcess {
             while executingProcess.isRunning {
                 RunLoop.current.run(until: Date.init(timeIntervalSinceNow: TimeInterval(0.10)))
             }
         }
-        self.logger.log("Done", for: action)
+        self.logger.log("Packages updated", for: command)
         return (output, error, process!.executingProcess.terminationStatus)
     }
     
     @discardableResult
     public func generateXcodeProject(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
+        logger.log("Generating Xcode Project", for: .updateMacOSPackages)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
         if let error = result.error, result.exitCode != 0 {
-            throw XcodeHelperError.updatePackages(message: "Error generating Xcode project (\(result.exitCode)):\n\(error)")
+            let message = "Error generating Xcode project (\(result.exitCode)):\n\(error)"
+            logger.log(message, for: .updateMacOSPackages)
+            throw XcodeHelperError.updatePackages(message: message)
         }
+        logger.log("Xcode project generated", for: .updateMacOSPackages)
         return result
     }
     
     //MARK: Build
     @discardableResult
-    public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "saltzmanjoelh/swiftubuntu", persistentVolumeName: String? = nil, shouldLog: Bool = true) throws -> ProcessResult {
-        
-        //check if we need to clean first
-        if try shouldClean(sourcePath: sourcePath, using: configuration) {
-            try clean(sourcePath: sourcePath)
-        }
+    public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "swift", persistentVolumeName: String? = nil, shouldLog: Bool = true) throws -> ProcessResult {
+        let command = Command.dockerBuild
+        logger.log("Building in Docker - \(dockerImageName)", for: command)
+        //We are using separate .build directories for each platform now.
+        //We don't need to clean
+//        //check if we need to clean first
+//        if try shouldClean(sourcePath: sourcePath, using: configuration) {
+//            logger.log("Cleaning", for: command)
+//            try clean(sourcePath: sourcePath)
+//        }
         var combinedRunOptions = [String]()
         if let dockerRunOptions = runOptions {
             combinedRunOptions += dockerRunOptions.flatMap{ $0.processValues } + ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath]
@@ -140,7 +154,9 @@ public struct XcodeHelper: XcodeHelpable {
         let result = DockerProcess(command: "run", commandOptions: combinedRunOptions, imageName: dockerImageName, commandArgs: bashCommand).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
             let prefix = persistentVolumeName != nil ? "\(persistentVolumeName!) - " : ""
-            throw XcodeHelperError.dockerBuild(message: "\(prefix)Error building in Docker: \(error)", exitCode: result.exitCode)
+            let message = "\(prefix) Error building in Docker: \(error)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.dockerBuild(message: message, exitCode: result.exitCode)
         }
         return result
     }
@@ -182,10 +198,13 @@ public struct XcodeHelper: XcodeHelpable {
     
     @discardableResult
     public func clean(sourcePath:String, shouldLog: Bool = true) throws -> ProcessResult {
+        logger.log("Cleaning", for: Command.updateDockerPackages)
         //We can use Process instead of firing up Docker because the end result is the same. A clean .build dir
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/swift build --clean"])
         if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.clean(message: "Error cleaning: \(error)")
+            let message = "Error cleaning: \(error)"
+            logger.log(message, for: Command.updateDockerPackages)
+            throw XcodeHelperError.clean(message: message)
         }
         return result
     }
@@ -193,18 +212,30 @@ public struct XcodeHelper: XcodeHelpable {
     //MARK: Symlink Dependencies
     //useful for your project so that you don't have to keep updating paths for your dependencies when they change
     public func symlinkDependencies(at sourcePath:String, shouldLog: Bool = true) throws {
+        logger.log("Symlinking dependencies", for: .updateMacOSPackages)
         //iterate Packages dir and create symlinks without the -Ver.sion.#
         let url = packagesURL(at: sourcePath)
         for versionedPackageName in try packageNames(from: sourcePath) {
             if let symlinkName = try symlink(dependencyPath: url.appendingPathComponent(versionedPackageName).path) {
+                let message = "Symlink: "+"\(symlinkName) -> \(url.appendingPathComponent(versionedPackageName).path)"
+                logger.log(message, for: Command.updateMacOSPackages)
+                print(message)
                 //update the xcode references to the symlink
-                try updateXcodeReferences(for: versionedPackageName, at: sourcePath, using: symlinkName)
+                do {
+                    try updateXcodeReferences(for: versionedPackageName, at: sourcePath, using: symlinkName)
+                    logger.log("Updated Xcode references", for: Command.updateMacOSPackages)
+                }catch let e{
+                    let message = String(describing: e)
+                    logger.log(message, for: Command.updateMacOSPackages)
+                    throw e
+                }
             }
         }
+        logger.log("Symlinking done", for: .updateMacOSPackages)
     }
     func packageNames(from sourcePath: String) throws -> [String] {
         //find the Packages directory
-        let packagesPath = URL(fileURLWithPath: sourcePath).appendingPathComponent(".build").appendingPathComponent("repositories").path
+        let packagesPath = URL(fileURLWithPath: sourcePath).appendingPathComponent(".build").appendingPathComponent("checkouts").path
         guard FileManager.default.fileExists(atPath: packagesPath)  else {
             throw XcodeHelperError.symlinkDependencies(message: "Failed to find directory: \(packagesPath)")
         }
@@ -218,22 +249,21 @@ public struct XcodeHelper: XcodeHelpable {
         }
         //remove the - version number from name and create sym link
         let packagesURL = URL(fileURLWithPath: dependencyPath).deletingLastPathComponent()
-        let packageName = directory.substring(to: directory.range(of: ".git-", options: .backwards)!.lowerBound)
+        let packageName = directory[directory.startIndex..<directory.range(of: ".git-", options: .backwards)!.lowerBound]
         let sourcePath = packagesURL.appendingPathComponent(directory).path
-        let newPath = packagesURL.appendingPathComponent(packageName).path
+        let newPath = packagesURL.appendingPathComponent(String(packageName)).path
         do{
             //create the symlink
             if !FileManager.default.fileExists(atPath: newPath){
                 let symlinkURL = URL(fileURLWithPath: newPath)
                 let destinationURL = URL(fileURLWithPath: sourcePath)
                 try FileManager.default.createSymbolicLink(at: symlinkURL, withDestinationURL: destinationURL)
-                print("\(symlinkURL.path) -> \(destinationURL.lastPathComponent)")
             }
         } catch let e {
             throw XcodeHelperError.clean(message: "Error creating symlink: \(e)")
         }
         
-        return packageName
+        return String(packageName)
     }
     func updateXcodeReferences(for versionedPackageName: String, at sourcePath: String, using symlinkName: String) throws {
         //find the xcodeproj
@@ -254,10 +284,14 @@ public struct XcodeHelper: XcodeHelpable {
                 path.hasSuffix(".xcodeproj")
             }).first
             guard xcodeProjectPath != nil else {
-                throw XcodeHelperError.symlinkDependencies(message: "Failed to find xcodeproj at path: \(sourcePath)")
+                let message = "Failed to find xcodeproj at path: \(sourcePath)"
+                logger.log(message, for: Command.updateMacOSPackages)
+                throw XcodeHelperError.symlinkDependencies(message: message)
             }
         } catch let e {
-            throw XcodeHelperError.symlinkDependencies(message: "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(e)")
+            let message = "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(e)"
+            logger.log(message, for: Command.updateMacOSPackages)
+            throw XcodeHelperError.symlinkDependencies(message: message)
         }
         do{
             xcodeProjectPath = "\(sourcePath)/\(xcodeProjectPath!)"
@@ -265,10 +299,14 @@ public struct XcodeHelper: XcodeHelpable {
                 path.hasSuffix(".pbxproj")
             }).first
             guard pbProjectPath != nil else {
-                throw XcodeHelperError.symlinkDependencies(message: "Failed to find pbxproj at path: \(String(describing: xcodeProjectPath))")
+                let message = "Failed to find pbxproj at path: \(String(describing: xcodeProjectPath))"
+                logger.log(message, for: Command.updateMacOSPackages)
+                throw XcodeHelperError.symlinkDependencies(message: message)
             }
         } catch let e {
-            throw XcodeHelperError.symlinkDependencies(message: "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(e)")
+            let message = "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(e)"
+            logger.log(message, for: Command.updateMacOSPackages)
+            throw XcodeHelperError.symlinkDependencies(message: message)
         }
         return "\(xcodeProjectPath!)/\(pbProjectPath!)"
     }
@@ -276,18 +314,25 @@ public struct XcodeHelper: XcodeHelpable {
     //MARK: Create Archive
     @discardableResult
     public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true, shouldLog: Bool = true) throws -> ProcessResult {
+        let command = Command.createArchive
+        logger.log("Creating archive \(archivePath)", for: command)
         try FileManager.default.createDirectory(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
         let arguments = ["-cvzf", archivePath]+args
         let result = ProcessRunner.synchronousRun("/usr/bin/tar", arguments: arguments)
         if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.createArchive(message: "Error creating archive: \(error)")
+            let message = "Error creating archive: \(error)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.createArchive(message: message)
         }
+        logger.log("Archive created", for: command)
         return result
     }
     
     //MARK: Upload Archive
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String, shouldLog: Bool = true) throws  {
+        let command = Command.uploadArchive
+        logger.log("Uploading archve: \(URL(fileURLWithPath: archivePath).lastPathComponent)", for: command)
         let result = try S3.with(key: key, and: secret).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
             var description = result.response.description
@@ -296,12 +341,15 @@ public struct XcodeHelper: XcodeHelpable {
                     description += "\n\(text)"
                 }
             }
+            logger.log(description, for: command)
             throw XcodeHelperError.uploadArchive(message: description)
         }
-        
+        logger.log("Archive uploaded", for: command)
     }
     
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String, shouldLog: Bool = true) throws  {
+        let command = Command.uploadArchive
+        logger.log("Uploading archve: \(URL(fileURLWithPath: archivePath).lastPathComponent)", for: command)
         let result = try S3.with(credentials: credentialsPath).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
             var description = result.response.description
@@ -310,23 +358,38 @@ public struct XcodeHelper: XcodeHelpable {
                     description += "\n\(text)"
                 }
             }
+            logger.log(description, for: command)
             throw XcodeHelperError.uploadArchive(message: description)
         }
-        
+        logger.log("Archive uploaded", for: command)
     }
     
     //MARK: Git Tag
     public func getGitTag(at sourcePath:String, shouldLog: Bool = true) throws -> String {
+        let command = Command.gitTag
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag"], printOutput: false)
         if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.gitTag(message: "Error reading git tags: \(error)")
+            let message = "Error reading git tags: \(error)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.gitTag(message: message)
         }
         
         //guard let tags = result.output!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n").last else {
         guard let tagStrings = result.output?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: "\n") else {
-            throw XcodeHelperError.gitTag(message: "Error parsing git tags: \(String(describing: result.output))")
+            let message = "Error parsing git tags: \(String(describing: result.output))"
+            logger.log(message, for: command)
+            throw XcodeHelperError.gitTag(message: message)
         }
-        return try largestGitTag(tagStrings: tagStrings)
+        var tag: String = ""
+        do {
+            tag = try largestGitTag(tagStrings: tagStrings)
+        }catch let e{
+            logger.log(String(describing: e), for: command)
+            throw e
+        }
+        
+        logger.log(tag, for: command)
+        return tag
     }
     
     
@@ -351,7 +414,9 @@ public struct XcodeHelper: XcodeHelpable {
     public func largestGitTag(tagStrings:[String]) throws -> String {
         let tags = tagStrings.flatMap(gitTagTuple)
         guard let tag = tags.sorted(by: {gitTagCompare($0, $1)}).last else {
-            throw XcodeHelperError.gitTag(message: "Git tag not found: \(tagStrings)")
+            let message = "Git tag not found: \(tagStrings)"
+            logger.log(message, for: Command.gitTag)
+            throw XcodeHelperError.gitTag(message: message)
         }
         
         return "\(tag.0).\(tag.1).\(tag.2)"
@@ -372,37 +437,56 @@ public struct XcodeHelper: XcodeHelpable {
             }
         }
         let updatedTag = newVersionComponents.joined(separator: ".")
-        try gitTag(updatedTag, repo: sourcePath)
-        
-        return try getGitTag(at: sourcePath)
+        do {
+            try gitTag(updatedTag, repo: sourcePath)
+            
+            return try getGitTag(at: sourcePath)
+        }catch let e{
+            logger.log(String(describing: e), for: Command.gitTag)
+            throw e
+        }
     }
     
     public func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool = true) throws {
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"], printOutput: false)
         if result.exitCode != 0, let error = result.error {
-            throw XcodeHelperError.gitTag(message: "Error tagging git repo: \(error)")
+            let message = "Error tagging git repo: \(error)"
+            logger.log(message, for: Command.gitTag)
+            throw XcodeHelperError.gitTag(message: message)
         }
     }
     
     public func pushGitTag(tag: String, at sourcePath:String, shouldLog: Bool = true) throws {
+        let command = Command.gitTag
+        logger.log("Pushing tag: \(tag)", for: command)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git push origin && /usr/bin/git push origin \(tag)"])
         if let error = result.error, result.exitCode != 0 || !error.contains("new tag") {
-            throw XcodeHelperError.gitTag(message: "Error pushing git tag: \(error)")
+            let message = "Error pushing git tag: \(error)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.gitTag(message: message)
         }
+        logger.log("Pushed tag: \(tag)", for: command)
     }
     
     //MARK: Create XCArchive
     //returns a String for the path of the xcarchive
     public func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool = true) throws -> String {
+        let command = Command.createXcarchive
+        logger.log("Creating XCAchrive \(URL(fileURLWithPath: binaryPath).lastPathComponent)", for: command)
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
         let directoryDate = xcarchiveDirectoryDate(from: dateFormatter)
         let archiveDate = xcarchiveDate(from: dateFormatter)
         let archiveName = "xchelper-\(name) \(archiveDate).xcarchive"
         let path = "\(dirPath)/\(directoryDate)/\(archiveName)"
-        try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
-        try createXcarchivePlist(in: path, name: name, schemeName: schemeName)
-        try createArchive(at: path.appending("/Products/\(name).tar"), with: [binaryPath])
-        return path
+        do {
+            try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+            try createXcarchivePlist(in: path, name: name, schemeName: schemeName)
+            try createArchive(at: path.appending("/Products/\(name).tar"), with: [binaryPath])
+            return path
+        }catch let e{
+            logger.log(String(describing: e), for: command)
+            throw e
+        }
     }
     
     private func xcarchiveDirectoryDate(from formatter: DateFormatter, from: Date = Date()) -> String {
@@ -430,6 +514,8 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     internal func createXcarchivePlist(in dirPath:String, name: String, schemeName:String) throws {
+        let command = Command.createXcarchive
+        logger.log("Creating Plist", for: command)
         let date = xcarchivePlistDateString(formatter: dateFormatter)
         let dictionary = ["ArchiveVersion": "2",
                           "CreationDate": date,
@@ -439,7 +525,9 @@ public struct XcodeHelper: XcodeHelpable {
             let data = try PropertyListSerialization.data(fromPropertyList: dictionary, format: .xml, options: 0)
             try data.write(to: URL.init(fileURLWithPath: dirPath.appending("/Info.plist")) )
         }catch let e{
-            throw XcodeHelperError.xcarchivePlist(message: "Failed to create plist in: \(dirPath). Error: \(e)")
+            let message = "Failed to create plist in: \(dirPath). Error: \(e)"
+            logger.log(message, for: command)
+            throw XcodeHelperError.xcarchivePlist(message: message)
         }
     }
     

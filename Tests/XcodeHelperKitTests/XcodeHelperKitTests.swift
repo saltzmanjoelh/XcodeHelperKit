@@ -103,18 +103,27 @@ class XcodeHelperTests: XCTestCase {
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             let helper = XcodeHelper(dockerRunnable: DockerProcess.self, processRunnable: ProcessRunnableFixture.self)
-
+            ProcessRunnableFixture.instanceTests.append({ (launchPath: String, arguments: [String]?, env: [String : String]?, stdout:((FileHandle) -> Void)?, stdErr:((FileHandle) -> Void)?) -> ProcessResult in
+                var exitCode: Int32 = 0
+                if let args = arguments,
+                    args.contains("swift package update") {
+                }else{
+                    print("Invalid args")
+                    exitCode = 1
+                }
+                return ProcessResult(output:"done", error:nil, exitCode:exitCode)
+            })
             let result = try helper.updateDockerPackages(at: sourcePath!, inImage: "swift", withVolume: "testing")
             
             XCTAssertNil(result.error)
             XCTAssertEqual(result.exitCode, 0)
             XCTAssertNotNil(result.output)
-            XCTAssert(result.output!.contains("Cloning \(libraryRepoURL)"))
         }catch let e{
             XCTFail("\(e)")
         }
     }
-    func testUpdateDockerPackages_backupPackages(){
+    //We aren't moving packages around any more. We use volumes for each platform
+    /*func testUpdateDockerPackages_backupPackages(){
         guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
@@ -156,15 +165,15 @@ class XcodeHelperTests: XCTestCase {
         }catch let e{
             XCTFail("\(e)")
         }
-    }
+    }*/
     
-    func testUpdateMacOsPackages() {
-        
-    }
-    
-    func testSymlinkDependencies() {
-        
-    }
+//    func testUpdateMacOsPackages() {
+//        
+//    }
+//    
+//    func testSymlinkDependencies() {
+//        
+//    }
     
     func testProjectFilePath() {
         do {
@@ -189,7 +198,7 @@ class XcodeHelperTests: XCTestCase {
             
             let packageNames = try helper.packageNames(from: sourcePath!)
             
-            XCTAssertTrue(packageNames.count == 2)//one for package, one for checkouts-state.json
+            XCTAssertEqual(packageNames.count, 1)//one for package directory
             XCTAssertEqual(packageNames.last, testVersionedPackageName)
         } catch let e {
             XCTFail("Error: \(e)")
@@ -264,23 +273,6 @@ class XcodeHelperTests: XCTestCase {
         }
         
         
-    }
-    
-    func testCleanDockerBuilds() {
-        //build first so that we have something to clean
-        sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
-        ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && swift build"], printOutput: true)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!)), ".build directory not found after build in macOS")
-        let helper = XcodeHelper()
-        
-        do {
-            try helper.clean(sourcePath: sourcePath!)
-            
-            let path = BuildConfiguration.debug.buildDirectory(inSourcePath: sourcePath!).appending("/build.db")
-            XCTAssertFalse(FileManager.default.fileExists(atPath: path), ".build/build.db should not found after cleaning")
-        } catch let e {
-            XCTFail("Error: \(e)")
-        }
     }
     
     func testBuildInDocker(){

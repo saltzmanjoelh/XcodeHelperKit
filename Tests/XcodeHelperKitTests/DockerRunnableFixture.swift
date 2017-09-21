@@ -11,6 +11,7 @@ import DockerProcess
 import ProcessRunner
 
 struct DockerRunnableFixture: DockerRunnable {
+    public var processRunnable: ProcessRunnable.Type = ProcessRunner.self
     init(){
         
     }
