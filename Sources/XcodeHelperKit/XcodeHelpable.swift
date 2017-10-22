@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import ProcessRunner
 import DockerProcess
+import ProcessRunner
 
 
 public enum BuildConfiguration {
@@ -105,6 +105,7 @@ public protocol XcodeHelpable {
     func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool, shouldLog: Bool) throws -> ProcessResult
     func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String, shouldLog: Bool) throws
     func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String, shouldLog: Bool) throws
+    func getGitTag(at sourcePath:String, shouldLog: Bool) throws -> String
     @discardableResult
     func incrementGitTag(component: GitTagComponent, at sourcePath: String, shouldLog: Bool) throws -> String
     func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool) throws

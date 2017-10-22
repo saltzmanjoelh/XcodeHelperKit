@@ -8,15 +8,17 @@
 
 import Foundation
 
-public enum Action: String {
-    case updatePackagesMacOS = "Update Packages - macOS"
-    case updatePackagesDocker = "Update Packages - Docker"
-    case buildInDocker = "Build in Docker"
-    case createArchive = "Create Archive"
-    case createXCArchive = "Create XCArchive"
-    case uploadArchive = "Upload Archive"
-    case gitTag = "Git Tag"
-    public static func allActions() -> [Action] {
-        return [.updatePackagesMacOS, .updatePackagesDocker, .buildInDocker, .createArchive, .createXCArchive, .uploadArchive, .gitTag]
-    }
-}
+//Redundant
+//public enum Action: String {
+//    case updatePackagesMacOS = "Update Packages - macOS"
+//    case updatePackagesDocker = "Update Packages - Docker"
+//    case buildInDocker = "Build in Docker"
+//    case createArchive = "Create Archive"
+//    case createXCArchive = "Create XCArchive"
+//    case uploadArchive = "Upload Archive"
+//    case gitTag = "Git Tag"
+//    public static func allActions() -> [Action] {
+//        return [.updatePackagesMacOS, .updatePackagesDocker, .buildInDocker, .createArchive, .createXCArchive, .uploadArchive, .gitTag]
+//    }
+//}
+
