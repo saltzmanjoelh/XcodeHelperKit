@@ -46,7 +46,7 @@ public enum BuildConfiguration {
     }
 }
 
-public enum GitTagComponent: Int {
+public enum GitTagComponent: Int, CustomStringConvertible {
     
     case major, minor, patch
     
@@ -63,6 +63,16 @@ public enum GitTagComponent: Int {
         }
     }
     
+    public var description: String {
+        switch self {
+        case .major:
+            return "major"
+        case .minor:
+            return "minor"
+        case .patch:
+            return "patch"
+        }
+    }
 }
 public enum Command: String {
     case updateMacOSPackages = "update-macos-packages"
