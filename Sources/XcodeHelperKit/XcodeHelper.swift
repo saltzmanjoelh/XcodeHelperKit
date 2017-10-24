@@ -424,7 +424,7 @@ public struct XcodeHelper: XcodeHelpable {
     
     @discardableResult
     public func incrementGitTag(component targetComponent: GitTagComponent = .patch, at sourcePath: String, shouldLog: Bool = true) throws -> String {
-        let tag = try getGitTag(at: sourcePath)
+        let tag = try getGitTag(at: sourcePath, shouldLog: false)
         let oldVersionComponents = tag.components(separatedBy: ".")
         if oldVersionComponents.count != 3 {
             throw XcodeHelperError.gitTag(message: "Invalid git tag: \(tag). It should be in the format #.#.# major.minor.patch")
