@@ -247,8 +247,12 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
+            let url = URL.init(fileURLWithPath: sourcePath!)
+                .appendingPathComponent(".build")
+                .appendingPathComponent("checkouts")
+                .appendingPathComponent(testVersionedPackageName)
             
-            try helper.updateXcodeReferences(for: testVersionedPackageName, at: sourcePath!, using: testPackageName)
+            try helper.updateXcodeReferences(for: url, at: sourcePath!, using: testPackageName)
             
             let projectPath = try helper.projectFilePath(for: sourcePath!)
             let file = try String(contentsOfFile: projectPath)
