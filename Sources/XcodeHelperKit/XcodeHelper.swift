@@ -99,24 +99,9 @@ public struct XcodeHelper: XcodeHelpable {
     
     @discardableResult
     public func updateMacOsPackages(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
-        //        var output = ""
-        //        var error = ""
         let command = Command.updateMacOSPackages
         logger.log("Updating macOS packages at \(sourcePath)", for: command)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
-        //        let process = try? ProcessRunner.init(launchPath: "/bin/bash",
-        //                                              arguments: ["-c", "cd \(sourcePath) && swift package update"],
-        //                                              environment: nil,
-        //                                              stdOut: { output += self.logger.log($0, for: command) },
-        //                                              stdErr: { error += self.logger.log($0, for: command)})
-        //        process!.launch()
-        //        if let executingProcess = process?.executingProcess {
-        //            while executingProcess.isRunning {
-        //                RunLoop.current.run(until: Date.init(timeIntervalSinceNow: TimeInterval(0.10)))
-        //            }
-        //        }
-        //        self.logger.log("Packages updated", for: command)
-        //        return (output, error, process!.executingProcess.terminationStatus)
         if let error = result.error, result.exitCode != 0 {
             let message = "Error updating packages (\(result.exitCode)):\n\(error)"
             logger.log(message, for: .updateMacOSPackages)
@@ -253,27 +238,42 @@ public struct XcodeHelper: XcodeHelpable {
     }
     func symlink(dependencyPath: String) throws -> String? {
         let directory = URL(fileURLWithPath: dependencyPath).lastPathComponent
-        if directory.hasPrefix(".") || directory.range(of: "-")?.lowerBound == nil || directory.hasSuffix("json") {
-            //if it begins with . or doesn't have the - in it like XcodeHelper-1.0.0, skip it
-            return nil
+        guard !directory.hasPrefix("."),
+            !directory.hasSuffix("json"),
+            let symlinkName = symlinkNameFromDependencyDirectory(directory)
+            else {
+                return nil //if it begins with . or doesn't have the - in it like XcodeHelper-7587831595904724403, skip it
         }
         //remove the - version number from name and create sym link
         let packagesURL = URL(fileURLWithPath: dependencyPath).deletingLastPathComponent()
-        let packageName = directory[directory.startIndex..<directory.range(of: ".git-", options: .backwards)!.lowerBound]
         let sourcePath = packagesURL.appendingPathComponent(directory).path
-        let newPath = packagesURL.appendingPathComponent(String(packageName)).path
+        let newPath = packagesURL.appendingPathComponent(symlinkName).path
         do{
             //create the symlink
-            if !FileManager.default.fileExists(atPath: newPath){
-                let symlinkURL = URL(fileURLWithPath: newPath)
-                let destinationURL = URL(fileURLWithPath: sourcePath)
-                try FileManager.default.createSymbolicLink(at: symlinkURL, withDestinationURL: destinationURL)
+            if FileManager.default.fileExists(atPath: newPath) {
+                //delete the existing file each time in case it gets corrupt
+                //I have seen files that don't correctly registre with FileManager as files, not sure what happened with it
+                try? FileManager.default.removeItem(atPath: newPath)
             }
+            let symlinkURL = URL(fileURLWithPath: newPath)
+            let destinationURL = URL(fileURLWithPath: sourcePath)
+            try FileManager.default.createSymbolicLink(at: symlinkURL, withDestinationURL: destinationURL)
         } catch let e {
             throw XcodeHelperError.clean(message: "Error creating symlink: \(e)")
         }
         
-        return String(packageName)
+        return symlinkName
+    }
+    //Directory can either be "ProcessRunner.git-7587831595904724403" or "ProcessRunner-7587831595904724403"
+    //Either way, we are looking for the last hyphen
+    func symlinkNameFromDependencyDirectory(_ directory: String) -> String? {
+        guard let hyphenRange = directory.range(of: "-", options: .backwards) else { return nil }
+        let checkoutPrefix = String(directory[directory.startIndex..<hyphenRange.lowerBound])
+        //checkoutPrefix can contain ".git-" or ".git--"
+        if let gitRange = checkoutPrefix.range(of: ".git", options: .backwards) {
+            return String(checkoutPrefix[checkoutPrefix.startIndex..<gitRange.lowerBound])
+        }
+        return String(checkoutPrefix)
     }
     func updateXcodeReferences(for versionedPackageURL: URL, at sourcePath: String, using symlinkName: String) throws {
         //find the xcodeproj
@@ -281,12 +281,29 @@ public struct XcodeHelper: XcodeHelpable {
         //open the project
         let file = try String(contentsOfFile: projectPath)
         //replace versioned group name with package name
+        guard let packageName = getPackageName(versionedPackageURL.lastPathComponent, from: file) else { return }
         let gitTag = try getGitTag(at: versionedPackageURL.path, shouldLog: false)
-        var updatedFile = file.replacingOccurrences(of: "\(symlinkName) \(gitTag)", with: symlinkName)
+        var updatedFile = file.replacingOccurrences(of: "\(packageName) \(gitTag)", with: packageName)
         //replace versioned package name with symlink name
         updatedFile = updatedFile.replacingOccurrences(of: versionedPackageURL.lastPathComponent, with: symlinkName)
         //save the project
         try updatedFile.write(toFile: projectPath, atomically: false, encoding: String.Encoding.utf8)
+    }
+    func getPackageName(_ checkoutName: String, from pbxFile: String) -> String? {
+        //Repo could have "XcodeHelperCli.git-8182514958374350212"
+        // but project name is "XcodeHelperCliKit" and has a folder reference as "XcodeHelperCliKit 1.0.3"
+        //Find the obj with
+        //  path = ".build/checkouts/XcodeHelperCli.git-8182514958374350212/Sources/XcodeHelperCliKit";
+        //return the last path
+        
+        let regex = try! NSRegularExpression.init(pattern: ".build/checkouts/\(checkoutName)/Sources(.*?)\"", options: [])
+        let pathRange = regex.rangeOfFirstMatch(in: pbxFile, options: [], range: NSMakeRange(0, pbxFile.count))
+        guard pathRange.location != NSNotFound else { return nil }
+        let path = pbxFile[pbxFile.index(pbxFile.startIndex, offsetBy: pathRange.lowerBound)..<pbxFile.index(pbxFile.startIndex, offsetBy: pathRange.upperBound-1)]
+        let url = URL.init(fileURLWithPath: String(path))
+        let packageName = url.lastPathComponent
+        
+        return packageName
     }
     
     public func projectFilePath(for sourcePath:String) throws -> String {
