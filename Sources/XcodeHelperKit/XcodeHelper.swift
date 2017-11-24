@@ -57,7 +57,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     public func packagesURL(at sourcePath: String) -> URL {
-        return URL(fileURLWithPath: sourcePath).appendingPathComponent(".build").appendingPathComponent("repositories")
+        return URL(fileURLWithPath: sourcePath).appendingPathComponent(".build").appendingPathComponent("checkouts")
     }
     
     //MARK: Update Packages
@@ -67,13 +67,13 @@ public struct XcodeHelper: XcodeHelpable {
     public func updateDockerPackages(at sourcePath: String, inImage dockerImageName: String, withVolume persistentVolumeName: String, shouldLog: Bool = true) throws -> ProcessResult {
         let command = Command.updateDockerPackages
         logger.log("Updating Docker packages at \(sourcePath)", for: command)
-//        //backup the Packages dir
-//        movePackages(at: sourcePath, fromBackup: false)
+        //        //backup the Packages dir
+        //        movePackages(at: sourcePath, fromBackup: false)
         
         //Update the Docker Packages
         let commandArgs = ["/bin/bash", "-c", "swift package update"]
         var commandOptions: [DockerRunOption] = [.volume(source: sourcePath, destination: sourcePath),//include the sourcePath
-                                                 .workingDirectory(at: sourcePath)]//move to the sourcePath
+            .workingDirectory(at: sourcePath)]//move to the sourcePath
         commandOptions += try persistentVolumeOptions(at: sourcePath, using: persistentVolumeName)//overwrite macOS .build with persistent volume for docker's .build dir
         var dockerProcess = dockerRunnable.init(command: "run", commandOptions: commandOptions.flatMap{ $0.processValues }, imageName: dockerImageName, commandArgs: commandArgs)
         dockerProcess.processRunnable = self.processRunnable
@@ -84,8 +84,8 @@ public struct XcodeHelper: XcodeHelpable {
             throw XcodeHelperError.updatePackages(message: message)
         }
         
-//        //Restore the Packages directory
-//        movePackages(at: sourcePath, fromBackup: true)
+        //        //Restore the Packages directory
+        //        movePackages(at: sourcePath, fromBackup: true)
         logger.log("Packages updated", for: command)
         return result
     }
@@ -99,23 +99,31 @@ public struct XcodeHelper: XcodeHelpable {
     
     @discardableResult
     public func updateMacOsPackages(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
-        var output = ""
-        var error = ""
+        //        var output = ""
+        //        var error = ""
         let command = Command.updateMacOSPackages
         logger.log("Updating macOS packages at \(sourcePath)", for: command)
-        let process = try? ProcessRunner.init(launchPath: "/bin/bash",
-                                              arguments: ["-c", "cd \(sourcePath) && swift package update"],
-                                              environment: nil,
-                                              stdOut: { output += self.logger.log($0, for: command) },
-                                              stdErr: { error += self.logger.log($0, for: command)})
-        process!.launch()
-        if let executingProcess = process?.executingProcess {
-            while executingProcess.isRunning {
-                RunLoop.current.run(until: Date.init(timeIntervalSinceNow: TimeInterval(0.10)))
-            }
+        let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
+        //        let process = try? ProcessRunner.init(launchPath: "/bin/bash",
+        //                                              arguments: ["-c", "cd \(sourcePath) && swift package update"],
+        //                                              environment: nil,
+        //                                              stdOut: { output += self.logger.log($0, for: command) },
+        //                                              stdErr: { error += self.logger.log($0, for: command)})
+        //        process!.launch()
+        //        if let executingProcess = process?.executingProcess {
+        //            while executingProcess.isRunning {
+        //                RunLoop.current.run(until: Date.init(timeIntervalSinceNow: TimeInterval(0.10)))
+        //            }
+        //        }
+        //        self.logger.log("Packages updated", for: command)
+        //        return (output, error, process!.executingProcess.terminationStatus)
+        if let error = result.error, result.exitCode != 0 {
+            let message = "Error updating packages (\(result.exitCode)):\n\(error)"
+            logger.log(message, for: .updateMacOSPackages)
+            throw XcodeHelperError.updatePackages(message: message)
         }
-        self.logger.log("Packages updated", for: command)
-        return (output, error, process!.executingProcess.terminationStatus)
+        logger.log("Packages updated", for: .updateMacOSPackages)
+        return result
     }
     
     @discardableResult
@@ -138,11 +146,11 @@ public struct XcodeHelper: XcodeHelpable {
         logger.log("Building in Docker - \(dockerImageName)", for: command)
         //We are using separate .build directories for each platform now.
         //We don't need to clean
-//        //check if we need to clean first
-//        if try shouldClean(sourcePath: sourcePath, using: configuration) {
-//            logger.log("Cleaning", for: command)
-//            try clean(sourcePath: sourcePath)
-//        }
+        //        //check if we need to clean first
+        //        if try shouldClean(sourcePath: sourcePath, using: configuration) {
+        //            logger.log("Cleaning", for: command)
+        //            try clean(sourcePath: sourcePath)
+        //        }
         var combinedRunOptions = [String]()
         if let dockerRunOptions = runOptions {
             combinedRunOptions += dockerRunOptions.flatMap{ $0.processValues } + ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath]
@@ -222,7 +230,9 @@ public struct XcodeHelper: XcodeHelpable {
                 print(message)
                 //update the xcode references to the symlink
                 do {
-                    try updateXcodeReferences(for: versionedPackageName, at: sourcePath, using: symlinkName)
+                    try updateXcodeReferences(for: url.appendingPathComponent(versionedPackageName),
+                                              at: sourcePath,
+                                              using: symlinkName)
                     logger.log("Updated Xcode references", for: Command.updateMacOSPackages)
                 }catch let e{
                     let message = String(describing: e)
@@ -265,13 +275,16 @@ public struct XcodeHelper: XcodeHelpable {
         
         return String(packageName)
     }
-    func updateXcodeReferences(for versionedPackageName: String, at sourcePath: String, using symlinkName: String) throws {
+    func updateXcodeReferences(for versionedPackageURL: URL, at sourcePath: String, using symlinkName: String) throws {
         //find the xcodeproj
         let projectPath = try projectFilePath(for: sourcePath)
         //open the project
         let file = try String(contentsOfFile: projectPath)
+        //replace versioned group name with package name
+        let gitTag = try getGitTag(at: versionedPackageURL.path, shouldLog: false)
+        var updatedFile = file.replacingOccurrences(of: "\(symlinkName) \(gitTag)", with: symlinkName)
         //replace versioned package name with symlink name
-        let updatedFile = file.replacingOccurrences(of: versionedPackageName, with: symlinkName)
+        updatedFile = updatedFile.replacingOccurrences(of: versionedPackageURL.lastPathComponent, with: symlinkName)
         //save the project
         try updatedFile.write(toFile: projectPath, atomically: false, encoding: String.Encoding.utf8)
     }
@@ -388,7 +401,9 @@ public struct XcodeHelper: XcodeHelpable {
             throw e
         }
         
-        logger.log(tag, for: command)
+        if shouldLog {
+            logger.log(tag, for: command)
+        }
         return tag
     }
     
