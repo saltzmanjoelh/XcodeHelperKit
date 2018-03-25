@@ -91,7 +91,7 @@ public enum Command: String {
         case .updateDockerPackages:
             return "Update Packages - Docker"
         default:
-            return self.rawValue.components(separatedBy: "-").flatMap({$0.capitalized}).joined(separator: " ")
+            return self.rawValue.components(separatedBy: "-").map({$0.capitalized}).joined(separator: " ")
         }
     }
     public static var allCommands: [Command] = [.updateMacOSPackages, updateDockerPackages, .dockerBuild,

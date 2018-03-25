@@ -444,7 +444,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     public func largestGitTag(tagStrings:[String]) throws -> String {
-        let tags = tagStrings.flatMap(gitTagTuple)
+        let tags = tagStrings.compactMap(gitTagTuple)
         guard let tag = tags.sorted(by: {gitTagCompare($0, $1)}).last else {
             let message = "Git tag not found: \(tagStrings)"
             logger.log(message, for: Command.gitTag)
