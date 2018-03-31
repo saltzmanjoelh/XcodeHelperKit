@@ -45,7 +45,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
 
 
 public struct XcodeHelper: XcodeHelpable {
-    
+    public static let logsSubDirectory = ".xcodehelper_logs"
     let dockerRunnable: DockerRunnable.Type
     let processRunnable: ProcessRunnable.Type
     let dateFormatter = DateFormatter()
@@ -143,7 +143,7 @@ public struct XcodeHelper: XcodeHelpable {
         if let volumeName = persistentVolumeName {
             combinedRunOptions += try persistentVolumeOptions(at: sourcePath, using: volumeName).flatMap{$0.processValues}
         }
-        let bashCommand = ["/bin/bash", "-c", "swift build --configuration \(configuration.stringValue)"]
+        let bashCommand = ["/bin/bash", "-c", "cd \(sourcePath) && swift build --configuration \(configuration.stringValue)"]
         let result = DockerProcess(command: "run", commandOptions: combinedRunOptions, imageName: dockerImageName, commandArgs: bashCommand).launch(printOutput: true)
         if let error = result.error, result.exitCode != 0 {
             let prefix = persistentVolumeName != nil ? "\(persistentVolumeName!) - " : ""
@@ -479,13 +479,14 @@ public struct XcodeHelper: XcodeHelpable {
         }
     }
     
-    public func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool = true) throws {
+    public func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && /usr/bin/git tag \(tag)"], printOutput: false)
         if result.exitCode != 0, let error = result.error {
             let message = "Error tagging git repo: \(error)"
             logger.log(message, for: Command.gitTag)
             throw XcodeHelperError.gitTag(message: message)
         }
+        return result
     }
     
     public func pushGitTag(tag: String, at sourcePath:String, shouldLog: Bool = true) throws {
@@ -502,7 +503,7 @@ public struct XcodeHelper: XcodeHelpable {
     
     //MARK: Create XCArchive
     //returns a String for the path of the xcarchive
-    public func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool = true) throws -> String {
+    public func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool = true) throws -> ProcessResult {
         let command = Command.createXcarchive
         logger.log("Creating XCAchrive \(URL(fileURLWithPath: binaryPath).lastPathComponent)", for: command)
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
@@ -513,8 +514,9 @@ public struct XcodeHelper: XcodeHelpable {
         do {
             try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
             try createXcarchivePlist(in: path, name: name, schemeName: schemeName)
-            try createArchive(at: path.appending("/Products/\(name).tar"), with: [binaryPath])
-            return path
+            var result = try createArchive(at: path.appending("/Products/\(name).tar"), with: [binaryPath])
+            result.output?.append("\n\(path)")
+            return result
         }catch let e{
             logger.log(String(describing: e), for: command)
             throw e
