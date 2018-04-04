@@ -49,7 +49,7 @@ public struct XcodeHelper: XcodeHelpable {
     let dockerRunnable: DockerRunnable.Type
     let processRunnable: ProcessRunnable.Type
     let dateFormatter = DateFormatter()
-    public let logger = Logger()
+    public var logger = Logger()
     
     public init(dockerRunnable: DockerRunnable.Type = DockerProcess.self, processRunnable: ProcessRunnable.Type = ProcessRunner.self) {
         self.dockerRunnable = dockerRunnable
@@ -115,7 +115,7 @@ public struct XcodeHelper: XcodeHelpable {
     public func generateXcodeProject(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
         logger.log("Generating Xcode Project", for: .updateMacOSPackages)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
-        if let error = result.error, result.exitCode != 0 {
+        if let error = result.error {
             let message = "Error generating Xcode project (\(result.exitCode)):\n\(error)"
             logger.log(message, for: .updateMacOSPackages)
             throw XcodeHelperError.updatePackages(message: message)
@@ -447,7 +447,7 @@ public struct XcodeHelper: XcodeHelpable {
         let tags = tagStrings.compactMap(gitTagTuple)
         guard let tag = tags.sorted(by: {gitTagCompare($0, $1)}).last else {
             let message = "Git tag not found: \(tagStrings)"
-            logger.log(message, for: Command.gitTag)
+            logger.error(message, for: Command.gitTag)
             throw XcodeHelperError.gitTag(message: message)
         }
         

@@ -10,19 +10,20 @@ import Foundation
 
 public struct Logger {
     public static let UserDefaultsKey = "XcodeHelperKit.Logging"
-    public enum level {
+    public enum level: Int {
         case log
         case error
+        case none
     }
     static var timers = [UUID: Timer]()
     
-    private var logLevel: Logger.level
+    public var logLevel: Logger.level
     public init(level: Logger.level = .log){
         self.logLevel = level
     }
     @discardableResult
-    public func error(_ message: String, for command: Command?) -> UUID? {
-        return log(level: .error, message: message, for: command)
+    public func error(_ message: String, for command: Command?, logsDirectory: URL? = nil) -> UUID? {
+        return log(level: .error, message: message, for: command, logsDirectory: logsDirectory)
     }
     @discardableResult
     public func log(_ handle: FileHandle, for command: Command  ) -> UUID? {
@@ -35,6 +36,9 @@ public struct Logger {
     }
     public func log(level: Logger.level, message: String, for command: Command?, logsDirectory: URL? = nil) -> UUID? {
         let uuid = UUID()
+        if level.rawValue < self.logLevel.rawValue {
+            return uuid
+        }
         if let theCommand = command {
             print("\(theCommand.title): \(message)")
         }else{
