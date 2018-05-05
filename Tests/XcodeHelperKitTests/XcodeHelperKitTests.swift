@@ -403,8 +403,8 @@ class XcodeHelperTests: XCTestCase {
             let archivePath = "\(sourcePath!)/\(archiveName)"
             try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
             
-            if FileManager.default.fileExists(atPath: "/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
-                try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/joelsaltzman/Sites/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
+            if FileManager.default.fileExists(atPath: "/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
+                try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
             }else{
                 let key = ProcessInfo.processInfo.environment["KEY"]!
                 let secret = ProcessInfo.processInfo.environment["SECRET"]!

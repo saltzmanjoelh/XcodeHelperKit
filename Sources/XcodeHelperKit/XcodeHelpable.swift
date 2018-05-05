@@ -118,8 +118,8 @@ public protocol XcodeHelpable {
     func getGitTag(at sourcePath:String, shouldLog: Bool) throws -> String
     @discardableResult
     func incrementGitTag(component: GitTagComponent, at sourcePath: String, shouldLog: Bool) throws -> String
-    func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool) throws -> ProcessResult
+    func gitTag(_ tag: String, repo sourcePath: String, shouldLog: Bool) throws
     func pushGitTag(tag: String, at sourcePath: String, shouldLog: Bool) throws
     @discardableResult
-    func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool) throws -> ProcessResult
+    func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool) throws -> String
 }
