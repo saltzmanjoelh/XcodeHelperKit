@@ -10,63 +10,72 @@ import Foundation
 
 public struct Logger {
     public static let UserDefaultsKey = "XcodeHelperKit.Logging"
-    public enum level {
+    public enum level: Int {
         case log
         case error
+        case none
     }
     static var timers = [UUID: Timer]()
     
-    private var logLevel: Logger.level
+    public var logLevel: Logger.level
     public init(level: Logger.level = .log){
         self.logLevel = level
     }
-    public func error(_ message: String, for command: Command?) {
-        log(level: .error, message: message, for: command)
+    @discardableResult
+    public func error(_ message: String, for command: Command?, logsDirectory: URL? = nil) -> UUID? {
+        return log(level: .error, message: message, for: command, logsDirectory: logsDirectory)
     }
-    public func log(_ handle: FileHandle, for command: Command  ) -> String {
-        guard let str = String.init(data: handle.availableData as Data, encoding: .utf8) else { return "" }
-        log(str, for: command)
-        return str
+    @discardableResult
+    public func log(_ handle: FileHandle, for command: Command  ) -> UUID? {
+        guard let str = String.init(data: handle.availableData as Data, encoding: .utf8) else { return nil }
+        return log(str, for: command)
     }
-    public func log(_ message: String, for command: Command?) {
-        log(level: .log, message: message, for: command)
+    @discardableResult
+    public func log(_ message: String, for command: Command? = nil, logsDirectory: URL? = nil) -> UUID? {
+        return log(level: .log, message: message, for: command, logsDirectory: logsDirectory)
     }
-    public func log(level: Logger.level, message: String, for command: Command?) {
+    public func log(level: Logger.level, message: String, for command: Command?, logsDirectory: URL? = nil) -> UUID? {
+        let uuid = UUID()
+        if level.rawValue < self.logLevel.rawValue {
+            return uuid
+        }
         if let theCommand = command {
             print("\(theCommand.title): \(message)")
         }else{
             print("\(message)")
         }
         if !UserDefaults.standard.bool(forKey: Logger.UserDefaultsKey) {
-            return
+            return nil
         }
         let notification = NSUserNotification()
         notification.informativeText = message
 //        notification.soundName = NSUserNotificationDefaultSoundName
         notification.actionButtonTitle = "Silence"
+        if let directory = logsDirectory {
+            notification.identifier = directory.appendingPathComponent(uuid.uuidString).path
+        }else{
+            notification.identifier = uuid.uuidString
+        }
         
         if let theCommand = command {
-            notification.identifier = theCommand.title
             notification.title = theCommand.title
         }else{
-            notification.identifier = "XcodeHelperKit"
             notification.title = "Xcode Helper"
         }
         
+        
         NSUserNotificationCenter.default.deliver(notification)
-//        if message == "Done" || message.contains("Error") {
             //auto dismiss when it's a completion message
             if #available(OSX 10.12, *) {
                 DispatchQueue.main.async {
-                    let uuid = UUID()
-                    let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(3.0), repeats: false, block: { _ in
+                    let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(5.0), repeats: false, block: { _ in
                         NSUserNotificationCenter.default.removeDeliveredNotification(notification)
                         Logger.timers.removeValue(forKey: uuid)
                     })
                     Logger.timers[uuid] = timer
                 }
             }
-//        }
+        return uuid
     }
     
 }

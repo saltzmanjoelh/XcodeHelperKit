@@ -581,12 +581,14 @@ class XcodeHelperTests: XCTestCase {
             FileManager.default.createFile(atPath: binaryPath, contents: "Hi".data(using: String.Encoding.utf8), attributes: nil)
             let helper = XcodeHelper()
             
-            let archivePath = try helper.createXcarchive(in: path, with: binaryPath, from: schemeName)
+            let processResult = try helper.createXcarchive(in: path, with: binaryPath, from: schemeName)
+            let archivePath = processResult.output?.components(separatedBy: "\n").last
             
-            XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath))
-            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath)/\(plist)"))
-            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath)/Products/\(appName).tar"))
-            try! FileManager.default.removeItem(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path)
+            XCTAssertNotNil(archivePath)
+            XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath!))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath!)/\(plist)"))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: "\(archivePath!)/Products/\(appName).tar"))
+            try! FileManager.default.removeItem(atPath: URL(fileURLWithPath: archivePath!).deletingLastPathComponent().path)
             
         } catch let e {
             XCTFail("Error: \(e)")
