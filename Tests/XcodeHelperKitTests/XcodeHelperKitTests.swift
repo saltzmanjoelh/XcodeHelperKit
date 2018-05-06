@@ -393,7 +393,7 @@ class XcodeHelperTests: XCTestCase {
     }
 
     func testUploadArchive(){
-        
+        guard ProcessInfo.processInfo.environment["TRAVIS_OS_NAME"] == nil else { return }
         do{
             let bucket = "saltzman.test"
             let region = "us-east-1"
