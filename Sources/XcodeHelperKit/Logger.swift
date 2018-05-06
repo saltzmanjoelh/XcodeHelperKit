@@ -44,6 +44,7 @@ public struct Logger {
         }else{
             print("\(message)")
         }
+        UserDefaults.standard.addSuite(named: "com.joelsaltzman.XcodeHelper")
         if !UserDefaults.standard.bool(forKey: Logger.UserDefaultsKey) {
             return nil
         }
