@@ -74,26 +74,45 @@ public enum GitTagComponent: Int, CustomStringConvertible {
         }
     }
 }
-public enum Command: String {
-    case updateMacOSPackages = "update-macos-packages"
-    case updateDockerPackages = "update-docker-packages"
-    case dockerBuild = "docker-build"
-    //        case clean = "clean"
-    case symlinkDependencies = "symlink-dependencies"
-    case createArchive = "create-archive"
-    case uploadArchive = "upload-archive"
-    case gitTag = "git-tag"
-    case createXcarchive = "create-xcarchive"
-    public var title: String {
-        switch self {
-        case .updateMacOSPackages:
-            return "Update Packages - macOS"
-        case .updateDockerPackages:
-            return "Update Packages - Docker"
-        default:
-            return self.rawValue.components(separatedBy: "-").map({$0.capitalized}).joined(separator: " ")
-        }
-    }
+public struct Command {
+    public var title: String
+    public var description: String
+    public var cliName: String
+    public var envName: String
+    static var updateMacOSPackages = Command.init(title: "Update Packages - macOS",
+                                                  description: "Update the package dependencies via 'swift package update'. Optionally, symlink your dependencies and regenerate your xcode project to prevent future updates from requiring a new xcode project to be built",
+                                                  cliName: "update-macos-packages",
+                                                  envName: "UPDATE_MACOS_PACKAGES")
+    static var updateDockerPackages = Command.init(title: "Update Packages - Docker",
+                                                   description: "Update the packages for your Docker container in the persistent volume directory",
+                                                   cliName: "update-docker-packages",
+                                                   envName: "UPDATE_DOCKER_PACKAGES")
+    static var dockerBuild = Command.init(title: "Build in Docker",
+                                                   description: "Build a Swift package on another platform like Linux and have the build errors appear in Xcode.",
+                                                   cliName: "docker-build",
+                                                   envName: "DOCKER_BUILD")
+    static var symlinkDependencies = Command.init(title: "Symlink Dependencies",
+                                                  description: "Create symbolic links for the dependency packages after `swift package update` so you don't have to generate a new xcode project.",
+                                                  cliName: "symlink-dependencies",
+                                                  envName: "SYMLINK_DEPENDENCIES")
+    static var createArchive = Command.init(title: "Create Archive",
+                                            description: "Archive files with tar.",
+                                            cliName: "create-archive",
+                                            envName: "CREATE_ARCHIVE")
+    static var uploadArchive = Command.init(title: "Upload Archive",
+                                            description: "Upload an archive to S3",
+                                            cliName: "upload-archive",
+                                            envName: "UPLOAD_ARCHIVE")
+    static var gitTag = Command.init(title: "Git Tag",
+                                     description: "Update your package's git repo's semantic versioned tag",
+                                     cliName: "git-tag",
+                                     envName: "GIT_TAG")
+    static var createXcarchive = Command.init(title: "Create XCArchive",
+                                              description: "Store your built binary in an xcarchive where Xcode's Organizer can keep track",
+                                              cliName: "create-xcarchive",
+                                              envName: "CREATE_XCARCHIVE")
+    
+    
     public static var allCommands: [Command] = [.updateMacOSPackages, updateDockerPackages, .dockerBuild,
                                                 /*.clean,*/ .symlinkDependencies, .createArchive,
                                                             .createXcarchive, .uploadArchive, .gitTag]
