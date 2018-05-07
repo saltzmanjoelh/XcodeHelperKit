@@ -79,6 +79,12 @@ public struct Command {
     public var description: String
     public var cliName: String
     public var envName: String
+    public init(title: String, description: String, cliName: String, envName: String) {
+        self.title = title
+        self.description = description
+        self.cliName = cliName
+        self.envName = envName
+    }
     public static var updateMacOSPackages = Command.init(title: "Update Packages - macOS",
                                                          description: "Update the package dependencies via 'swift package update'. Optionally, symlink your dependencies and regenerate your xcode project to prevent future updates from requiring a new xcode project to be built",
                                                          cliName: "update-macos-packages",
