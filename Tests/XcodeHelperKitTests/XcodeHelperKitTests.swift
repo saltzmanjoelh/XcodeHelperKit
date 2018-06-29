@@ -26,10 +26,10 @@ enum LibraryTag: Int {
     case patch = 3
 }
 
-let testPackageName = "Hello"
-let testVersionedPackageName = "Hello.git-918358885156091396"
+
 
 class XcodeHelperTests: XCTestCase {
+    let testPackageName = "Hello"
     
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
     let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
@@ -199,7 +199,7 @@ class XcodeHelperTests: XCTestCase {
             let packageNames = try helper.packageNames(from: sourcePath!)
             
             XCTAssertEqual(packageNames.count, 1)//one for package directory
-            XCTAssertEqual(packageNames.last, testVersionedPackageName)
+            XCTAssertTrue(packageNames.last!.contains("\(testPackageName).git--"), "\(packageNames.last!) should have contained \(testPackageName).git--")
         } catch let e {
             XCTFail("Error: \(e)")
         }
@@ -247,16 +247,17 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
+            let packageNames = try helper.packageNames(from: sourcePath!)
             let url = URL.init(fileURLWithPath: sourcePath!)
                 .appendingPathComponent(".build")
                 .appendingPathComponent("checkouts")
-                .appendingPathComponent(testVersionedPackageName)
+                .appendingPathComponent(packageNames.last!)
             
             try helper.updateXcodeReferences(for: url, at: sourcePath!, using: testPackageName)
             
             let projectPath = try helper.projectFilePath(for: sourcePath!)
             let file = try String(contentsOfFile: projectPath)
-            XCTAssertFalse(file.contains(testVersionedPackageName), "Xcode project should not contain any package versions")
+            XCTAssertFalse(file.contains("\(testPackageName).git--"), "Xcode project should not contain any package versions")
         } catch let e {
             XCTFail("Error: \(e)")
         }

@@ -3,3 +3,5 @@
 /Packages
 *.csv
 Package.pins
+.build
+Packages
