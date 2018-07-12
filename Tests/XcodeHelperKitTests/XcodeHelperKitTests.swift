@@ -199,7 +199,7 @@ class XcodeHelperTests: XCTestCase {
             let packageNames = try helper.packageNames(from: sourcePath!)
             
             XCTAssertEqual(packageNames.count, 1)//one for package directory
-            XCTAssertTrue(packageNames.last!.contains("\(testPackageName).git-"), "\(packageNames.last!) should have contained \(testPackageName).git--")
+            XCTAssertTrue(packageNames.last!.contains("\(testPackageName).git-"), "\(packageNames.last!) should have contained \(testPackageName).git-")
         } catch let e {
             XCTFail("Error: \(e)")
         }
