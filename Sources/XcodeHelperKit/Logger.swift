@@ -147,7 +147,7 @@ public struct Logger {
     func compileFormatString(_ message: StaticString, _ args: [CVarArg]) -> String {
         switch args.count {
         case 0:
-            return String.init(format: message.description, args[0])
+            return String.init(format: message.description)
         case 1:
             return String.init(format: message.description, args[0])
         case 2:

@@ -22,9 +22,9 @@ class LoggerTests: XCTestCase {
     }
 
     func testLog() {
-        let logger = Logger()
+        let logger = Logger(category: "Test")
 //        logger.log("one", forAction: "testLog")
-        logger.log("one", for: .dockerBuild)
+        logger.log("one")
         //RunLoop.current.run(until: Date.init(timeIntervalSinceNow: 2))
     }
 
