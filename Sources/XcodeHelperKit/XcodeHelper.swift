@@ -81,8 +81,10 @@ public struct XcodeHelper: XcodeHelpable {
         dockerProcess.processRunnable = self.processRunnable
         let result = dockerProcess.launch(printOutput: true, outputPrefix: dockerImageName)
         if let error = result.error, result.exitCode != 0 {
-            let message = "\(persistentVolumeName) - Error updating packages (\(result.exitCode):\n\(error)"
-            XcodeHelper.logger?.error("%@", message)
+            let message = "\(persistentVolumeName) - Error updating packages\n\(error)"
+            if error.count > 1 {
+                XcodeHelper.logger?.error("%@", message)
+            }
             throw XcodeHelperError.updatePackages(message: message)
         }
         
@@ -105,8 +107,8 @@ public struct XcodeHelper: XcodeHelpable {
         XcodeHelper.logger?.logWithNotification("Updating macOS packages at: %@" as StaticString, sourcePath)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
-            let message = "Error updating packages (\(result.exitCode):\n\(error)"
-            XcodeHelper.logger?.log("%@", message)
+            let message = "Error updating packages\n\(error)"
+//            XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
         XcodeHelper.logger?.log("Packages updated")

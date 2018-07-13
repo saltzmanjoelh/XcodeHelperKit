@@ -13,16 +13,17 @@ import os.log
 public struct Logger {
     public struct LogIdentifier {
         let category: String
-        let pid: Int
+        let pid: Int32
     }
     
     public static let subsystemIdentifier = "com.joelsaltzman.XcodeHelper.plist"
     public static let UserDefaultsKey = "XcodeHelperKit.Logging"
     
-    static var timers = [UUID: Timer]()
+    static var timers = [UUID: (Timer, NSUserNotification)]()
     //log show --style compact --predicate '(subsystem == "com.joelsaltzman.XcodeHelper.plist") && (category == "Update Packages - macOS")'
     
     private let logSystem: OSLog?
+    private let identifier: LogIdentifier
     public init(category: String){
 //        let pid = ProcessInfo.processInfo.processIdentifier
 //        print("pid: \(pid)")
@@ -31,6 +32,41 @@ public struct Logger {
         } else {
             // Fallback on earlier versions
             logSystem = nil
+        }
+        identifier = LogIdentifier.init(category: category, pid: ProcessInfo.processInfo.processIdentifier)
+    }
+    
+    @discardableResult
+    public func error(_ message: StaticString, _ args: CVarArg...) -> UUID? {
+        if #available(OSX 10.12, *) {
+            return log(type: .error, message: message, args)
+        } else {
+            // Fallback on earlier versions
+            return log(type: OSLogType.init(16), message: message, args)
+        }
+    }
+    @discardableResult
+    public func errorWithNotification(_ message: StaticString, _ args: CVarArg...) -> UUID? {
+        var uuid: UUID?
+        if #available(OSX 10.12, *) {
+            uuid = log(type: .default, message: message, args)
+        } else {
+            // Fallback on earlier versions
+            uuid = log(type: OSLogType.init(16), message: message, args)
+        }
+        if let theUUID = uuid {
+            displayNotification(uuid: theUUID, withMessage: message, args)
+            removeOtherNotifications(except: theUUID)
+        }
+        return uuid
+    }
+    @discardableResult
+    public func log(_ message: StaticString, _ args: CVarArg...) -> UUID? {
+        if #available(OSX 10.12, *) {
+            return log(type: .default, message: message, args)
+        } else {
+            // Fallback on earlier versions
+            return log(type: OSLogType.init(0), message: message, args)
         }
     }
     @discardableResult
@@ -46,24 +82,6 @@ public struct Logger {
             displayNotification(uuid: theUUID, withMessage: message, args)
         }
         return uuid
-    }
-    @discardableResult
-    public func error(_ message: StaticString, _ args: CVarArg...) -> UUID? {
-        if #available(OSX 10.12, *) {
-            return log(type: .error, message: message, args)
-        } else {
-            // Fallback on earlier versions
-            return log(type: OSLogType.init(16), message: message, args)
-        }
-    }
-    @discardableResult
-    public func log(_ message: StaticString, _ args: CVarArg...) -> UUID? {
-        if #available(OSX 10.12, *) {
-            return log(type: .default, message: message, args)
-        } else {
-            // Fallback on earlier versions
-            return log(type: OSLogType.init(0), message: message, args)
-        }
     }
 //    public func log(type: OSLogType, message: StaticString, args: CVarArg...) -> UUID? {
 //        let uuid = UUID()
@@ -116,6 +134,7 @@ public struct Logger {
         }
         let notification = NSUserNotification()
         
+        notification.title = identifier.category
         notification.informativeText = compileFormatString(message, args)
         //        notification.soundName = NSUserNotificationDefaultSoundName
         notification.actionButtonTitle = "Silence"
@@ -140,8 +159,18 @@ public struct Logger {
                     NSUserNotificationCenter.default.removeDeliveredNotification(notification)
                     Logger.timers.removeValue(forKey: uuid)
                 })
-                Logger.timers[uuid] = timer
+                Logger.timers[uuid] = (timer, notification)
             }
+        }
+    }
+    func removeOtherNotifications(except uuid: UUID) {
+        let entries = Logger.timers.compactMap { (key: UUID, value: (Timer, NSUserNotification)) -> (UUID, NSUserNotification)? in
+            guard key != uuid else { return nil }
+            return (key, value.1)
+        }
+        for entry in entries {
+            Logger.timers.removeValue(forKey: entry.0)
+            NSUserNotificationCenter.default.removeDeliveredNotification(entry.1)
         }
     }
     func compileFormatString(_ message: StaticString, _ args: [CVarArg]) -> String {
@@ -162,11 +191,11 @@ public struct Logger {
             return String.init(format: message.description, args)
         }
     }
-    public func logStringFromProcessResults(_ processResults: [ProcessResult]) -> String {
-        return ""
-    }
-    @discardableResult
-    public func storeLog(_ log: String, inDirectory directory: URL, uuid: UUID) throws -> String? {
-        return nil
-    }
+//    public func logStringFromProcessResults(_ processResults: [ProcessResult]) -> String {
+//        return ""
+//    }
+//    @discardableResult
+//    public func storeLog(_ log: String, inDirectory directory: URL, uuid: UUID) throws -> String? {
+//        return nil
+//    }
 }
