@@ -12,21 +12,24 @@ import os.log
 
 public struct Logger {
     public struct LogIdentifier {
-        let category: String
-        let pid: Int32
+        public let category: String
+        public let pid: Int32
+    }
+    public struct LogEntry {
+        public let uuid: UUID
+        public let timer: Timer
+        public let notification: NSUserNotification
+        public let identifier: LogIdentifier
     }
     
-    public static let subsystemIdentifier = "com.joelsaltzman.XcodeHelper.plist"
+    public static let subsystemIdentifier = "com.joelsaltzman.XcodeHelper"
     public static let UserDefaultsKey = "XcodeHelperKit.Logging"
     
-    static var timers = [UUID: (Timer, NSUserNotification)]()
-    //log show --style compact --predicate '(subsystem == "com.joelsaltzman.XcodeHelper.plist") && (category == "Update Packages - macOS")'
+    public static var timers = [UUID: LogEntry]()
     
     private let logSystem: OSLog?
     private let identifier: LogIdentifier
     public init(category: String){
-//        let pid = ProcessInfo.processInfo.processIdentifier
-//        print("pid: \(pid)")
         if #available(OSX 10.12, *) {
             logSystem = OSLog.init(subsystem: Logger.subsystemIdentifier, category: category)
         } else {
@@ -134,43 +137,37 @@ public struct Logger {
         }
         let notification = NSUserNotification()
         
+        notification.identifier = uuid.uuidString
         notification.title = identifier.category
         notification.informativeText = compileFormatString(message, args)
         //        notification.soundName = NSUserNotificationDefaultSoundName
         notification.actionButtonTitle = "Silence"
-        //        if let directory = logsDirectory {
-        //            notification.identifier = directory.appendingPathComponent(uuid.uuidString).path
-        //        }else{
-        //            notification.identifier = uuid.uuidString
-        //        }
-        
-        //        if let theCommand = command {
-        //            notification.title = theCommand.title
-        //        }else{
-        //            notification.title = "Xcode Helper"
-        //        }
         
         
         NSUserNotificationCenter.default.deliver(notification)
         //auto dismiss when it's a completion message
         if #available(OSX 10.12, *) {
-            DispatchQueue.main.async {
-                let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(5.0), repeats: false, block: { _ in
+            let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(5.0), repeats: false, block: { _ in
+                DispatchQueue.main.async {
                     NSUserNotificationCenter.default.removeDeliveredNotification(notification)
                     Logger.timers.removeValue(forKey: uuid)
-                })
-                Logger.timers[uuid] = (timer, notification)
-            }
+                }
+            })
+            Logger.timers[uuid] = LogEntry.init(uuid: uuid,
+                                                timer: timer,
+                                                notification: notification,
+                                                identifier: identifier)
+            
         }
     }
     func removeOtherNotifications(except uuid: UUID) {
-        let entries = Logger.timers.compactMap { (key: UUID, value: (Timer, NSUserNotification)) -> (UUID, NSUserNotification)? in
-            guard key != uuid else { return nil }
-            return (key, value.1)
+        let entries = Logger.timers.values.compactMap { (value: LogEntry) -> LogEntry? in
+            guard value.uuid != uuid else { return nil }
+            return value
         }
         for entry in entries {
-            Logger.timers.removeValue(forKey: entry.0)
-            NSUserNotificationCenter.default.removeDeliveredNotification(entry.1)
+            Logger.timers.removeValue(forKey: entry.uuid)
+            NSUserNotificationCenter.default.removeDeliveredNotification(entry.notification)
         }
     }
     func compileFormatString(_ message: StaticString, _ args: [CVarArg]) -> String {
@@ -191,11 +188,4 @@ public struct Logger {
             return String.init(format: message.description, args)
         }
     }
-//    public func logStringFromProcessResults(_ processResults: [ProcessResult]) -> String {
-//        return ""
-//    }
-//    @discardableResult
-//    public func storeLog(_ log: String, inDirectory directory: URL, uuid: UUID) throws -> String? {
-//        return nil
-//    }
 }

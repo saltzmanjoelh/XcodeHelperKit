@@ -90,7 +90,6 @@ public struct XcodeHelper: XcodeHelpable {
         
         //        //Restore the Packages directory
         //        movePackages(at: sourcePath, fromBackup: true)
-        XcodeHelper.logger?.logWithNotification("Packages updated.")
         return result
     }
     func movePackages(at sourcePath: String, fromBackup: Bool) {
@@ -111,7 +110,7 @@ public struct XcodeHelper: XcodeHelpable {
 //            XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
-        XcodeHelper.logger?.log("Packages updated")
+        XcodeHelper.logger?.logWithNotification("Packages updated")
         return result
     }
     
