@@ -83,6 +83,7 @@ public struct Logger {
         }
         if let theUUID = uuid {
             displayNotification(uuid: theUUID, withMessage: message, args)
+            removeOtherNotifications(except: theUUID)
         }
         return uuid
     }

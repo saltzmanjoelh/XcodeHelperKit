@@ -45,7 +45,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
 
 
 public struct XcodeHelper: XcodeHelpable {
-    public static let logsSubDirectory = ".xcodehelper_logs"
+//    public static let logsSubDirectory = ".xcodehelper_logs"
     public static var logger: Logger?
     let dockerRunnable: DockerRunnable.Type
     let processRunnable: ProcessRunnable.Type
@@ -90,6 +90,7 @@ public struct XcodeHelper: XcodeHelpable {
         
         //        //Restore the Packages directory
         //        movePackages(at: sourcePath, fromBackup: true)
+        XcodeHelper.logger?.logWithNotification("Packages updated.")
         return result
     }
     func movePackages(at sourcePath: String, fromBackup: Bool) {
@@ -123,7 +124,7 @@ public struct XcodeHelper: XcodeHelpable {
             XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
-        XcodeHelper.logger?.logWithNotification("Xcode project generated")
+        XcodeHelper.logger?.log("Xcode project generated")
         return result
     }
     
@@ -131,7 +132,7 @@ public struct XcodeHelper: XcodeHelpable {
     @discardableResult
     public func dockerBuild(_ sourcePath:String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName:String = "swift", persistentVolumeName: String? = nil, shouldLog: Bool = true) throws -> ProcessResult {
         XcodeHelper.logger = Logger(category: Command.dockerBuild.title)
-        XcodeHelper.logger?.log("Building in Docker - %@", dockerImageName)
+        XcodeHelper.logger?.logWithNotification("Building in Docker - %@", dockerImageName)
         //We are using separate .build directories for each platform now.
         //We don't need to clean
         //        //check if we need to clean first
@@ -139,9 +140,13 @@ public struct XcodeHelper: XcodeHelpable {
         //            XcodeHelper.logger?.log("Cleaning", for: command)
         //            try clean(sourcePath: sourcePath)
         //        }
+        
         var combinedRunOptions = [String]()
         if let dockerRunOptions = runOptions {
             combinedRunOptions += dockerRunOptions.flatMap{ $0.processValues } + ["-v", "\(sourcePath):\(sourcePath)", "--workdir", sourcePath]
+            if let containerName = containerNameToRemove(dockerRunOptions) {
+                removeContainer(named: containerName)
+            }
         }
         if let volumeName = persistentVolumeName {
             combinedRunOptions += try persistentVolumeOptions(at: sourcePath, using: volumeName).flatMap{$0.processValues}
@@ -155,6 +160,7 @@ public struct XcodeHelper: XcodeHelpable {
             throw XcodeHelperError.dockerBuild(message: message,
                                                exitCode: result.exitCode)
         }
+        XcodeHelper.logger?.logWithNotification("Done building")
         return result
     }
     //persistentBuildDirectory is a subdirectory of .build and we mount it with .build/persistentBuildDirectory/.build:sourcePath/.build and .build/buildDirName/.Packages:sourcePath/Packages so that we can use it's artifacts for future builds and don't have to keep rebuilding
@@ -179,6 +185,22 @@ public struct XcodeHelper: XcodeHelpable {
             try FileManager.default.createDirectory(at: sourceDirectory, withIntermediateDirectories: true, attributes: nil)
         }
         return .volume(source: sourceDirectory.path, destination: destinationDirectory.path)
+    }
+    func containerNameToRemove(_ dockerRunOptions: [DockerRunOption]) -> String? {
+        guard dockerRunOptions.contains(where: { (runOption: DockerRunOption) -> Bool in
+            return runOption.processValues == DockerRunOption.removeWhenDone.processValues
+        }) else { return nil }
+        
+        guard let containerNameFlag = DockerRunOption.container(name: "").processValues.first, //--name
+            let containerNameOption = dockerRunOptions.first(where: { (runOption: DockerRunOption) -> Bool in
+            return runOption.processValues.contains(containerNameFlag)
+        }) else { return nil }
+        
+        return containerNameOption.processValues.last
+    }
+    func removeContainer(named containerName: String) {
+        let process = DockerProcess.init(command: "rm", commandOptions: ["-f", "-v", containerName])
+        process.launch()
     }
     
     //MARK: Clean
@@ -349,7 +371,7 @@ public struct XcodeHelper: XcodeHelpable {
     @discardableResult
     public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true, shouldLog: Bool = true) throws -> ProcessResult {
         XcodeHelper.logger = Logger(category: Command.createArchive.title)
-        XcodeHelper.logger?.log("Creating archive %@", archivePath)
+        XcodeHelper.logger?.logWithNotification("Creating archive %@", archivePath)
         try FileManager.default.createDirectory(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)
         let args = flatList ? filePaths.flatMap{ return ["-C", URL(fileURLWithPath:$0).deletingLastPathComponent().path, URL(fileURLWithPath:$0).lastPathComponent] } : filePaths
         let arguments = ["-cvzf", archivePath]+args
@@ -359,14 +381,14 @@ public struct XcodeHelper: XcodeHelpable {
             XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.createArchive(message: message)
         }
-        XcodeHelper.logger?.log("Archive created")
+        XcodeHelper.logger?.logWithNotification("Archive created")
         return result
     }
     
     //MARK: Upload Archive
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String, shouldLog: Bool = true) throws  {
         XcodeHelper.logger = Logger(category: Command.uploadArchive.title)
-        XcodeHelper.logger?.log("Uploading archve: %@", URL(fileURLWithPath: archivePath).lastPathComponent)
+        XcodeHelper.logger?.logWithNotification("Uploading archve: %@", URL(fileURLWithPath: archivePath).lastPathComponent)
         let result = try S3.with(key: key, and: secret).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
             var description = result.response.description
@@ -378,12 +400,12 @@ public struct XcodeHelper: XcodeHelpable {
             XcodeHelper.logger?.log("%@", description)
             throw XcodeHelperError.uploadArchive(message: description)
         }
-        XcodeHelper.logger?.log("Archive uploaded")
+        XcodeHelper.logger?.logWithNotification("Archive uploaded")
     }
     
     public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String, shouldLog: Bool = true) throws  {
         XcodeHelper.logger = Logger(category: Command.uploadArchive.title)
-        XcodeHelper.logger?.log("Uploading archve: %@", URL(fileURLWithPath: archivePath).lastPathComponent)
+        XcodeHelper.logger?.logWithNotification("Uploading archve: %@", URL(fileURLWithPath: archivePath).lastPathComponent)
         let result = try S3.with(credentials: credentialsPath).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
             var description = result.response.description
@@ -395,7 +417,7 @@ public struct XcodeHelper: XcodeHelpable {
             XcodeHelper.logger?.log("%@", description)
             throw XcodeHelperError.uploadArchive(message: description)
         }
-        XcodeHelper.logger?.log("Archive uploaded")
+        XcodeHelper.logger?.logWithNotification("Archive uploaded")
     }
     
     //MARK: Git Tag
@@ -509,7 +531,7 @@ public struct XcodeHelper: XcodeHelpable {
     //returns a String for the path of the xcarchive
     public func createXcarchive(in dirPath: String, with binaryPath: String, from schemeName: String, shouldLog: Bool = true) throws -> ProcessResult {
         XcodeHelper.logger = Logger(category: Command.createXcarchive.title)
-        XcodeHelper.logger?.log("Creating XCAchrive %@", URL(fileURLWithPath: binaryPath).lastPathComponent)
+        XcodeHelper.logger?.logWithNotification("Creating XCAchrive %@", URL(fileURLWithPath: binaryPath).lastPathComponent)
         let name = URL(fileURLWithPath: binaryPath).lastPathComponent
         let directoryDate = xcarchiveDirectoryDate(from: dateFormatter)
         let archiveDate = xcarchiveDate(from: dateFormatter)
