@@ -191,6 +191,7 @@ class XcodeHelperTests: XCTestCase {
         
     }
     
+    @available(OSX 10.11, *)
     func testRecursiveProjects() {
         guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
