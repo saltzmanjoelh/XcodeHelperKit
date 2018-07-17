@@ -114,6 +114,14 @@ public struct XcodeHelper: XcodeHelpable {
         XcodeHelper.logger?.logWithNotification("Packages updated")
         return result
     }
+    public func recursiveXcodeProjects(at sourcePath: String) -> [String] {
+        guard let contents = FileManager.default.recursiveContents(of: URL(fileURLWithPath: sourcePath))
+            else { return [sourcePath] }
+        let urls: [String] = contents.compactMap{ (url: URL) in
+            return url.pathExtension == "xcodeproj" && !url.path.contains("/.") ? url.path : nil
+        }
+        return urls.count > 0 ? urls : [sourcePath]
+    }
     
     @discardableResult
     public func generateXcodeProject(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {

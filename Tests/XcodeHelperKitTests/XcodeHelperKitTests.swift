@@ -10,6 +10,7 @@ import XCTest
 import ProcessRunner
 import DockerProcess
 import S3Kit
+import XcodeHelperKit
 
 //#if os(OSX) || os(iOS)
     import Darwin
@@ -188,6 +189,24 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
         
+    }
+    func testRecursiveProjects() {
+        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
+        do{
+            let helper = XcodeHelper()
+            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
+            try helper.generateXcodeProject(at: sourcePath!)
+            let subproject = cloneToTempDirectory(repoURL: executableRepoURL)
+            try helper.generateXcodeProject(at: subproject!)
+            let subprojectURL = URL.init(fileURLWithPath: subproject!)
+            try FileManager.default.moveItem(atPath: subproject!, toPath: sourcePath!.appending("/\(subprojectURL.lastPathComponent)"))
+
+            let results = helper.recursiveXcodeProjects(at: sourcePath!)
+            
+            XCTAssertEqual(results.count, 2)
+        }catch let e{
+            XCTFail("\(e)")
+        }
     }
     
     func testPackageNames(){
