@@ -20,6 +20,7 @@ extension FileManager {
 //        return attributes[FileAttributeKey.creationDate] as? NSDate
 //    }
     
+    @available(OSX 10.11, *)
     public func recursiveContents(of directory: URL) -> [URL]? {
         guard let directoryContents = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil , options: []) else { return nil }
         let subdirectoryContents = directoryContents.compactMap({ (url: URL) -> [URL]? in

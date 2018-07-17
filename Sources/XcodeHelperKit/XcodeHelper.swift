@@ -114,6 +114,7 @@ public struct XcodeHelper: XcodeHelpable {
         XcodeHelper.logger?.logWithNotification("Packages updated")
         return result
     }
+    @available(OSX 10.11, *)
     public func recursiveXcodeProjects(at sourcePath: String) -> [String] {
         guard let contents = FileManager.default.recursiveContents(of: URL(fileURLWithPath: sourcePath))
             else { return [sourcePath] }

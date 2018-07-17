@@ -190,6 +190,7 @@ class XcodeHelperTests: XCTestCase {
         }
         
     }
+    
     func testRecursiveProjects() {
         guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
         do{
