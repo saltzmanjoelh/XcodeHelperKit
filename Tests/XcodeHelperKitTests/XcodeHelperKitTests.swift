@@ -193,11 +193,11 @@ class XcodeHelperTests: XCTestCase {
     }
     
     @available(OSX 10.11, *)
-    func testRecursiveProjects() {
+    func testRecursivePackagePaths() {
         let helper = XcodeHelper()
         sourcePath = cloneToTempDirectory(repoURL: dependenciesRepoURL)
         
-        let results = helper.recursiveXcodeProjects(at: sourcePath!)
+        let results = helper.recursivePackagePaths(at: sourcePath!)
         
         XCTAssertEqual(results.count, 1)
         XCTAssertTrue(results.first!.contains("Dependencies"))

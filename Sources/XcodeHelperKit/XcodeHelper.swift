@@ -115,7 +115,7 @@ public struct XcodeHelper: XcodeHelpable {
         return result
     }
     @available(OSX 10.11, *)
-    public func recursiveXcodeProjects(at sourcePath: String) -> [String] {
+    public func recursivePackagePaths(at sourcePath: String) -> [String] {
         guard let contents = FileManager.default.recursiveContents(of: URL(fileURLWithPath: sourcePath))
             else { return [sourcePath] }
         let urls: [String] = contents.compactMap{ (url: URL) in

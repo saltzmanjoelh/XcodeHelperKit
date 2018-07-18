@@ -130,7 +130,7 @@ public protocol XcodeHelpable {
     @discardableResult
     func updateMacOsPackages(at sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     @available(OSX 10.11, *)
-    func recursiveXcodeProjects(at sourcePath: String) -> [String]
+    func recursivePackagePaths(at sourcePath: String) -> [String]
     @discardableResult
     func generateXcodeProject(at sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     @discardableResult
