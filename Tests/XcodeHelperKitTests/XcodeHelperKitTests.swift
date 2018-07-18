@@ -35,6 +35,7 @@ class XcodeHelperTests: XCTestCase {
 //    just create a sample repo that uses another repo so that we don't have to worry about swift version breakage
     let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
     let libraryRepoURL = "https://github.com/saltzmanjoelh/Hello"
+    let dependenciesRepoURL = "https://github.com/saltzmanjoelh/HelloDependencies"
     var sourcePath : String?
     
     override func setUp() {
@@ -193,22 +194,13 @@ class XcodeHelperTests: XCTestCase {
     
     @available(OSX 10.11, *)
     func testRecursiveProjects() {
-        guard FileManager.default.fileExists(atPath: "/usr/local/bin/docker") else { return }
-        do{
-            let helper = XcodeHelper()
-            sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
-            try helper.generateXcodeProject(at: sourcePath!)
-            let subproject = cloneToTempDirectory(repoURL: executableRepoURL)
-            try helper.generateXcodeProject(at: subproject!)
-            let subprojectURL = URL.init(fileURLWithPath: subproject!)
-            try FileManager.default.moveItem(atPath: subproject!, toPath: sourcePath!.appending("/\(subprojectURL.lastPathComponent)"))
-
-            let results = helper.recursiveXcodeProjects(at: sourcePath!)
-            
-            XCTAssertEqual(results.count, 2)
-        }catch let e{
-            XCTFail("\(e)")
-        }
+        let helper = XcodeHelper()
+        sourcePath = cloneToTempDirectory(repoURL: dependenciesRepoURL)
+        
+        let results = helper.recursiveXcodeProjects(at: sourcePath!)
+        
+        XCTAssertEqual(results.count, 1)
+        XCTAssertTrue(results.first!.contains("Dependencies"))
     }
     
     func testPackageNames(){
