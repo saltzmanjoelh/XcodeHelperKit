@@ -104,7 +104,7 @@ public struct XcodeHelper: XcodeHelpable {
     @discardableResult
     public func updateMacOsPackages(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
         XcodeHelper.logger = Logger(category: Command.updateMacOSPackages.title)
-        XcodeHelper.logger?.logWithNotification("Updating macOS packages at: %@" as StaticString, sourcePath)
+        XcodeHelper.logger?.logWithNotification("Updating macOS packages at: %@" as StaticString, (sourcePath as NSString).lastPathComponent)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
             let message = "Error updating packages\n\(error)"
