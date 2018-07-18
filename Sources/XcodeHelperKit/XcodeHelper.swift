@@ -129,7 +129,7 @@ public struct XcodeHelper: XcodeHelpable {
         XcodeHelper.logger?.log("Generating Xcode Project")
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
         if let error = result.error {
-            let message = "Error generating Xcode project (\(result.exitCode):\n\(error)"
+            let message = "Error generating Xcode project:\n\(error)"
             XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
