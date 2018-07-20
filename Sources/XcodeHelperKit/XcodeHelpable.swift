@@ -9,7 +9,7 @@
 import Foundation
 import DockerProcess
 import ProcessRunner
-
+import xcproj
 
 public enum BuildConfiguration {
     case debug
@@ -97,6 +97,10 @@ public struct Command {
                                                  description: "Build a Swift package on another platform like Linux and have the build errors appear in Xcode.",
                                                  cliName: "docker-build",
                                                  envName: "DOCKER_BUILD")
+    public static var dockerBuildPhase = Command.init(title: "Add Build in Docker Phase",
+                                                      description: "Update the xcodeproj to contain a 'Run Script Phase' which will call the `Build in Docker` action.",
+                                                      cliName: "docker-build-phase",
+                                                      envName: "DOCKER_BUILD_PHASE")
     public static var symlinkDependencies = Command.init(title: "Symlink Dependencies",
                                                          description: "Create symbolic links for the dependency packages after `swift package update` so you don't have to generate a new xcode project.",
                                                          cliName: "symlink-dependencies",
@@ -135,6 +139,9 @@ public protocol XcodeHelpable {
     func generateXcodeProject(at sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     @discardableResult
     func dockerBuild(_ sourcePath: String, with runOptions: [DockerRunOption]?, using configuration: BuildConfiguration, in dockerImageName: String, persistentVolumeName: String?, shouldLog: Bool) throws -> ProcessResult
+    @discardableResult
+    func addDockerBuildPhase(toTarget target: String, inProject xcprojPath: String) throws -> ProcessResult
+    func addBuildPhases(_ buildPhases: [String: [PBXShellScriptBuildPhase]], toProject xcprojPath: String) throws
 //    @discardableResult
 //    func clean(sourcePath: String, shouldLog: Bool) throws -> ProcessResult
     func symlinkDependencies(at sourcePath: String, shouldLog: Bool) throws

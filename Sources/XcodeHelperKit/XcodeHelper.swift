@@ -2,6 +2,8 @@ import Foundation
 import ProcessRunner
 import DockerProcess
 import S3Kit
+import xcproj
+import PathKit
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
     case clean(message:String)
@@ -45,6 +47,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
 
 
 public struct XcodeHelper: XcodeHelpable {
+    
     //    public static let logsSubDirectory = ".xcodehelper_logs"
     public static var logger: Logger?
     let dockerRunnable: DockerRunnable.Type
@@ -366,10 +369,35 @@ public struct XcodeHelper: XcodeHelpable {
         return "\(xcodeProjectPath!)/\(pbProjectPath!)"
     }
     
+    //MARK: Docker Build Phase
+    @discardableResult
+    public func addDockerBuildPhase(toTarget target: String, inProject xcprojPath: String) throws -> ProcessResult {
+        let id = UUID().uuidString
+        let buildPhase = PBXShellScriptBuildPhase.init(reference: id)
+        buildPhase.shellScript = "cd \(xcprojPath)/.. && /Applications/XcodeHelper.app/Contents/Executables/xchelper docker-build"
+        try addBuildPhases([target: [buildPhase]], toProject: xcprojPath)
+        return (id, nil, 0)
+    }
+    public func addBuildPhases(_ buildPhases: [String: [PBXShellScriptBuildPhase]], toProject xcprojPath: String) throws {
+        let xcproj = try XcodeProj.init(pathString: xcprojPath)
+        for buildPhaseEntry in buildPhases {
+            //Add the build phase to the project
+            for buildPhase in buildPhaseEntry.value {
+                xcproj.pbxproj.objects.shellScriptBuildPhases.append(buildPhase)
+            }
+            //Tell the target to use the build phase
+            for target in xcproj.pbxproj.objects.nativeTargets {
+                if target.value.name == buildPhaseEntry.key {
+                    target.value.buildPhases += buildPhaseEntry.value.map({ (buildPhase: PBXShellScriptBuildPhase) -> String in
+                        buildPhase.reference
+                    })
+                }
+            }
+        }
+        try xcproj.write(path: Path.init(xcprojPath))
+    }
+    
     //MARK: Create Archive
-    
-    
-    
     @discardableResult
     public func createArchive(at archivePath:String, with filePaths:[String], flatList:Bool = true, shouldLog: Bool = true) throws -> ProcessResult {
         try FileManager.default.createDirectory(atPath: URL(fileURLWithPath: archivePath).deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)

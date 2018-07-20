@@ -11,6 +11,7 @@ import ProcessRunner
 import DockerProcess
 import S3Kit
 import XcodeHelperKit
+import xcproj
 
 //#if os(OSX) || os(iOS)
     import Darwin
@@ -36,6 +37,7 @@ class XcodeHelperTests: XCTestCase {
     let executableRepoURL = "https://github.com/saltzmanjoelh/HelloSwift" //we use a different repo for testing because this repo isn't meant for linux
     let libraryRepoURL = "https://github.com/saltzmanjoelh/Hello"
     let dependenciesRepoURL = "https://github.com/saltzmanjoelh/HelloDependencies"
+    let workspaceRepoURL = "https://github.com/saltzmanjoelh/HelloWorkspace"
     var sourcePath : String?
     
     override func setUp() {
@@ -361,6 +363,27 @@ class XcodeHelperTests: XCTestCase {
                 XCTFail("volume option should have been returned")
             }
             
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    
+    func testDockerBuildPhase(){
+        sourcePath = cloneToTempDirectory(repoURL: workspaceRepoURL)
+        let helper = XcodeHelper()
+        let projectPath = sourcePath!.appending("/ProjectOne/ProjectOne.xcodeproj")
+        do {
+            let result = try helper.addDockerBuildPhase(toTarget: "ProjectOne", inProject: projectPath)
+            
+            XCTAssertNil(result.error, result.error!)
+            XCTAssertNotNil(result.output)
+            let id = result.output!//reference id of the new phase
+            let xcproj = try XcodeProj.init(pathString: projectPath)
+            XCTAssertTrue(xcproj.pbxproj.objects.shellScriptBuildPhases.contains(reference: id))//Phase added to project
+            let buildPhases = xcproj.pbxproj.objects.nativeTargets.compactMap({ (arg: (key: String, value: PBXNativeTarget)) -> [String] in
+                return arg.value.buildPhases
+            }).flatMap({ $0 })
+            XCTAssertTrue(buildPhases.contains(id)) //Phase added to target
         } catch let e {
             XCTFail("Error: \(e)")
         }
