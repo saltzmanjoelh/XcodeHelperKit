@@ -1,4 +1,4 @@
-// swift-tools-version:4.1
+// swift-tools-version:4.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -18,16 +18,16 @@ let package = Package(
         .package(url: "https://github.com/saltzmanjoelh/DockerProcess.git", from: "1.0.0"),
         .package(url: "https://github.com/saltzmanjoelh/CliRunnable.git", from: "1.0.0"),
         .package(url: "https://github.com/saltzmanjoelh/S3Kit.git", from: "1.0.0"),
-        .package(url: "https://github.com/xcodeswift/xcproj", from: "1.0.0")
+        .package(url: "https://github.com/tuist/xcodeproj.git", .upToNextMajor(from: "6.2.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "XcodeHelperKit",
-            dependencies: ["ProcessRunner", "DockerProcess", "CliRunnable", "S3Kit", "xcproj"]),
+            dependencies: ["ProcessRunner", "DockerProcess", "CliRunnable", "S3Kit", "xcodeproj"]),
         .testTarget(
             name: "XcodeHelperKitTests",
-            dependencies: ["XcodeHelperKit", "ProcessRunner", "DockerProcess", "CliRunnable", "S3Kit", "xcproj"]),
+            dependencies: ["XcodeHelperKit", "ProcessRunner", "DockerProcess", "CliRunnable", "S3Kit", "xcodeproj"]),
     ]
 )

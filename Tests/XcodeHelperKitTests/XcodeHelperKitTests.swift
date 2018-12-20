@@ -11,7 +11,7 @@ import ProcessRunner
 import DockerProcess
 import S3Kit
 import XcodeHelperKit
-import xcproj
+import xcodeproj
 
 //#if os(OSX) || os(iOS)
     import Darwin
@@ -25,7 +25,7 @@ import XcodeHelperKit
 enum LibraryTag: Int {
     case major = 1
     case minor = 0
-    case patch = 3
+    case patch = 4
 }
 
 
@@ -374,16 +374,18 @@ class XcodeHelperTests: XCTestCase {
         let projectPath = sourcePath!.appending("/ProjectOne/ProjectOne.xcodeproj")
         do {
             let result = try helper.addDockerBuildPhase(toTarget: "ProjectOne", inProject: projectPath)
-            
+
             XCTAssertNil(result.error, result.error!)
             XCTAssertNotNil(result.output)
-            let id = result.output!//reference id of the new phase
             let xcproj = try XcodeProj.init(pathString: projectPath)
-            XCTAssertTrue(xcproj.pbxproj.objects.shellScriptBuildPhases.contains(reference: id))//Phase added to project
-            let buildPhases = xcproj.pbxproj.objects.nativeTargets.compactMap({ (arg: (key: String, value: PBXNativeTarget)) -> [String] in
-                return arg.value.buildPhases
-            }).flatMap({ $0 })
-            XCTAssertTrue(buildPhases.contains(id)) //Phase added to target
+            let dockerBuildPhase = xcproj.pbxproj.shellScriptBuildPhases.first(where: { (phase: PBXShellScriptBuildPhase) -> Bool in
+                phase.name == "docker-build"
+            })
+            XCTAssertNotNil(dockerBuildPhase)
+            let target = xcproj.pbxproj.nativeTargets.first?.buildPhases.contains(where: { (buildPhase: PBXBuildPhase) -> Bool in
+                buildPhase == dockerBuildPhase
+            })
+            XCTAssertNotNil(target)
         } catch let e {
             XCTFail("Error: \(e)")
         }
@@ -395,7 +397,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)/test.tar"
         
         do{
-            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello/Hello.swift"], flatList: true)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
@@ -414,7 +416,7 @@ class XcodeHelperTests: XCTestCase {
         let archivePath = "\(sourcePath!)/test.tar"
         
         do{
-            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: false)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello/Hello.swift"], flatList: false)
             
             XCTAssertTrue(FileManager.default.fileExists(atPath: archivePath), "Failed to create the archive")
             let subPath = sourcePath!.appending("/\(UUID())")//untar into subdir and make sure that there are no subsubdirs
@@ -438,7 +440,7 @@ class XcodeHelperTests: XCTestCase {
             sourcePath = cloneToTempDirectory(repoURL: libraryRepoURL)
             let archiveName = "test.zip"
             let archivePath = "\(sourcePath!)/\(archiveName)"
-            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello.swift"], flatList: true)
+            try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello/Hello.swift"], flatList: true)
             
             if FileManager.default.fileExists(atPath: "/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
                 try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
@@ -603,7 +605,7 @@ class XcodeHelperTests: XCTestCase {
             try helper.pushGitTag(tag:tag!, at: sourcePath!)
             
         } catch let e {
-            XCTFail("Error: \(e)")
+            XCTFail("Error: \(e). Did you provide a username and password for github?")
         }
     }
     

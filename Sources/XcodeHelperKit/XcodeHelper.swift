@@ -2,7 +2,7 @@ import Foundation
 import ProcessRunner
 import DockerProcess
 import S3Kit
-import xcproj
+import xcodeproj
 import PathKit
 
 public enum XcodeHelperError : Error, CustomStringConvertible {
@@ -372,25 +372,22 @@ public struct XcodeHelper: XcodeHelpable {
     //MARK: Docker Build Phase
     @discardableResult
     public func addDockerBuildPhase(toTarget target: String, inProject xcprojPath: String) throws -> ProcessResult {
-        let id = UUID().uuidString
-        let buildPhase = PBXShellScriptBuildPhase.init(reference: id)
-        buildPhase.shellScript = "cd \(xcprojPath)/.. && /Applications/XcodeHelper.app/Contents/Executables/xchelper docker-build"
+        let buildPhase = PBXShellScriptBuildPhase.init(name: "docker-build",
+                                                       shellScript: "cd \(xcprojPath)/.. && /Applications/XcodeHelper.app/Contents/Executables/xchelper docker-build")
         try addBuildPhases([target: [buildPhase]], toProject: xcprojPath)
-        return (id, nil, 0)
+        return ("docker-build", nil, 0)
     }
     public func addBuildPhases(_ buildPhases: [String: [PBXShellScriptBuildPhase]], toProject xcprojPath: String) throws {
         let xcproj = try XcodeProj.init(pathString: xcprojPath)
         for buildPhaseEntry in buildPhases {
             //Add the build phase to the project
             for buildPhase in buildPhaseEntry.value {
-                xcproj.pbxproj.objects.shellScriptBuildPhases.append(buildPhase)
-            }
-            //Tell the target to use the build phase
-            for target in xcproj.pbxproj.objects.nativeTargets {
-                if target.value.name == buildPhaseEntry.key {
-                    target.value.buildPhases += buildPhaseEntry.value.map({ (buildPhase: PBXShellScriptBuildPhase) -> String in
-                        buildPhase.reference
-                    })
+                xcproj.pbxproj.add(object: buildPhase)
+                //Tell the target to use the build phase
+                for target in xcproj.pbxproj.nativeTargets {
+                    if target.name == buildPhaseEntry.key {
+                        target.buildPhases.append(buildPhase)
+                    }
                 }
             }
         }

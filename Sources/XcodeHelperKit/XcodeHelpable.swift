@@ -9,7 +9,7 @@
 import Foundation
 import DockerProcess
 import ProcessRunner
-import xcproj
+import xcodeproj
 
 public enum BuildConfiguration {
     case debug
