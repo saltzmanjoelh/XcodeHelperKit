@@ -179,13 +179,13 @@ class XcodeHelperTests: XCTestCase {
 //        
 //    }
     
-    func testProjectFilePath() {
+    func testProjectBuilderFilePath() {
         do {
             sourcePath = cloneToTempDirectory(repoURL: executableRepoURL)
             _ = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath!) && /usr/bin/swift package generate-xcodeproj"])
             let helper = XcodeHelper()
             
-            let path = try helper.projectFilePath(for: sourcePath!)
+            let path = try helper.projectBuilderPath(inSourcePath: sourcePath!)
             
             XCTAssert(path.contains("/HelloSwift.xcodeproj/project.pbxproj"))
         } catch let e {
@@ -270,7 +270,7 @@ class XcodeHelperTests: XCTestCase {
             
             try helper.updateXcodeReferences(for: url, at: sourcePath!, using: testPackageName)
             
-            let projectPath = try helper.projectFilePath(for: sourcePath!)
+            let projectPath = try helper.projectBuilderPath(inSourcePath: sourcePath!)
             let file = try String(contentsOfFile: projectPath)
             XCTAssertFalse(file.contains("\(testPackageName).git--"), "Xcode project should not contain any package versions")
         } catch let e {
@@ -367,7 +367,32 @@ class XcodeHelperTests: XCTestCase {
             XCTFail("Error: \(e)")
         }
     }
-    
+    func testXcodeProjectPath(){
+        sourcePath = cloneToTempDirectory(repoURL: workspaceRepoURL)?.appending("/ProjectOne")
+        let helper = XcodeHelper()
+        do {
+            
+            let result = try helper.xcodeProjectPath(inSourcePath: sourcePath!)
+            
+            XCTAssertEqual(result, sourcePath!.appending("/ProjectOne.xcodeproj"))
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
+    func testTargetNames(){
+        sourcePath = cloneToTempDirectory(repoURL: workspaceRepoURL)
+        let helper = XcodeHelper()
+        let projectPath = sourcePath!.appending("/ProjectOne/ProjectOne.xcodeproj")
+        do {
+            
+            let result = try helper.packageTargets(inProject: projectPath)
+            
+            XCTAssertEqual(result.count, 2)
+            XCTAssertEqual(result, ["ProjectOne", "TargetB"])
+        } catch let e {
+            XCTFail("Error: \(e)")
+        }
+    }
     func testDockerBuildPhase(){
         sourcePath = cloneToTempDirectory(repoURL: workspaceRepoURL)
         let helper = XcodeHelper()

@@ -129,6 +129,10 @@ public struct Command {
 }
 public protocol XcodeHelpable {
     
+    func xcodeProjectPath(inSourcePath sourcePath:String) throws -> String
+    func projectBuilderPath(inSourcePath sourcePath:String) throws -> String
+    func packageTargets(inProject xcprojPath: String) throws -> [String]
+    
     @discardableResult
     func updateDockerPackages(at sourcePath: String, inImage dockerImageName: String, withVolume persistentVolumeName: String, shouldLog: Bool) throws -> ProcessResult
     @discardableResult

@@ -10,6 +10,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     //    case fetch(message:String)
     case updatePackages(message:String)
     case dockerBuild(message:String, exitCode: Int32)
+    case xcodeProjectPath(message:String)
     case symlinkDependencies(message:String)
     case createArchive(message:String)
     case uploadArchive(message:String)
@@ -24,6 +25,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
             case let .dockerBuild(message, _): return message
             case let .clean(message): return message
             case let .updatePackages(message): return message
+            case let .xcodeProjectPath(message): return message
             case let .symlinkDependencies(message): return message
             case let .createArchive(message): return message
             case let .uploadArchive(message): return message
@@ -256,6 +258,54 @@ public struct XcodeHelper: XcodeHelpable {
         }
         XcodeHelper.logger?.log("Symlinking done")
     }
+    
+    public func xcodeProjectPath(inSourcePath sourcePath: String) throws -> String {
+        do{
+            let path = try FileManager.default.contentsOfDirectory(atPath: sourcePath).filter({ (path) -> Bool in
+                path.hasSuffix(".xcodeproj")
+            }).first
+            guard let result = path else {
+                let message = "Failed to find xcodeproj at path: \(sourcePath)"
+                XcodeHelper.logger?.log("%@", message)
+                throw XcodeHelperError.xcodeProjectPath(message: message)
+            }
+            let url = URL.init(fileURLWithPath: sourcePath)
+            return url.appendingPathComponent(result).path
+        } catch let e {
+            let message = "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(String(describing: e))"
+            XcodeHelper.logger?.log("%@", message)
+            throw XcodeHelperError.xcodeProjectPath(message: message)
+        }
+    }
+    
+    public func projectBuilderPath(inSourcePath sourcePath:String) throws -> String {
+        
+        var pbProjectPath: String?
+        let xcodeProjectFilePath: String = try xcodeProjectPath(inSourcePath: sourcePath)
+        
+        do{
+            pbProjectPath = try FileManager.default.contentsOfDirectory(atPath: xcodeProjectFilePath).filter({ (path) -> Bool in
+                path.hasSuffix(".pbxproj")
+            }).first
+            guard pbProjectPath != nil else {
+                let message = "Failed to find pbxproj at path: \(String(describing: xcodeProjectPath))"
+                XcodeHelper.logger?.log("%@", message)
+                throw XcodeHelperError.symlinkDependencies(message: message)
+            }
+        } catch let e {
+            let message = "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(String(describing: e))"
+            XcodeHelper.logger?.log("%@", message)
+            throw XcodeHelperError.symlinkDependencies(message: message)
+        }
+        return "\(xcodeProjectFilePath)/\(pbProjectPath!)"
+    }
+    public func packageTargets(inProject xcprojPath: String) throws -> [String] {
+        let xcproj = try XcodeProj.init(pathString: xcprojPath)
+        let targetNames = xcproj.pbxproj.nativeTargets.compactMap { (target: PBXNativeTarget) -> String? in
+            return target.name.range(of: "PackageDescription") == nil ? target.name : nil
+        }
+        return targetNames
+    }
     func packageNames(from sourcePath: String) throws -> [String] {
         //find the Packages directory
         let packagesPath = URL(fileURLWithPath: sourcePath).appendingPathComponent(".build").appendingPathComponent("checkouts").path
@@ -305,7 +355,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     func updateXcodeReferences(for versionedPackageURL: URL, at sourcePath: String, using symlinkName: String) throws {
         //find the xcodeproj
-        let projectPath = try projectFilePath(for: sourcePath)
+        let projectPath = try projectBuilderPath(inSourcePath: sourcePath)
         //open the project
         let file = try String(contentsOfFile: projectPath)
         //replace versioned group name with package name
@@ -333,41 +383,7 @@ public struct XcodeHelper: XcodeHelpable {
         
         return packageName
     }
-    
-    public func projectFilePath(for sourcePath:String) throws -> String {
-        var xcodeProjectPath: String?
-        var pbProjectPath: String?
-        do{
-            xcodeProjectPath = try FileManager.default.contentsOfDirectory(atPath: sourcePath).filter({ (path) -> Bool in
-                path.hasSuffix(".xcodeproj")
-            }).first
-            guard xcodeProjectPath != nil else {
-                let message = "Failed to find xcodeproj at path: \(sourcePath)"
-                XcodeHelper.logger?.log("%@", message)
-                throw XcodeHelperError.symlinkDependencies(message: message)
-            }
-        } catch let e {
-            let message = "Error when trying to find xcodeproj at path: \(sourcePath).\nError: \(String(describing: e))"
-            XcodeHelper.logger?.log("%@", message)
-            throw XcodeHelperError.symlinkDependencies(message: message)
-        }
-        do{
-            xcodeProjectPath = "\(sourcePath)/\(xcodeProjectPath!)"
-            pbProjectPath = try FileManager.default.contentsOfDirectory(atPath: xcodeProjectPath!).filter({ (path) -> Bool in
-                path.hasSuffix(".pbxproj")
-            }).first
-            guard pbProjectPath != nil else {
-                let message = "Failed to find pbxproj at path: \(String(describing: xcodeProjectPath))"
-                XcodeHelper.logger?.log("%@", message)
-                throw XcodeHelperError.symlinkDependencies(message: message)
-            }
-        } catch let e {
-            let message = "Error when trying to find pbxproj at path: \(sourcePath).\nError: \(String(describing: e))"
-            XcodeHelper.logger?.log("%@", message)
-            throw XcodeHelperError.symlinkDependencies(message: message)
-        }
-        return "\(xcodeProjectPath!)/\(pbProjectPath!)"
-    }
+
     
     //MARK: Docker Build Phase
     @discardableResult
