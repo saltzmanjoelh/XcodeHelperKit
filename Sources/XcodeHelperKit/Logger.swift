@@ -87,47 +87,33 @@ public struct Logger {
         }
         return uuid
     }
-//    public func log(type: OSLogType, message: StaticString, args: CVarArg...) -> UUID? {
-//        let uuid = UUID()
-//        if #available(OSX 10.12, *) {
-//            if let system = logSystem {
-//                os_log(message, log: system, type: type, args)
-////                os_log(message, log: system, type: type, args)
-//            }else{
-//                print(message)
-//            }
-//        }else{
-//            print(message)
-//        }
-//
-//        return uuid
-//    }
+    //    public func log(type: OSLogType, message: StaticString, args: CVarArg...) -> UUID? {
+    //        let uuid = UUID()
+    //        if #available(OSX 10.12, *) {
+    //            if let system = logSystem {
+    //                os_log(message, log: system, type: type, args)
+    ////                os_log(message, log: system, type: type, args)
+    //            }else{
+    //                print(message)
+    //            }
+    //        }else{
+    //            print(message)
+    //        }
+    //
+    //        return uuid
+    //    }
     private func log(type: OSLogType, message: StaticString, _ args: [CVarArg]) -> UUID? {
         let uuid = UUID()
         if #available(OSX 10.12, *) {
             if let system = logSystem {
-                switch args.count {
-                case 0:
-                    os_log(message, log: system, type: type)
-                case 1:
-                    os_log(message, log: system, type: type, args[0])
-                case 2:
-                    os_log(message, log: system, type: type, args[0], args[1])
-                case 3:
-                    os_log(message, log: system, type: type, args[0], args[1], args[2])
-                case 4:
-                    os_log(message, log: system, type: type, args[0], args[1], args[2], args[3])
-                case 5:
-                    os_log(message, log: system, type: type, args[0], args[1], args[2], args[3], args[4])
-                default:
-                    os_log(message, log: system, type: type, args)
-                }
+                os_log("%s", log: system, type: type, compileFormatString(message, args))
             } else {
                 print(compileFormatString(message, args))
             }
         } else {
             print(compileFormatString(message, args))
         }
+        
         return uuid
     }
     func displayNotification(uuid: UUID, withMessage message: StaticString, _ args: [CVarArg]) {

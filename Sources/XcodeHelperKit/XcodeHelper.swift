@@ -85,7 +85,7 @@ public struct XcodeHelper: XcodeHelpable {
         if let error = result.error, result.exitCode != 0 {
             let message = "\(persistentVolumeName) - Error updating packages\n\(error)"
             if error.count > 1 {
-                XcodeHelper.logger?.error("%@", message)
+                XcodeHelper.logger?.error("%@", message as NSString)
             }
             throw XcodeHelperError.updatePackages(message: message)
         }
