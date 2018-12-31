@@ -388,7 +388,8 @@ class XcodeHelperTests: XCTestCase {
             let result = try helper.packageTargets(inProject: projectPath)
             
             XCTAssertEqual(result.count, 2)
-            XCTAssertEqual(result, ["ProjectOne", "TargetB"])
+            XCTAssertTrue(result.contains("ProjectOne"))
+            XCTAssertTrue(result.contains("TargetB"))
         } catch let e {
             XCTFail("Error: \(e)")
         }
