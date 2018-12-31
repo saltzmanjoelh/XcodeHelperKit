@@ -126,14 +126,15 @@ public struct XcodeHelper: XcodeHelpable {
     
     @discardableResult
     public func generateXcodeProject(at sourcePath: String, shouldLog: Bool = true) throws -> ProcessResult {
-        XcodeHelper.logger?.log("Generating Xcode Project")
+        let url = URL.init(fileURLWithPath: sourcePath)
+        XcodeHelper.logger?.log("Generating %@ Xcode Project", url.lastPathComponent)
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package generate-xcodeproj"])
         if let error = result.error {
             let message = "Error generating Xcode project:\n\(error)"
             XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
-        XcodeHelper.logger?.log("Xcode project generated")
+        XcodeHelper.logger?.log("%@ Xcode project generated", url.lastPathComponent)
         return result
     }
     
