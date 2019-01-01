@@ -107,7 +107,8 @@ public struct XcodeHelper: XcodeHelpable {
         
         let result = ProcessRunner.synchronousRun("/bin/bash", arguments: ["-c", "cd \(sourcePath) && swift package update"])
         if let error = result.error, result.exitCode != 0 {
-            let message = "Error updating packages\n\(error)"
+            let url = URL.init(fileURLWithPath: sourcePath)
+            let message = "Error updating \(url.lastPathComponent) packages\n\(error)"
             //            XcodeHelper.logger?.log("%@", message)
             throw XcodeHelperError.updatePackages(message: message)
         }
