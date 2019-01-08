@@ -118,7 +118,7 @@ public struct Logger {
     }
     func displayNotification(uuid: UUID, withMessage message: StaticString, _ args: [CVarArg]) {
         //UserDefaults.standard.addSuite(named: "com.joelsaltzman.XcodeHelper")
-        let defaults = Bundle.main.bundleIdentifier == "com.joelsaltzman.XcodeHelper" ? UserDefaults.standard : UserDefaults.init(suiteName: "com.joelsaltzman.XcodeHelper")
+        let defaults = UserDefaults.init(suiteName: "A43A74F4MB.group.com.joelsaltzman.XcodeHelper")
         if defaults?.bool(forKey: Logger.UserDefaultsKey) == false {
             return
         }
