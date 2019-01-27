@@ -78,7 +78,7 @@ class XcodeHelperTests: XCTestCase {
                                           .updatePackages(message: "update"),
                                           .symlinkDependencies(message: "symlinkDependencies"),
                                           .createArchive(message: "createArchive"),
-                                          .uploadArchive(message: "uploadArchive"),
+                                          .uploadFile(message: "uploadFile"),
                                           .gitTagParse(message: "gitTagParse"),
                                           .gitTag(message: "gitTag"),
                                           .createXcarchive(message: "createXcarchive"),
@@ -469,11 +469,11 @@ class XcodeHelperTests: XCTestCase {
             try helper.createArchive(at:archivePath, with: ["\(sourcePath!)/Package.swift", "\(sourcePath!)/Sources/Hello/Hello.swift"], flatList: true)
             
             if FileManager.default.fileExists(atPath: "/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv") {
-                try helper.uploadArchive(at: archivePath, to: bucket, in: region, using:"/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
+                try helper.uploadFile(at: archivePath, to: bucket, in: region, using:"/Users/\(ProcessInfo.processInfo.environment["LOGNAME"]!)/Projects/XcodeHelper/XcodeHelperKit/s3Credentials.csv")
             }else{
                 let key = ProcessInfo.processInfo.environment["KEY"]!
                 let secret = ProcessInfo.processInfo.environment["SECRET"]!
-                try helper.uploadArchive(at: archivePath, to: bucket, in: region, key: key, secret: secret)
+                try helper.uploadFile(at: archivePath, to: bucket, in: region, key: key, secret: secret)
             }
             
             

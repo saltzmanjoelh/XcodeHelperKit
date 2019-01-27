@@ -13,7 +13,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
     case xcodeProjectPath(message:String)
     case symlinkDependencies(message:String)
     case createArchive(message:String)
-    case uploadArchive(message:String)
+    case uploadFile(message:String)
     case gitTagParse(message:String)
     case gitTag(message:String)
     case createXcarchive(message:String)
@@ -28,7 +28,7 @@ public enum XcodeHelperError : Error, CustomStringConvertible {
             case let .xcodeProjectPath(message): return message
             case let .symlinkDependencies(message): return message
             case let .createArchive(message): return message
-            case let .uploadArchive(message): return message
+            case let .uploadFile(message): return message
             case let .gitTagParse(message): return message
             case let .gitTag(message): return message
             case let .createXcarchive(message): return message
@@ -429,7 +429,7 @@ public struct XcodeHelper: XcodeHelpable {
     }
     
     //MARK: Upload Archive
-    public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String, shouldLog: Bool = true) throws  {
+    public func uploadFile(at archivePath:String, to s3Bucket:String, in region: String, key: String, secret: String, shouldLog: Bool = true) throws  {
         
         let result = try S3.with(key: key, and: secret).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
@@ -440,11 +440,11 @@ public struct XcodeHelper: XcodeHelpable {
                 }
             }
             XcodeHelper.logger?.log("%@", description)
-            throw XcodeHelperError.uploadArchive(message: description)
+            throw XcodeHelperError.uploadFile(message: description)
         }
     }
     
-    public func uploadArchive(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String, shouldLog: Bool = true) throws  {
+    public func uploadFile(at archivePath:String, to s3Bucket:String, in region: String, using credentialsPath: String, shouldLog: Bool = true) throws  {
         
         let result = try S3.with(credentials: credentialsPath).upload(file: URL.init(fileURLWithPath: archivePath), to: s3Bucket, in: region)
         if result.response.statusCode != 200 {
@@ -455,7 +455,7 @@ public struct XcodeHelper: XcodeHelpable {
                 }
             }
             XcodeHelper.logger?.log("%@", description)
-            throw XcodeHelperError.uploadArchive(message: description)
+            throw XcodeHelperError.uploadFile(message: description)
         }
     }
     

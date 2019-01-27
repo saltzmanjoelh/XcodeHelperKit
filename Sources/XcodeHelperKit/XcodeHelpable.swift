@@ -106,10 +106,10 @@ public struct Command {
                                                          cliName: "symlink-dependencies",
                                                          envName: "SYMLINK_DEPENDENCIES")
     public static var createArchive = Command.init(title: "Create Archive",
-                                                   description: "Archive files with tar.",
+                                                   description: "Use `tar -cvzf` to archive some files.",
                                                    cliName: "create-archive",
                                                    envName: "CREATE_ARCHIVE")
-    public static var uploadArchive = Command.init(title: "Upload Archive",
+    public static var uploadFile = Command.init(title: "Upload Archive",
                                                    description: "Upload an archive to S3",
                                                    cliName: "upload-archive",
                                                    envName: "UPLOAD_ARCHIVE")
@@ -125,7 +125,7 @@ public struct Command {
     
     public static var allCommands: [Command] = [.updateMacOSPackages, updateDockerPackages, .dockerBuild,
                                                 /*.clean,*/ .symlinkDependencies, .createArchive,
-                                                            .createXcarchive, .uploadArchive, .gitTag]
+                                                            .createXcarchive, .uploadFile, .gitTag]
 }
 public protocol XcodeHelpable {
     
@@ -151,8 +151,8 @@ public protocol XcodeHelpable {
     func symlinkDependencies(at sourcePath: String, shouldLog: Bool) throws
     @discardableResult
     func createArchive(at archivePath: String, with filePaths: [String], flatList: Bool, shouldLog: Bool) throws -> ProcessResult
-    func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String, shouldLog: Bool) throws
-    func uploadArchive(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String, shouldLog: Bool) throws
+    func uploadFile(at archivePath: String, to s3Bucket: String, in region: String, key: String, secret: String, shouldLog: Bool) throws
+    func uploadFile(at archivePath: String, to s3Bucket: String, in region: String, using credentialsPath: String, shouldLog: Bool) throws
     func getGitTag(at sourcePath:String, shouldLog: Bool) throws -> String
     @discardableResult
     func incrementGitTag(component: GitTagComponent, at sourcePath: String, shouldLog: Bool) throws -> String
